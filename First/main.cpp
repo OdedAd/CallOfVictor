@@ -1,14 +1,13 @@
-#include "GLUT.h"
-#include <math.h>
-#include <time.h>
-#include "Node.h"
-#include "Room.h"
-#include <vector>
 #include <iostream>
 #include <queue>
-#include "CompareNodes.h"
+#include <time.h>
+#include <vector>
 #include "Bullet.h"
+#include "CompareNodes.h"
+#include "GLUT.h"
 #include "Granade.h"
+#include "Node.h"
+#include "Room.h"
 
 using namespace std;
 
@@ -22,27 +21,24 @@ bool run_bfs = false;
 Node maze[MSZ][MSZ];
 double map[MSZ][MSZ] = { 0 };
 Room rooms[NUM_ROOMS];
-int numExistingRooms = 0;
+int num_existing_rooms = 0;
 
-Bullet* pb = NULL;
+Bullet* pb = nullptr;
 Granade* pg;
 bool move_on = false;
 
-
-
 vector <Node> gray; // gray nodes
 
+void setup_maze();
 
-void SetupMaze();
 
-
-void init()
+void Init()
 {
-	srand(time(0)); // pseudo randomizer
+	srand(time(nullptr)); // pseudo randomization
 
 	glClearColor(0.7, 0.7, 0.7, 0);
 
-	SetupMaze();
+	setup_maze();
 
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
@@ -50,7 +46,7 @@ void init()
 
 Room GenerateRoom()
 {
-	int w, h,ci,cj;
+	int width, h,ci,cj;
 	Room* pr=nullptr;
 	bool isOveralaping;
 
@@ -58,18 +54,15 @@ Room GenerateRoom()
 	{
 		delete pr;
 		isOveralaping = false;
-		w = 6 + rand() % 10;
+		width = 6 + rand() % 10;
 		h = 6 + rand() % 10;
 
 		ci = h / 2 + rand() % (MSZ - h);
-		cj = w / 2 + rand() % (MSZ - w);
+		cj = width / 2 + rand() % (MSZ - width);
 
-		pr = new Room(ci, cj, w, h);
-//		cout << "check new Room " << "center: (" << ci << "," << cj << "), width: " << w << ", height" << h << endl;
-		for (int i = 0; i < numExistingRooms && !isOveralaping; i++)
+		pr = new Room(ci, cj, width, h);
+		for (auto i = 0; i < num_existing_rooms && !isOveralaping; i++)
 		{
-//			cout << "room # " << i << " ";
-//			rooms[i].toString();
 			if (rooms[i].CheckOverlapping(pr))
 				isOveralaping = true;
 			
@@ -77,8 +70,8 @@ Room GenerateRoom()
 	} while (isOveralaping);
 
 	// pr is not overlapping with other rooms
-	for (int i = pr->getLeftTop().getRow(); i <= pr->getRightBottom().getRow(); i++)
-		for (int j = pr->getLeftTop().getCol(); j <= pr->getRightBottom().getCol(); j++)
+	for (auto i = pr->getLeftTop().getRow(); i <= pr->getRightBottom().getRow(); i++)
+		for (auto j = pr->getLeftTop().getCol(); j <= pr->getRightBottom().getCol(); j++)
 			maze[i][j].SetValue(SPACE);
 	return *pr;
 }
@@ -173,36 +166,6 @@ void GeneratePath(Point2D start, Point2D target)
 			black.push_back(*pn);
 			// check the neighbours
 			AddNeighbours(pn, gray, black, pq);
-			// try up
-/*			if (pn->getPoint().getRow() < MSZ - 1)
-			{
-				Point2D pt;
-				pt.setCol(pn->getPoint().getCol());
-				pt.setRow(pn->getPoint().getRow() + 1); // going up
-				int value = maze[pt.getRow()][pt.getCol()].GetValue();
-				double cost;
-				if (value == SPACE) cost = space_cost;
-				else cost = wall_cost;
-				pn1 = new Node(pt, &target, value, pn->getG() + cost, pn);
-				// check if this is not black neighbour
-				black_it = find(black.begin(), black.end(), pn1); // operator == must be implemented in Node
-				if (black_it != black.end())
-				{
-					// check if pn1 is gray
-					gray_it = find(gray.begin(), gray.end(), pn1); // operator == must be implemented in Node
-					if (gray_it != gray.end()) // it is already gray
-					{
-						// check if pn1 has lower f then what was foud before
-						if (pn1->getF() < (*gray_it)->getF())
-						{
-							(*gray_it) = pn1;
-							// and update it in PQ!!!!!
-						}
-					}
-						// add pn1 to pq and to gray
-				}
-			}*/
-
 		}
 	}
 }
@@ -222,7 +185,7 @@ void DigTunnels()
 	}
 }
 
-void SetupMaze()
+void setup_maze()
 {
 	int i, j,k;
 
@@ -230,8 +193,8 @@ void SetupMaze()
 		for (j = 0; j < MSZ ; j++)
 				maze[i][j].SetValue(WALL);
 
-	for (numExistingRooms = 0; numExistingRooms < NUM_ROOMS; numExistingRooms++)
-		rooms[numExistingRooms] = GenerateRoom();
+	for (num_existing_rooms = 0; num_existing_rooms < NUM_ROOMS; num_existing_rooms++)
+		rooms[num_existing_rooms] = GenerateRoom();
 
 	for (k = 0; k < 30; k++)
 	{
@@ -440,7 +403,7 @@ void main(int argc, char* argv[])
 
 
 
-	init();
+	Init();
 
 	glutMainLoop();
 }

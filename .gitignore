@@ -81,6 +81,7 @@ StyleCopReport.xml
 *.tmp_proj
 *_wpftmp.csproj
 *.log
+*.tlog
 *.vspscc
 *.vssscc
 .builds
@@ -338,3 +339,15 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+Debug/First.ilk
+Debug/First.pdb
+First/Debug/First.log
+First/Debug/First.tlog/CL.command.1.tlog
+First/Debug/First.tlog/CL.read.1.tlog
+First/Debug/First.tlog/CL.write.1.tlog
+First/Debug/First.tlog/First.lastbuildstate
+First/Debug/First.tlog/link.command.1.tlog
+First/Debug/First.tlog/link.read.1.tlog
+First/Debug/First.tlog/link.write.1.tlog
+First/Debug/vc142.idb
+First/Debug/vc142.pdb
