@@ -1,10 +1,1 @@
-﻿  Bullet.cpp
-  CompareNodes.cpp
-  Granade.cpp
-  main.cpp
-D:\Google Drive\לימודים\בינה מלכותית\SafetyMap\First\First\main.cpp(43,31): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  Node.cpp
-  Point2D.cpp
-  Room.cpp
-  Generating Code...
-  First.vcxproj -> D:\Google Drive\לימודים\בינה מלכותית\SafetyMap\First\Debug\First.exe
+﻿  First.vcxproj -> C:\Users\o0124\Documents\GitHub\CallOfVictor\Debug\First.exe
