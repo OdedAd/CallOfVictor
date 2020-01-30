@@ -262,3 +262,7 @@ __pycache__/
 MHT main/desktop.ini
 MHT main/MHT.vcxproj
 *.vcxproj
+*.pdb
+*.tlog
+*.log
+*.ilk
