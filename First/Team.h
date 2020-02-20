@@ -15,10 +15,10 @@ private:
 	int m_color;
 
 public:
-	Team(int color, std::vector<Player*> players) :
+	Team(int color, std::vector<Player*> players = {}) :
 		m_color(color), m_players(players)  {}
 
-	std::vector<Player*> GetTeammates();
-
+	std::vector<Player*>& GetTeammates();
+	void AddPlayer(Player* player);
 };
 

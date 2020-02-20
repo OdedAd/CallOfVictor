@@ -9,6 +9,9 @@
 #include "Node.h"
 #include "Room.h"
 
+#include "Team.h"
+#include "Player.h"
+
 using namespace std;
 
 const int W = 600; // window width
@@ -29,7 +32,10 @@ bool move_on = false;
 
 vector <Node> gray; // gray nodes
 
+vector <Team*> teams;
+
 void setup_maze();
+void add_teams();
 
 
 void Init()
@@ -93,6 +99,8 @@ void AddNode(int row, int col, Node* pn, vector<Node> &gray, vector<Node> &black
 		cost = 0.1; // space cost
 	else if (maze[row][col].GetValue() == WALL)
 		cost = 3;
+	else // player or pickup object or something, we don't want pathes right next to them.
+		cost = 5;
 	// cost depends on is it a wall or a space
 	pn1 = new Node(pt, pn->getTarget(), maze[pt.getRow()][pt.getCol()].GetValue(), pn->getG()+cost, pn);
 
@@ -185,6 +193,35 @@ void DigTunnels()
 	}
 }
 
+void add_teams()
+{
+	Team* redTeam = new Team(1);
+
+	//add a player in a random location at room 0
+	Room teamRoom = rooms[0];
+	int teamRoomLeftTopRow, teamRoomLeftTopCol, teamRoomRightBottomRow, teamRoomRightBottomCol , i , j;
+	int maxNumOfPlayers = 5;
+
+	for (int curNumOfPlayers = 0; curNumOfPlayers < maxNumOfPlayers; curNumOfPlayers++)
+	{
+		teamRoomLeftTopRow = teamRoom.getLeftTop().getRow();
+		teamRoomLeftTopCol = teamRoom.getLeftTop().getCol();
+		teamRoomRightBottomRow = teamRoom.getRightBottom().getRow();
+		teamRoomRightBottomCol = teamRoom.getRightBottom().getCol();
+
+		do
+		{
+			i = rand() % (teamRoomRightBottomRow - teamRoomLeftTopRow) + teamRoomLeftTopRow;
+			j = rand() % (teamRoomRightBottomCol - teamRoomLeftTopCol) + teamRoomLeftTopCol;
+
+		} while (maze[i][j].GetValue() == PLAYER); //collision prevention
+
+		maze[i][j].SetValue(PLAYER);
+		redTeam->AddPlayer(new Player(redTeam, &maze[i][j]));
+	}
+	teams.push_back(redTeam);
+}
+
 void setup_maze()
 {
 	int i, j,k;
@@ -196,6 +233,7 @@ void setup_maze()
 	for (num_existing_rooms = 0; num_existing_rooms < NUM_ROOMS; num_existing_rooms++)
 		rooms[num_existing_rooms] = GenerateRoom();
 
+
 	for (k = 0; k < 30; k++)
 	{
 		i = rand() % MSZ;
@@ -204,6 +242,8 @@ void setup_maze()
 	}
 
 	DigTunnels();
+
+	add_teams();
 
 }
 
@@ -228,6 +268,9 @@ void DrawMaze()
 				glColor3d(0.4, 0.8, 1); // light blue
 				break;
 			case TARGET:
+				glColor3d(1, 0, 0); // red
+				break;
+			case PLAYER:
 				glColor3d(1, 0, 0); // red
 				break;
 			}

@@ -9,6 +9,9 @@ const int PATH = 4; // belongs to the path to target
 const int GRAY = 5; // Fringe
 const int BLACK = 6; // VISITED
 
+const int PLAYER = 7; // player
+
+
 
 class Node
 {
