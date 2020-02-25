@@ -6,6 +6,9 @@ Point2D::Point2D()
 {
 }
 
+Point2D::Point2D(int r, int c) : row(r), col(c)
+{
+}
 
 Point2D::~Point2D()
 {

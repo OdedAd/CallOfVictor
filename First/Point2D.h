@@ -3,6 +3,7 @@ class Point2D
 {
 public:
 	Point2D();
+	Point2D(int r , int c);
 	~Point2D();
 	int getRow();
 	int getCol();

@@ -195,7 +195,8 @@ void DigTunnels()
 
 void add_teams()
 {
-	Team* redTeam = new Team(1);
+	int red[3] = { 1 , 0, 0 };
+	Team* redTeam = new Team(red);
 
 	//add a player in a random location at room 0
 	Room teamRoom = rooms[0];
@@ -224,11 +225,15 @@ void add_teams()
 
 void setup_maze()
 {
-	int i, j,k;
+	int i, j, k;
 
-	for(i=0;i<MSZ;i++)
-		for (j = 0; j < MSZ ; j++)
-				maze[i][j].SetValue(WALL);
+	for (i = 0; i < MSZ; i++)
+		for (j = 0; j < MSZ; j++)
+		{
+			maze[i][j].SetValue(WALL);
+			maze[i][j].SetPoint(Point2D(i , j));
+		}
+	
 
 	for (num_existing_rooms = 0; num_existing_rooms < NUM_ROOMS; num_existing_rooms++)
 		rooms[num_existing_rooms] = GenerateRoom();
@@ -271,7 +276,7 @@ void DrawMaze()
 				glColor3d(1, 0, 0); // red
 				break;
 			case PLAYER:
-				glColor3d(1, 0, 0); // red
+				//glColor3d(1, 0, 0); // red
 				break;
 			}
 			// draw rectangle
@@ -351,6 +356,14 @@ void display()
 	{
 	//	pb->showMe();
 		pg->showMe();
+	}
+
+	for (Team* curTeam : teams)
+	{
+		for (Player* curPlayer : curTeam->GetTeammates())
+		{
+			curPlayer->showMe();
+		}
 	}
 
 	glutSwapBuffers();// show what was drawn in "frame buffer"

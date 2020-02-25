@@ -29,6 +29,11 @@ void Node::SetValue( int value)
 	this->value = value;
 }
 
+void Node::SetPoint(Point2D point)
+{
+	this->point = point;
+}
+
 int Node::GetValue()
 {
 	return value;

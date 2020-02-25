@@ -5,6 +5,8 @@
 
 class Player;
 
+ static int DEFAULT_COLOR[] = { 0 , 0 , 1 }; //blue
+
 class Team
 {
 
@@ -12,13 +14,14 @@ class Team
 private:
 	std::vector<Player*> m_players;
 
-	int m_color;
+	//color in RGB
+	 int m_color[3]; 
 
 public:
-	Team(int color, std::vector<Player*> players = {}) :
-		m_color(color), m_players(players)  {}
+	Team(int color[3] = DEFAULT_COLOR, std::vector<Player*> players = {}) ;
 
 	std::vector<Player*>& GetTeammates();
 	void AddPlayer(Player* player);
+	int* GetColor();
 };
 

@@ -31,6 +31,7 @@ private:
 
 public:
 	void SetValue(int value);
+	void SetPoint(Point2D point);
 	int GetValue();
 	double getG();
 	double ComputeH();

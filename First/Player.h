@@ -22,6 +22,8 @@ public:
 		m_ammo(max_ammo), m_maxAmmo(max_ammo),
 		m_curHP(maxHP), m_maxHP(maxHP) {}
 
+	void showMe();
+
 	///<summary>
 	/// Run away to a safer place.
 	///</summary>
