@@ -53,10 +53,21 @@ void Bullet::move(Node maze[MSZ][MSZ])
 	i = MSZ * (y + 1) / 2;
 	j = MSZ * (x + 1) / 2;
 
-	if (isMoving && maze[i][j].GetValue()==SPACE)
+	if (isMoving)
 	{
-		x += 0.001*dirx;
-		y += 0.001*diry;
+		if (maze[i][j].GetValue() == SPACE)
+		{
+			x += 0.001 * dirx;
+			y += 0.001 * diry;
+		}
+		if (maze[i][j].GetValue() == PLAYER)
+		{
+			//TODO: 
+			//add somthing to hurt the player. signel damage at a node or somthing
+			//(will send the node coordinates to someone else and he will handle the damage part).
+
+			isMoving = false;
+		}
 	}
 }
 
@@ -78,6 +89,7 @@ void Bullet::SetDir(double angle)
 
 void Bullet::SimulateMotion(double map[MSZ][MSZ], Node maze[MSZ][MSZ])
 {
+
 	int i, j;
 	i = MSZ * (y + 1) / 2;
 	j = MSZ * (x + 1) / 2;

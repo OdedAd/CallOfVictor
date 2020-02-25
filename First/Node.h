@@ -36,7 +36,7 @@ public:
 	double getG();
 	double ComputeH();
 	double getF();
-	Point2D getPoint();
+	Point2D& getPoint();
 	Node* getParent();
 	Point2D* getTarget();
 	bool operator == (const Node &other) {

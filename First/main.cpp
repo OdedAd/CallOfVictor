@@ -11,6 +11,8 @@
 
 #include "Team.h"
 #include "Player.h"
+#include <windows.h> 
+
 
 using namespace std;
 
@@ -391,14 +393,32 @@ bool CheckIsSpace(double dx, double dy)
 
 void idle()
 {
-	if (move_on && pg != NULL)
-	{
-//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
-//		pb->move();
-		pg->moveBullets(maze);
+	
+	Sleep(100);
 
-//		move_on = pg->GetIsMoving();
+	if (move_on)
+	{
+		if (pg != NULL)
+		{
+			//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
+			//		pb->move();
+			pg->moveBullets(maze);
+
+			//		move_on = pg->GetIsMoving();
+
+
+		}
+
+		for (Team* curTeam : teams)
+		{
+			for (Player* curPlayer : curTeam->GetTeammates())
+			{
+				curPlayer->move(maze);
+			}
+		}
+
 	}
+
 	glutPostRedisplay();// calls indirectly to display
 }
 
@@ -414,7 +434,19 @@ void Menu(int choice)
 	{
 		glutDisplayFunc(display);
 //		pb->SetIsMoving(true);
-		pg->explode();
+		if(pg != NULL)
+		{
+			pg->explode();
+		}
+
+		for (Team* curTeam : teams)
+		{
+			for (Player* curPlayer : curTeam->GetTeammates())
+			{
+				curPlayer->SetIsMoving(true);
+			}
+		}
+
 		move_on = true;
 	}
 

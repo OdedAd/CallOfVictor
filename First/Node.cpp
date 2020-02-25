@@ -57,7 +57,7 @@ double Node::getF()
 	return g+h;
 }
 
-Point2D Node::getPoint()
+Point2D& Node::getPoint()
 {
 	return point;
 }

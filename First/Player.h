@@ -3,6 +3,10 @@
 #include "Team.h"
 #include "Node.h"
 
+
+//TODO: remove this when we have this value in the utils class.
+static const int MSZ_player = 100;
+
 class Player
 {
 private:
@@ -14,13 +18,16 @@ private:
 	int m_curHP;
 	const int m_maxHP;
 
+	int m_dirx, m_diry;
+	bool m_isMoving;
+
+
+	const double player_delta = 0.0001;
+
 
 public:
 
-	Player(Team* team , Node* location, int max_ammo = 10, int maxHP = 10) :
-		m_team(team), m_location(location),
-		m_ammo(max_ammo), m_maxAmmo(max_ammo),
-		m_curHP(maxHP), m_maxHP(maxHP) {}
+	Player(Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
 
 	void showMe();
 
@@ -44,6 +51,14 @@ public:
 	///</summary>
 	void Fight();
 
+
+	Node* GetLocation();
+
+	void SetIsMoving(bool move);
+	bool GetIsMoving();
+	void move(Node maze[MSZ_player][MSZ_player]);
+	void SetDir(double angle);
+	void SimulateMotion(double map[MSZ_player][MSZ_player], Node maze[MSZ_player][MSZ_player]);
 
 
 };
