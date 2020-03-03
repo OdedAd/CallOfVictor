@@ -62,6 +62,25 @@ std::vector<Team>& GameMgr::get_teams()
 	return this->teams_;
 }
 
+Point2D& GameMgr::find_nearest_pickup(PickupType type)
+{
+	Point2D p;
+
+	return p;
+}
+
+Point2D& GameMgr::find_nearest_enemy(Team& my_team,bool& is_shootable)
+{
+	Point2D p;
+
+	return p;
+}
+
+Node* GameMgr::a_star(Point2D& start, Point2D& target)
+{
+	return nullptr;
+}
+
 ///
 ///adds a team to the teams vector
 ///

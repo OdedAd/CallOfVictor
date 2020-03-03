@@ -2,6 +2,7 @@
 #include "Maze.h"
 #include "Team.h"
 #include "Node.h"
+#include "PickupObject.h"
 #include "Player.h"
 #include "Room.h"
 
@@ -16,8 +17,11 @@ public:
 	void generate_teams();
 	Maze& get_maze();
 	std::vector<Team>& get_teams();
+	Point2D& find_nearest_pickup(PickupType type);
+	Point2D& find_nearest_enemy(Team& my_team,bool& is_shootable);
+	Node* a_star(Point2D& start, Point2D& target);
 private:
 	Maze maze_;
 	std::vector<Team> teams_;
-	
+	std::vector<PickupObject> pickup_objects_;
 };
