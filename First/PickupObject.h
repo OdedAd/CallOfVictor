@@ -2,9 +2,9 @@
 
 #include "Point2D.h"
 
-static enum class PickupType {
-	Ammo,
-	Medkit
+enum class PickupType {
+	ammo,
+	med_kit
 };
 
 class PickupObject
@@ -13,17 +13,17 @@ class PickupObject
 public:
 
 	PickupObject(Point2D* position , PickupType type, int quantity = 10);
-	void Pickup();
+	void pickup();
 
-	Point2D* GetPosition();
-	int GetQuantity();
-	PickupType GetType();
+	Point2D* get_position() const;
+	int get_quantity() const;
+	PickupType get_type() const;
 
 private:
 
-	Point2D* m_position;
-	int m_quantity;
-	PickupType m_myType;
+	Point2D* m_position_;
+	int m_quantity_;
+	PickupType m_my_type_;
 
 
 };

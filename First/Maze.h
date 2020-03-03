@@ -4,8 +4,8 @@
 #include "CompareNodes.h"
 #include "Node.h"
 #include "Room.h"
+#include "Utils.h"
 
-const int maze_size = 100;
 const int num_of_rooms = 20;
 
 

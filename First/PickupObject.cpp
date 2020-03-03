@@ -1,29 +1,30 @@
 #include "PickupObject.h"
 
 
-PickupObject::PickupObject(Point2D* position, PickupType type, int quantity) : m_myType(type), m_quantity(quantity)
+PickupObject::PickupObject(Point2D* position, const PickupType type, const int quantity)
+	: m_quantity_(quantity), m_my_type_(type)
 {
-	m_position = position;
+	m_position_ = position;
 }
 
 
-void PickupObject::Pickup()
+void PickupObject::pickup()
 {
-	--m_quantity;
+	--m_quantity_;
 }
 
-Point2D* PickupObject::GetPosition()
+Point2D* PickupObject::get_position() const
 {
-	return m_position;
+	return m_position_;
 }
 
-int PickupObject::GetQuantity()
+int PickupObject::get_quantity() const
 {
-	return m_quantity;
+	return m_quantity_;
 }
 
 
-PickupType PickupObject::GetType()
+PickupType PickupObject::get_type() const
 {
-	return m_myType;
+	return m_my_type_;
 }

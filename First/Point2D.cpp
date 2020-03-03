@@ -2,29 +2,22 @@
 
 
 
-Point2D::Point2D()
+Point2D::Point2D(const int r, const int c) : row_(r), col_(c)
 {
 }
 
-Point2D::Point2D(int r, int c) : row(r), col(c)
+int Point2D::get_row() const
 {
+	return row_;
 }
-
-Point2D::~Point2D()
+int Point2D::get_col() const
 {
+	return col_;
 }
-
-int Point2D::getRow()
+void Point2D::set_row(const int r) {
+	row_ = r;
+}
+void Point2D::set_col(const int c)
 {
-	return row;
-}
-int Point2D::getCol() {
-	return col;
-}
-void Point2D::setRow(int r) {
-	row = r;
-}
-void Point2D::setCol(int c)
-{
-	col = c;
+	col_ = c;
 }

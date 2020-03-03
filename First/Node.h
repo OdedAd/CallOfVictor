@@ -22,25 +22,25 @@ public:
 	Node(Point2D & pt, Point2D * t, int v, double g, Node * pr);
 
 private:
-	int value;
-	double h, g;
-	Node* parent;
-	Point2D* target;
-	Point2D point;
+	int value_;
+	double h_, g_;
+	Node* parent_;
+	Point2D* target_;
+	Point2D point_;
 
 
 public:
-	void SetValue(int value);
-	void SetPoint(Point2D point);
-	int GetValue();
-	double getG();
-	double ComputeH();
-	double getF();
-	Point2D& getPoint();
-	Node* getParent();
-	Point2D* getTarget();
+	void set_value(int value);
+	void set_point(Point2D point);
+	int get_value();
+	double get_g();
+	double compute_h();
+	double get_f();
+	Point2D& get_point();
+	Node* get_parent();
+	Point2D* get_target();
 	bool operator == (const Node &other) {
-		return point == other.point;
+		return point_ == other.point_;
 	}
 };
 

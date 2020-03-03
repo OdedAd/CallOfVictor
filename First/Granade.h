@@ -11,12 +11,12 @@ public:
 	Granade(double x, double y);
 	~Granade();
 	void explode();
-	void showMe();
-	void moveBullets(Maze maze);
-	void SimulateExplosion(double map[MSZ][MSZ], Maze maze);
+	void show_me();
+	void move_bullets(Maze maze);
+	void simulate_explosion(double map[maze_size][maze_size], Maze& maze);
 private:
-	double x, y;
-	Bullet* bullets[NUM_BULLETS];
+	double x_, y_;
+	Bullet* bullets_[NUM_BULLETS];
 
 };
 

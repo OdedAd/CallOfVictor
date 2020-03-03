@@ -7,7 +7,7 @@ public:
 	~CompareNodes();
 	bool operator () (Node* pn1, Node* pn2)
 	{
-		return pn1->getF() > pn2->getF();
+		return pn1->get_f() > pn2->get_f();
 	}
 };
 

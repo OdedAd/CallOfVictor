@@ -4,9 +4,6 @@
 
 using namespace std;
 
-
-
-
 Room::Room()
 {
 }
@@ -17,46 +14,47 @@ Room::~Room()
 }
 
 Room::Room(int ci, int cj, int w, int h) {
-	center.setCol(cj);
-	center.setRow(ci);
-	leftTop.setCol(cj - w / 2);
-	leftTop.setRow(ci - h / 2);
-	rightBottom.setCol(cj + w / 2);
-	rightBottom.setRow(ci + h / 2);
-	width = w;
-	height = h;
+	center_.set_col(cj);
+	center_.set_row(ci);
+	left_top_.set_col(cj - w / 2);
+	left_top_.set_row(ci - h / 2);
+	right_bottom_.set_col(cj + w / 2);
+	right_bottom_.set_row(ci + h / 2);
+	width_ = w;
+	height_ = h;
 
 }
 
-Point2D Room::getLeftTop()
+Point2D Room::get_left_top() const
 {
-	return leftTop;
+	return left_top_;
 }
-Point2D Room::getRightBottom() {
-	return rightBottom;
+Point2D Room::get_right_bottom() const
+{
+	return right_bottom_;
 }
 
-bool Room::CheckOverlapping(Room* pother)
+bool Room::check_overlapping(Room* pother)
 {
 	int horiz_dist, vert_dist, vsz,hsz;
-	horiz_dist = abs(center.getCol() - pother->center.getCol());
-	vert_dist = abs(center.getRow() - pother->center.getRow());
-	vsz = height / 2 + pother->height / 2;
-	hsz = width / 2 + pother->width / 2;
+	horiz_dist = abs(center_.get_col() - pother->center_.get_col());
+	vert_dist = abs(center_.get_row() - pother->center_.get_row());
+	vsz = height_ / 2 + pother->height_ / 2;
+	hsz = width_ / 2 + pother->width_ / 2;
 
 	return horiz_dist <= hsz+2 && vert_dist <= vsz+2;
 }
 
 
-void Room::toString()
+void Room::to_string() const
 {
-	cout << "check new Room " << "center: (" << center.getRow() << "," << center.getCol()
-		<< "), width: " << width << ", height" << height << endl;
+	cout << "check new Room " << "center: (" << center_.get_row() << "," << center_.get_col()
+		<< "), width: " << width_ << ", height" << height_ << endl;
 }
 
-Point2D Room::getCenter()
+Point2D Room::get_center() const
 {
-	return center;
+	return center_;
 }
 
 

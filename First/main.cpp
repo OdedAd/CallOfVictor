@@ -23,12 +23,7 @@ GameMgr game_mgr;
 const int W = 600; // window width
 const int H = 600; // window height
 
-const int NUM_ROOMS = 20;
-
-bool run_bfs = false;
-
-Node maze[MSZ][MSZ];
-double map[MSZ][MSZ] = { 0 };
+double map[maze_size][maze_size] = { 0 };
 
 Bullet* pb = nullptr;
 Granade* pg;
@@ -50,11 +45,11 @@ void draw_maze()
 {
 	double sz, x, y;
 
-	for(auto i=0;i<MSZ;i++)
-		for (auto j = 0; j < MSZ; j++)
+	for(auto i=0;i<maze_size;i++)
+		for (auto j = 0; j < maze_size; j++)
 		{
 			// set color
-			switch (game_mgr.get_maze().get_at_pos(i,j).GetValue())
+			switch (game_mgr.get_maze().get_at_pos(i,j).get_value())
 			{
 			case SPACE:
 				glColor3d(1, 1, 1); // white
@@ -73,7 +68,7 @@ void draw_maze()
 				break;
 			}
 			// draw rectangle
-			sz = 2.0 / MSZ;
+			sz = 2.0 / maze_size;
 			x = j * sz -1;
 			y = i * sz -1;
 
@@ -92,16 +87,16 @@ void draw_map()
 	int i, j;
 	double sz, xx, yy;
 
-	for (i = 0; i < MSZ; i++)
-		for (j = 0; j < MSZ; j++)
+	for (i = 0; i < maze_size; i++)
+		for (j = 0; j < maze_size; j++)
 		{
-			if (game_mgr.get_maze().get_at_pos(i,j).GetValue() == SPACE)
+			if (game_mgr.get_maze().get_at_pos(i,j).get_value() == SPACE)
 			{
 				double c;
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
 				glColor3d(c, c, c);
 				// draw rectangle
-				sz = 2.0 / MSZ;
+				sz = 2.0 / maze_size;
 				xx = (j * sz - 1);
 				yy = i * sz - 1;
 
@@ -115,9 +110,9 @@ void draw_map()
 			}
 		}
 }
-void GenerateMap()
+void generate_map()
 {
-	int num_tries = 1000;
+	const int num_tries = 1000;
 	int col, row;
 	double x, y,sz;
 	Granade* pg = nullptr;
@@ -126,14 +121,16 @@ void GenerateMap()
 	{
 		do
 		{
-			col = rand() % MSZ;
-			row = rand() % MSZ;
-		} while (game_mgr.get_maze().get_at_pos(row,col).GetValue() != SPACE);
-		sz = 2.0 / MSZ;
+			col = rand() % maze_size;
+			row = rand() % maze_size;
+		} while (game_mgr.get_maze().get_at_pos(row,col).get_value() != SPACE);
+		sz = 2.0 / maze_size;
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		pg->SimulateExplosion(map,game_mgr.get_maze());
+		cout<<"here +"<<i<<endl;
+		pg->simulate_explosion(map,game_mgr.get_maze());
+		cout<<"here after +"<<i<<endl;
 		delete pg;
 	}
 }
@@ -148,14 +145,14 @@ void display()
 	if (pg != NULL)
 	{
 	//	pb->showMe();
-		pg->showMe();
+		pg->show_me();
 	}
 
 	for (Team cur_team : game_mgr.get_teams())
 	{
-		for (Player* cur_player : cur_team.GetTeammates())
+		for (Player* cur_player : cur_team.get_teammates())
 		{
-			cur_player->showMe();
+			cur_player->show_me();
 		}
 	}
 
@@ -173,13 +170,11 @@ void display_map()
 }
 
 // checks if dx,dy is on SPACE in maze
-bool CheckIsSpace(double dx, double dy)
+bool check_is_space(const double dx, const double dy)
 {
-	int i, j;
-
-	i = MSZ * (dy + 1) / 2;
-	j = MSZ * (dx + 1) / 2;
-	return  maze[i][j].GetValue() == SPACE;
+	int i = maze_size * (dy + 1) / 2;
+	int j = maze_size * (dx + 1) / 2;
+	return  game_mgr.get_maze().get_at_pos(i,j).get_value() == SPACE;
 }
 
 void idle()
@@ -193,14 +188,14 @@ void idle()
 		{
 			//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
 			//		pb->move();
-			pg->moveBullets(game_mgr.get_maze());
+			pg->move_bullets(game_mgr.get_maze());
 
 			//		move_on = pg->GetIsMoving();
 		}
 
 		for (Team cur_team : game_mgr.get_teams())
 		{
-			for (Player* cur_player : cur_team.GetTeammates())
+			for (Player* cur_player : cur_team.get_teammates())
 			{
 				cur_player->move(game_mgr.get_maze());
 			}
@@ -214,7 +209,7 @@ void Menu(const int choice)
 	if (choice == 1) // generate security map
 	{
 		move_on = false;
-		GenerateMap();
+		generate_map();
 		glutDisplayFunc(display_map);
 	}
 	else if (choice == 2) // generate security map
@@ -228,9 +223,9 @@ void Menu(const int choice)
 
 		for (Team cur_team : game_mgr.get_teams())
 		{
-			for (Player* cur_player : cur_team.GetTeammates())
+			for (Player* cur_player : cur_team.get_teammates())
 			{
-				cur_player->SetIsMoving(true);
+				cur_player->set_is_moving(true);
 			}
 		}
 

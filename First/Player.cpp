@@ -2,29 +2,29 @@
 #include "GLUT.H"
 
 
-Player::Player(Team* team, Node* location, int max_ammo, int maxHP) :
-	m_team(team), m_location(location),
-	m_ammo(max_ammo), m_maxAmmo(max_ammo),
-	m_curHP(maxHP), m_maxHP(maxHP)
+Player::Player(Team* team, Node* location, const int max_ammo, const int maxHP) :
+	m_team_(team), m_location_(location),
+	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
+	m_cur_hp_(maxHP), m_max_hp_(maxHP)
 {
 	double len;
 
 	//random starting direction, later when we add the brain of the player 
 	//the direction will be chosen somewhat intelligently before each move.  
-	m_dirx = (int)(rand() % 3) - 1;
-	m_diry = (int)(rand() % 3) - 1;
-	m_isMoving = false;
+	m_dirx_ = (int)(rand() % 3) - 1;
+	m_diry_ = (int)(rand() % 3) - 1;
+	m_is_moving_ = false;
 
 }
 
-void Player::showMe()
+void Player::show_me() const
 {
-	double y = m_location->getPoint().getRow() ;
-	double x = m_location->getPoint().getCol() ;
+	double y = m_location_->get_point().get_row() ;
+	double x = m_location_->get_point().get_col() ;
 
-	int R = m_team->GetColor()[0];
-	int G = m_team->GetColor()[1];
-	int B = m_team->GetColor()[2];
+	int R = m_team_->get_color()[0];
+	int G = m_team_->get_color()[1];
+	int B = m_team_->get_color()[2];
 
 	glColor3d(R, G, B);
 
@@ -44,7 +44,7 @@ void Player::showMe()
 ///<summary>
 /// Run away to a safer place.
 ///</summary>
-void Player::RunAway()
+void Player::run_away()
 {
 
 }
@@ -52,7 +52,7 @@ void Player::RunAway()
 ///<summary>
 /// Go the nearest health station.
 ///</summary>
-void Player::Heal()
+void Player::heal()
 {
 
 }
@@ -60,7 +60,7 @@ void Player::Heal()
 ///<summary>
 /// Go to the nearest ammo dump to refill your ammo.
 ///</summary>
-void Player::Reload()
+void Player::reload()
 {
 
 }
@@ -68,35 +68,35 @@ void Player::Reload()
 ///<summary>
 /// Find a target and attack if in range.
 ///</summary>
-void Player::Fight()
+void Player::fight()
 {
 
 }
 
-Node* Player::GetLocation()
+Node* Player::get_location() const
 {
-	return m_location;
+	return m_location_;
 }
 
-void Player::SetIsMoving(bool move)
+void Player::set_is_moving(const bool move)
 {
-	m_isMoving = move;
+	m_is_moving_ = move;
 }
 
-bool Player::GetIsMoving()
+bool Player::get_is_moving() const
 {
-	return m_isMoving;
+	return m_is_moving_;
 }
 
-void Player::move(Maze maze)
+void Player::move(Maze maze) const
 {
-	int x = m_location->getPoint().getRow();
-	int y = m_location->getPoint().getCol();
+	int x = m_location_->get_point().get_row();
+	int y = m_location_->get_point().get_col();
 
-	if (m_isMoving && (maze.get_at_pos(x + m_dirx,y + m_diry).GetValue() == SPACE || maze.get_at_pos(x + m_dirx,y + m_diry).GetValue() == SPACE ))
+	if (m_is_moving_ && (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE || maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE ))
 	{
-		m_location->getPoint().setRow(x + m_dirx);
-		m_location->getPoint().setCol(y + m_diry);
+		m_location_->get_point().set_row(x + m_dirx_);
+		m_location_->get_point().set_col(y + m_diry_);
 		//TODO:
 		//will need to add setValue to the node i am at (he is now SPACE) and the new node (he is now PLAYER).
 		//right now this function holds a copy of the maze and can't effect his nodes, so either the method will
@@ -107,24 +107,24 @@ void Player::move(Maze maze)
 
 }
 
-void Player::SetDir(double angle)
+void Player::set_dir(double angle)
 {
-	m_dirx = cos(angle);
-	m_diry = sin(angle);
+	m_dirx_ = cos(angle);
+	m_diry_ = sin(angle);
 }
 
 //NOT DONE. maybe will be needed for the danger map. TBD.
-void Player::SimulateMotion(double map[MSZ_player][MSZ_player], Node maze[MSZ_player][MSZ_player])
+void Player::simulate_motion(double map[maze_size][maze_size], Maze maze) const
 {
-	int x = m_location->getPoint().getRow();
-	int y = m_location->getPoint().getCol();
+	int x = m_location_->get_point().get_row();
+	int y = m_location_->get_point().get_col();
 
 
-	while (maze[x + m_dirx][y + m_diry].GetValue() == SPACE)
+	while (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE)
 	{
-		map[x][y] += player_delta;
-		x += m_dirx;
-		y += m_diry;
+		map[x][y] += player_delta_;
+		x += m_dirx_;
+		y += m_diry_;
 		
 	}
 }

@@ -1,27 +1,27 @@
 #pragma once
 
-//#include "Player.h"
 #include <vector>
+#define COLOR_LENGTH 3
 
 class Player;
 
- static int DEFAULT_COLOR[] = { 0 , 0 , 1 }; //blue
+ static int default_color[] = { 0 , 0 , 1 }; //blue
 
 class Team
 {
 
 
 private:
-	std::vector<Player*> m_players;
+	std::vector<Player*> m_players_;
 
 	//color in RGB
-	 int m_color[3]; 
+	 int m_color_[COLOR_LENGTH]; 
 
 public:
-	Team(int color[3] = DEFAULT_COLOR, std::vector<Player*> players = {}) ;
+	Team(const int color[COLOR_LENGTH] = default_color, std::vector<Player*> players = {}) ;
 
-	std::vector<Player*>& GetTeammates();
-	void AddPlayer(Player* player);
-	int* GetColor();
+	std::vector<Player*>& get_teammates();
+	void add_player(Player* player);
+	int* get_color();
 };
 

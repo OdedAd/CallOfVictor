@@ -34,19 +34,19 @@ void GameMgr::generate_teams()
 
 		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
 		{
-			const auto team_room_left_top_row = team_room.getLeftTop().getRow();
-			const auto team_room_left_top_col = team_room.getLeftTop().getCol();
-			const auto team_room_right_bottom_row = team_room.getRightBottom().getRow();
-			const auto team_room_right_bottom_col = team_room.getRightBottom().getCol();
+			const auto team_room_left_top_row = team_room.get_left_top().get_row();
+			const auto team_room_left_top_col = team_room.get_left_top().get_col();
+			const auto team_room_right_bottom_row = team_room.get_right_bottom().get_row();
+			const auto team_room_right_bottom_col = team_room.get_right_bottom().get_col();
 
 			do
 			{
 				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
 				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-			} while (maze_.get_at_pos(k, j).GetValue() == PLAYER); //collision prevention
+			} while (maze_.get_at_pos(k, j).get_value() == PLAYER); //collision prevention
 
-			maze_.get_at_pos(k, j).SetValue(PLAYER);
-			team->AddPlayer(new Player(team, &maze_.get_at_pos(k, j)));
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Player(team, &maze_.get_at_pos(k, j)));
 		}
 		this->add_team(*team);
 	}

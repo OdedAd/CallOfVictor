@@ -4,62 +4,58 @@
 #include "Team.h"
 #include "Node.h"
 
-
-//TODO: remove this when we have this value in the utils class.
-static const int MSZ_player = 100;
-
 class Player
 {
 private:
-	Team* m_team;
-	Node* m_location;
+	Team* m_team_;
+	Node* m_location_;
 
-	int m_ammo;
-	const int m_maxAmmo;
-	int m_curHP;
-	const int m_maxHP;
+	int m_ammo_;
+	const int m_max_ammo_;
+	int m_cur_hp_;
+	const int m_max_hp_;
 
-	int m_dirx, m_diry;
-	bool m_isMoving;
+	int m_dirx_, m_diry_;
+	bool m_is_moving_;
 
 
-	const double player_delta = 0.0001;
+	const double player_delta_ = 0.0001;
 
 
 public:
 
 	Player(Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
 
-	void showMe();
+	void show_me() const;
 
 	///<summary>
 	/// Run away to a safer place.
 	///</summary>
-	void RunAway();
+	void run_away();
 
 	///<summary>
 	/// Go the nearest health station.
 	///</summary>
-	void Heal();
+	void heal();
 
 	///<summary>
 	/// Go to the nearest ammo dump to refill your ammo.
 	///</summary>
-	void Reload();
+	void reload();
 
 	///<summary>
 	/// Find a target and attack if in range.
 	///</summary>
-	void Fight();
+	void fight();
 
 
-	Node* GetLocation();
+	Node* get_location() const;
 
-	void SetIsMoving(bool move);
-	bool GetIsMoving();
-	void move(Maze maze);
-	void SetDir(double angle);
-	void SimulateMotion(double map[MSZ_player][MSZ_player], Node maze[MSZ_player][MSZ_player]);
+	void set_is_moving(bool move);
+	bool get_is_moving() const;
+	void move(Maze maze) const;
+	void set_dir(double angle);
+	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 
 
 };

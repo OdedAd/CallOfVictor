@@ -1,25 +1,27 @@
 #include "Utils.h"
 
-Point2D& Utils::FindMaximumInMatrix(Node maze[MSZ_UTILS][MSZ_UTILS])
+#include "Maze.h"
+
+Point2D& Utils::FindMaximumInMatrix(Maze maze)
 {
 	Point2D* maxValueLocation = new Point2D();
 	int rowIndex, colIndex;
 	double curValue, maxValue;
 
-	maxValueLocation->setRow(0);
-	maxValueLocation->setCol(0);
-	maxValue = maze[0][0].GetValue();
+	maxValueLocation->set_row(0);
+	maxValueLocation->set_col(0);
+	maxValue = maze.get_at_pos(0,0).get_value();
 
-	for (rowIndex = 0; rowIndex < MSZ_UTILS; rowIndex++)
+	for (rowIndex = 0; rowIndex < maze_size; rowIndex++)
 	{
-		for (colIndex = 0; colIndex < MSZ_UTILS; colIndex++)
+		for (colIndex = 0; colIndex < maze_size; colIndex++)
 		{
-			curValue = maze[rowIndex][colIndex].GetValue();
+			curValue = maze.get_at_pos(rowIndex,colIndex).get_value();
 			if (maxValue < curValue)
 			{
-				maxValueLocation->setRow(rowIndex);
-				maxValueLocation->setCol(colIndex);
-				maxValue = maze[rowIndex][colIndex].GetValue();
+				maxValueLocation->set_row(rowIndex);
+				maxValueLocation->set_col(colIndex);
+				maxValue = maze.get_at_pos(rowIndex,colIndex).get_value();
 			}
 		}
 	}
@@ -27,26 +29,26 @@ Point2D& Utils::FindMaximumInMatrix(Node maze[MSZ_UTILS][MSZ_UTILS])
 	return *maxValueLocation;
 }
 
-Point2D& Utils::FindMinimumInMatrix(Node maze[MSZ_UTILS][MSZ_UTILS])
+Point2D& Utils::FindMinimumInMatrix(Maze maze)
 {
 	Point2D* minValueLocation = new Point2D();
 	int rowIndex, colIndex;
 	double curValue , minValue;
 
-	minValueLocation->setRow(0);
-	minValueLocation->setCol(0);
-	minValue = maze[0][0].GetValue();
+	minValueLocation->set_row(0);
+	minValueLocation->set_col(0);
+	minValue = maze.get_at_pos(0,0).get_value();
 
-	for (rowIndex = 0; rowIndex < MSZ_UTILS; rowIndex++)
+	for (rowIndex = 0; rowIndex < maze_size; rowIndex++)
 	{
-		for (colIndex = 0; colIndex < MSZ_UTILS; colIndex++)
+		for (colIndex = 0; colIndex < maze_size; colIndex++)
 		{
-			curValue = maze[rowIndex][colIndex].GetValue();
+			curValue = maze.get_at_pos(rowIndex,colIndex).get_value();
 			if (minValue > curValue)
 			{
-				minValueLocation->setRow(rowIndex);
-				minValueLocation->setCol(colIndex);
-				minValue = maze[rowIndex][colIndex].GetValue();
+				minValueLocation->set_row(rowIndex);
+				minValueLocation->set_col(colIndex);
+				minValue = maze.get_at_pos(rowIndex,colIndex).get_value();
 			}
 		}
 	}

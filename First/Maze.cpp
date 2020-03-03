@@ -20,8 +20,8 @@ void Maze::setup_maze()
 	{
 		for (j = 0; j < maze_size; j++)
 		{
-			maze_[i][j].SetValue(WALL);
-			maze_[i][j].SetPoint(Point2D(i , j));
+			maze_[i][j].set_value(WALL);
+			maze_[i][j].set_point(Point2D(i , j));
 		}
 	}
 	for (num_existing_rooms_ = 0; num_existing_rooms_ < num_of_rooms; num_existing_rooms_++)
@@ -34,7 +34,7 @@ void Maze::setup_maze()
 	{
 		i = rand() % maze_size;
 		j = rand() % maze_size;
-		maze_[i][j].SetValue(WALL);
+		maze_[i][j].set_value(WALL);
 	}
 
 	dig_tunnels();
@@ -66,18 +66,18 @@ Room& Maze::generate_room()
 		pr = new Room(center_i, center_j, width, height);
 		for (auto i = 0; i < num_existing_rooms_ && !is_overlapping; i++)
 		{
-			if (rooms_[i].CheckOverlapping(pr))
+			if (rooms_[i].check_overlapping(pr))
 				is_overlapping = true;
 
 		}
 	} while (is_overlapping);
 
 	// pr is not overlapping with other rooms
-	for (auto i = pr->getLeftTop().getRow(); i <= pr->getRightBottom().getRow(); i++)
+	for (auto i = pr->get_left_top().get_row(); i <= pr->get_right_bottom().get_row(); i++)
 	{
-		for (auto j = pr->getLeftTop().getCol(); j <= pr->getRightBottom().getCol(); j++)
+		for (auto j = pr->get_left_top().get_col(); j <= pr->get_right_bottom().get_col(); j++)
 		{
-			maze_[i][j].SetValue(SPACE);
+			maze_[i][j].set_value(SPACE);
 		}
 	}
 	return *pr;
@@ -91,7 +91,7 @@ void Maze::dig_tunnels()
 		for (auto j = i + 1; j < num_of_rooms; j++)
 		{
 			std::cout << " to " << j << std::endl;
-			generate_path(rooms_[i].getCenter(), rooms_[j].getCenter());
+			generate_path(rooms_[i].get_center(), rooms_[j].get_center());
 		}
 	}
 }
@@ -102,7 +102,7 @@ void Maze::generate_path(Point2D start, Point2D target)
 	std::vector<Node> gray;
 	std::vector<Node> black;
 	std::vector<Node>::iterator black_it;
-	auto pn = new Node(start, &target, maze_[start.getRow()][start.getCol()].GetValue(), 0, nullptr);
+	auto pn = new Node(start, &target, maze_[start.get_row()][start.get_col()].get_value(), 0, nullptr);
 	pq.push(pn);
 	gray.push_back(*pn);
 	while (!pq.empty())
@@ -110,14 +110,14 @@ void Maze::generate_path(Point2D start, Point2D target)
 		pn = pq.top();
 		pq.pop();
 		
-		if (pn->getPoint() == target) // the path has been found
+		if (pn->get_point() == target) // the path has been found
 		{
 			// restore path to dig tunnels
 			// set SPACE instead of WALL on the path
-			while (!(pn->getPoint() == start))
+			while (!(pn->get_point() == start))
 			{
-				maze_[pn->getPoint().getRow()][pn->getPoint().getCol()].SetValue(SPACE);
-				pn = pn->getParent();
+				maze_[pn->get_point().get_row()][pn->get_point().get_col()].set_value(SPACE);
+				pn = pn->get_parent();
 			}
 			return;
 		}
@@ -140,17 +140,17 @@ void Maze::add_neighbors(Node* pn, std::vector<Node> &gray, std::vector<Node> &b
                    std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq)
 {
 	// try down
-	if(pn->getPoint().getRow()<maze_size-1)
-		add_node(pn->getPoint().getRow() + 1, pn->getPoint().getCol(), pn, gray, black, pq);
+	if(pn->get_point().get_row()<maze_size-1)
+		add_node(pn->get_point().get_row() + 1, pn->get_point().get_col(), pn, gray, black, pq);
 	// try up
-	if (pn->getPoint().getRow() >0)
-		add_node(pn->getPoint().getRow() - 1, pn->getPoint().getCol(), pn, gray, black, pq);
+	if (pn->get_point().get_row() >0)
+		add_node(pn->get_point().get_row() - 1, pn->get_point().get_col(), pn, gray, black, pq);
 	// try left
-	if (pn->getPoint().getCol() > 0)
-		add_node(pn->getPoint().getRow() , pn->getPoint().getCol()- 1, pn, gray, black, pq);
+	if (pn->get_point().get_col() > 0)
+		add_node(pn->get_point().get_row() , pn->get_point().get_col()- 1, pn, gray, black, pq);
 	// try right
-	if (pn->getPoint().getCol() <maze_size-1)
-		add_node(pn->getPoint().getRow(), pn->getPoint().getCol() + 1, pn, gray, black, pq);
+	if (pn->get_point().get_col() <maze_size-1)
+		add_node(pn->get_point().get_row(), pn->get_point().get_col() + 1, pn, gray, black, pq);
 }
 
 void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
@@ -159,16 +159,16 @@ void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &g
 	Point2D pt;
 	double cost;
 
-	pt.setRow(row);
-	pt.setCol(col);
-	if (maze_[row][col].GetValue() == SPACE)
+	pt.set_row(row);
+	pt.set_col(col);
+	if (maze_[row][col].get_value() == SPACE)
 		cost = 0.1; // space cost
-	else if (maze_[row][col].GetValue() == WALL)
+	else if (maze_[row][col].get_value() == WALL)
 		cost = 3;
 	else // player or pickup object or something, we don't want pathes right next to them.
 		cost = 5;
 	// cost depends on is it a wall or a space
-	const auto pn1 = new Node(pt, pn->getTarget(), maze_[pt.getRow()][pt.getCol()].GetValue(), pn->getG() + cost, pn);
+	const auto pn1 = new Node(pt, pn->get_target(), maze_[pt.get_row()][pt.get_col()].get_value(), pn->get_g() + cost, pn);
 
 	const auto black_it = find(black.begin(), black.end(), *pn1);
 	const auto gray_it = find(gray.begin(), gray.end(), *pn1);
