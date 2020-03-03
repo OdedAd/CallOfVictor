@@ -112,7 +112,7 @@ void draw_map()
 }
 void generate_map()
 {
-	const int num_tries = 1000;
+	const int num_tries = 3000;
 	int col, row;
 	double x, y,sz;
 	Granade* pg = nullptr;
@@ -128,9 +128,9 @@ void generate_map()
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		cout<<"here +"<<i<<endl;
+		//cout<<"here +"<<i<<endl;
 		pg->simulate_explosion(map,game_mgr.get_maze());
-		cout<<"here after +"<<i<<endl;
+		//cout<<"here after +"<<i<<endl;
 		delete pg;
 	}
 }

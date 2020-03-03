@@ -84,7 +84,7 @@ void Bullet::set_dir(double angle)
 	diry_ = sin(angle);
 }
 
-void Bullet::simulate_motion(double map[maze_size][maze_size], Maze maze)
+void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 {
 
 	int i, j;

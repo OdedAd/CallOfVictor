@@ -16,7 +16,7 @@ public:
 	double get_x() const;
 	double get_y() const;
 	void set_dir(double angle);
-	void simulate_motion(double map[maze_size][maze_size], Maze maze);
+	void simulate_motion(double map[maze_size][maze_size], Maze& maze);
 	
 private:
 	double x_, y_;
