@@ -14,8 +14,10 @@ public:
 	void init_game();
 	void add_team(const Team& team);
 	void generate_teams();
+	Maze& get_maze();
+	std::vector<Team>& get_teams();
 private:
-	Maze* maze_ = nullptr;
+	Maze maze_;
 	std::vector<Team> teams_;
 	
 };

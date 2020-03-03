@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <queue>
 
 #include "CompareNodes.h"
@@ -25,5 +24,9 @@ public:
 	Room& generate_room();
 	void dig_tunnels();
 	void generate_path(Point2D start,Point2D target);
+	void add_neighbors(Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
+                   std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq);
+	void add_node(int row, int col, Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
+             std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq);
 };
 

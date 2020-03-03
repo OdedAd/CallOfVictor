@@ -1,8 +1,9 @@
 #include "Maze.h"
+#include <iostream>
 
 Node** Maze::get_sub_matrix(Point2D top_left, Point2D bottom_right)
 {
-	
+
 	return nullptr;
 }
 
@@ -15,11 +16,11 @@ void Maze::setup_maze()
 {
 	int i, j;
 
-	for(i=0;i<maze_size;i++)
+	for (i = 0; i < maze_size; i++)
 	{
-		for (j = 0; j < maze_size ; j++)
+		for (j = 0; j < maze_size; j++)
 		{
-				maze_[i][j].SetValue(WALL);
+			maze_[i][j].SetValue(WALL);
 		}
 	}
 	for (num_existing_rooms_ = 0; num_existing_rooms_ < num_of_rooms; num_existing_rooms_++)
@@ -35,12 +36,12 @@ void Maze::setup_maze()
 		maze_[i][j].SetValue(WALL);
 	}
 
-	//DigTunnels();
+	dig_tunnels();
 }
 
 Room& Maze::get_room_at(const unsigned short index)
 {
-	if (index>=num_of_rooms)
+	if (index >= num_of_rooms)
 	{
 		throw "get_room_at: Index out of bounds!";
 	}
@@ -49,7 +50,7 @@ Room& Maze::get_room_at(const unsigned short index)
 
 Room& Maze::generate_room()
 {
-	Room* pr=nullptr;
+	Room* pr = nullptr;
 	bool is_overlapping;
 
 	do
@@ -66,7 +67,7 @@ Room& Maze::generate_room()
 		{
 			if (rooms_[i].CheckOverlapping(pr))
 				is_overlapping = true;
-			
+
 		}
 	} while (is_overlapping);
 
@@ -83,12 +84,10 @@ Room& Maze::generate_room()
 
 void Maze::dig_tunnels()
 {
-	int i, j;
-
-	for (i = 0; i < num_of_rooms; i++)
+	for (auto i = 0; i < num_of_rooms; i++)
 	{
 		std::cout << "Path from " << i << std::endl;
-		for (j = i + 1; j < num_of_rooms; j++)
+		for (auto j = i + 1; j < num_of_rooms; j++)
 		{
 			std::cout << " to " << j << std::endl;
 			generate_path(rooms_[i].getCenter(), rooms_[j].getCenter());
@@ -99,31 +98,24 @@ void Maze::dig_tunnels()
 void Maze::generate_path(Point2D start, Point2D target)
 {
 	std::priority_queue <Node*, std::vector<Node*>, CompareNodes> pq;
-	vector<Node> gray;
-	vector<Node> black;
-	Node *pn;
-	bool stop = false;
-	vector<Node>::iterator gray_it;
-	vector<Node>::iterator black_it;
-	double wall_cost = 10;
-	double space_cost = 0.2;
-	pn = new Node(start, &target, maze[start.getRow()][start.getCol()].GetValue(), 0, nullptr);
+	std::vector<Node> gray;
+	std::vector<Node> black;
+	std::vector<Node>::iterator black_it;
+	auto pn = new Node(start, &target, maze_[start.getRow()][start.getCol()].GetValue(), 0, nullptr);
 	pq.push(pn);
 	gray.push_back(*pn);
-	while (!pq.empty()&&!stop)
+	while (!pq.empty())
 	{
-		// take the best node from pq
 		pn = pq.top();
-			// remove top Node from pq
 		pq.pop();
+		
 		if (pn->getPoint() == target) // the path has been found
 		{
-			stop = true;
 			// restore path to dig tunnels
 			// set SPACE instead of WALL on the path
 			while (!(pn->getPoint() == start))
 			{
-				maze[pn->getPoint().getRow()][pn->getPoint().getCol()].SetValue(SPACE);
+				maze_[pn->getPoint().getRow()][pn->getPoint().getCol()].SetValue(SPACE);
 				pn = pn->getParent();
 			}
 			return;
@@ -131,12 +123,57 @@ void Maze::generate_path(Point2D start, Point2D target)
 		else // pn is not target
 		{
 			// remove Node from gray and add it to black
-			gray_it = find(gray.begin(), gray.end(), *pn); // operator == must be implemented in Node
+			auto gray_it = find(gray.begin(), gray.end(), *pn); // operator == must be implemented in Node
 			if (gray_it != gray.end())
+			{
 				gray.erase(gray_it);
+			}
 			black.push_back(*pn);
-			// check the neighbours
-			AddNeighbours(pn, gray, black, pq);
+			// check the neighbors
+			add_neighbors(pn, gray, black, pq);
 		}
+	}
+}
+
+void Maze::add_neighbors(Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
+                   std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq)
+{
+	// try down
+	if(pn->getPoint().getRow()<maze_size-1)
+		add_node(pn->getPoint().getRow() + 1, pn->getPoint().getCol(), pn, gray, black, pq);
+	// try up
+	if (pn->getPoint().getRow() >0)
+		add_node(pn->getPoint().getRow() - 1, pn->getPoint().getCol(), pn, gray, black, pq);
+	// try left
+	if (pn->getPoint().getCol() > 0)
+		add_node(pn->getPoint().getRow() , pn->getPoint().getCol()- 1, pn, gray, black, pq);
+	// try right
+	if (pn->getPoint().getCol() <maze_size-1)
+		add_node(pn->getPoint().getRow(), pn->getPoint().getCol() + 1, pn, gray, black, pq);
+}
+
+void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
+             std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq)
+{
+	Point2D pt;
+	double cost;
+
+	pt.setRow(row);
+	pt.setCol(col);
+	if (maze_[row][col].GetValue() == SPACE)
+		cost = 0.1; // space cost
+	else if (maze_[row][col].GetValue() == WALL)
+		cost = 3;
+	else // player or pickup object or something, we don't want pathes right next to them.
+		cost = 5;
+	// cost depends on is it a wall or a space
+	const auto pn1 = new Node(pt, pn->getTarget(), maze_[pt.getRow()][pt.getCol()].GetValue(), pn->getG() + cost, pn);
+
+	const auto black_it = find(black.begin(), black.end(), *pn1);
+	const auto gray_it = find(gray.begin(), gray.end(), *pn1);
+	if (black_it == black.end() && gray_it==gray.end()) // it is not black and not gray!
+	{// i.e. it is white
+		pq.push(pn1);
+		gray.push_back(*pn1);
 	}
 }
