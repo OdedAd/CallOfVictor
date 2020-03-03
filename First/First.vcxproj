@@ -149,8 +149,10 @@
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="CompareNodes.cpp" />
+    <ClCompile Include="GameMgr.cpp" />
     <ClCompile Include="Granade.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point2D.cpp" />
@@ -160,7 +162,9 @@
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="CompareNodes.h" />
+    <ClInclude Include="GameMgr.h" />
     <ClInclude Include="Granade.h" />
+    <ClInclude Include="Maze.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point2D.h" />
