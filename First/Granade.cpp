@@ -46,7 +46,7 @@ void Granade::moveBullets(Maze maze)
 
 }
 
-void Granade::SimulateExplosion(double map[MSZ][MSZ], Node maze[MSZ][MSZ])
+void Granade::SimulateExplosion(double map[MSZ][MSZ], Maze maze)
 {
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{

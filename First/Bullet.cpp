@@ -85,14 +85,14 @@ void Bullet::SetDir(double angle)
 	diry = sin(angle);
 }
 
-void Bullet::SimulateMotion(double map[MSZ][MSZ], Node maze[MSZ][MSZ])
+void Bullet::SimulateMotion(double map[MSZ][MSZ], Maze maze)
 {
 
 	int i, j;
 	i = MSZ * (y + 1) / 2;
 	j = MSZ * (x + 1) / 2;
 
-	while(maze[i][j].GetValue() == SPACE)
+	while(maze.get_at_pos(i,j).GetValue() == SPACE)
 	{
 		map[i][j] += delta;
 		x += 0.001*dirx;

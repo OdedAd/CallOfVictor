@@ -87,7 +87,7 @@ void draw_maze()
 		}
 }
 
-void DrawMap()
+void draw_map()
 {
 	int i, j;
 	double sz, xx, yy;
@@ -95,7 +95,7 @@ void DrawMap()
 	for (i = 0; i < MSZ; i++)
 		for (j = 0; j < MSZ; j++)
 		{
-			if (maze[i][j].GetValue() == SPACE)
+			if (game_mgr.get_maze().get_at_pos(i,j).GetValue() == SPACE)
 			{
 				double c;
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
@@ -118,23 +118,23 @@ void DrawMap()
 void GenerateMap()
 {
 	int num_tries = 1000;
-	int i;
 	int col, row;
 	double x, y,sz;
 	Granade* pg = nullptr;
 
-	for (i = 0; i < num_tries; i++)
+	for (auto i = 0; i < num_tries; i++)
 	{
 		do
 		{
 			col = rand() % MSZ;
 			row = rand() % MSZ;
-		} while (maze[row][col].GetValue() != SPACE);
+		} while (game_mgr.get_maze().get_at_pos(row,col).GetValue() != SPACE);
 		sz = 2.0 / MSZ;
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		pg->SimulateExplosion(map,maze);
+		pg->SimulateExplosion(map,game_mgr.get_maze());
+		delete pg;
 	}
 }
 
@@ -151,23 +151,23 @@ void display()
 		pg->showMe();
 	}
 
-	for (Team curTeam : game_mgr.get_teams())
+	for (Team cur_team : game_mgr.get_teams())
 	{
-		for (Player* curPlayer : curTeam.GetTeammates())
+		for (Player* cur_player : cur_team.GetTeammates())
 		{
-			curPlayer->showMe();
+			cur_player->showMe();
 		}
 	}
 
 	glutSwapBuffers();// show what was drawn in "frame buffer"
 }
 
-void displayMap()
+void display_map()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // clean frame buffer
 
 	draw_maze();
-	DrawMap();
+	draw_map();
 
 	glutSwapBuffers();// show what was drawn in "frame buffer"
 }
@@ -198,24 +198,24 @@ void idle()
 			//		move_on = pg->GetIsMoving();
 		}
 
-		for (Team curTeam : game_mgr.get_teams())
+		for (Team cur_team : game_mgr.get_teams())
 		{
-			for (Player* curPlayer : curTeam.GetTeammates())
+			for (Player* cur_player : cur_team.GetTeammates())
 			{
-				curPlayer->move(game_mgr.get_maze());
+				cur_player->move(game_mgr.get_maze());
 			}
 		}
 	}
 	glutPostRedisplay();// calls indirectly to display
 }
 
-void Menu(int choice)
+void Menu(const int choice)
 {
 	if (choice == 1) // generate security map
 	{
 		move_on = false;
 		GenerateMap();
-		glutDisplayFunc(displayMap);
+		glutDisplayFunc(display_map);
 	}
 	else if (choice == 2) // generate security map
 	{
@@ -226,11 +226,11 @@ void Menu(int choice)
 			pg->explode();
 		}
 
-		for (Team curTeam : game_mgr.get_teams())
+		for (Team cur_team : game_mgr.get_teams())
 		{
-			for (Player* curPlayer : curTeam.GetTeammates())
+			for (Player* cur_player : cur_team.GetTeammates())
 			{
-				curPlayer->SetIsMoving(true);
+				cur_player->SetIsMoving(true);
 			}
 		}
 
@@ -238,7 +238,7 @@ void Menu(int choice)
 	}
 }
 
-void mouse(int button, int state, int x, int y)
+void mouse(const int button,const int state,const int x,const int y)
 {
 	double xx, yy;
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)

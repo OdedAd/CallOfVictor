@@ -17,7 +17,7 @@ public:
 	double getX();
 	double getY();
 	void SetDir(double angle);
-	void SimulateMotion(double map[MSZ][MSZ], Node maze[MSZ][MSZ]);
+	void SimulateMotion(double map[MSZ][MSZ], Maze maze);
 	
 private:
 	double x, y;

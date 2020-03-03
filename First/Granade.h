@@ -13,7 +13,7 @@ public:
 	void explode();
 	void showMe();
 	void moveBullets(Maze maze);
-	void SimulateExplosion(double map[MSZ][MSZ], Node maze[MSZ][MSZ]);
+	void SimulateExplosion(double map[MSZ][MSZ], Maze maze);
 private:
 	double x, y;
 	Bullet* bullets[NUM_BULLETS];
