@@ -39,7 +39,7 @@ void Granade::showMe()
 		bullets[i]->showMe();
 }
 
-void Granade::moveBullets(Node maze[MSZ][MSZ])
+void Granade::moveBullets(Maze maze)
 {
 	for (int i = 0; i < NUM_BULLETS; i++)
 		bullets[i]->move(maze);

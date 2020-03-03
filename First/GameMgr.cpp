@@ -14,7 +14,6 @@ void GameMgr::init_game()
 ///
 void GameMgr::generate_maze()
 {
-	/*this->maze_ = new Maze()*/;
 	this->maze_.setup_maze();
 }
 
@@ -23,12 +22,13 @@ void GameMgr::generate_maze()
 ///
 void GameMgr::generate_teams()
 {
+	int rooms[2] = {0,maze_.get_num_existing_rooms()-1};
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
 		int color[3] = {i%2,0,(i+1)%2};
 		auto team = new Team(color);
 		//add a player in a random location at room 0
-		auto team_room = maze_.get_room_at(0);
+		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
 		const auto max_num_of_players = 5;
 

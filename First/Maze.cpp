@@ -21,6 +21,7 @@ void Maze::setup_maze()
 		for (j = 0; j < maze_size; j++)
 		{
 			maze_[i][j].SetValue(WALL);
+			maze_[i][j].SetPoint(Point2D(i , j));
 		}
 	}
 	for (num_existing_rooms_ = 0; num_existing_rooms_ < num_of_rooms; num_existing_rooms_++)
@@ -176,4 +177,9 @@ void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &g
 		pq.push(pn1);
 		gray.push_back(*pn1);
 	}
+}
+
+int Maze::get_num_existing_rooms() const
+{
+	return num_existing_rooms_;
 }

@@ -12,7 +12,7 @@ public:
 	~Granade();
 	void explode();
 	void showMe();
-	void moveBullets(Node maze[MSZ][MSZ]);
+	void moveBullets(Maze maze);
 	void SimulateExplosion(double map[MSZ][MSZ], Node maze[MSZ][MSZ]);
 private:
 	double x, y;

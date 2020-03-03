@@ -2,8 +2,6 @@
 #include "GLUT.H"
 #include <math.h>
 
-
-
 Bullet::Bullet()
 {
 }
@@ -47,7 +45,7 @@ bool Bullet::GetIsMoving()
 	return isMoving;
 }
 
-void Bullet::move(Node maze[MSZ][MSZ])
+void Bullet::move(Maze maze)
 {
 	int i, j;
 	i = MSZ * (y + 1) / 2;
@@ -55,12 +53,12 @@ void Bullet::move(Node maze[MSZ][MSZ])
 
 	if (isMoving)
 	{
-		if (maze[i][j].GetValue() == SPACE)
+		if (maze.get_at_pos(i,j).GetValue() == SPACE)
 		{
 			x += 0.001 * dirx;
 			y += 0.001 * diry;
 		}
-		if (maze[i][j].GetValue() == PLAYER)
+		if (maze.get_at_pos(i,j).GetValue() == PLAYER)
 		{
 			//TODO: 
 			//add somthing to hurt the player. signel damage at a node or somthing

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Maze.h"
 #include "Team.h"
 #include "Node.h"
 
@@ -56,7 +57,7 @@ public:
 
 	void SetIsMoving(bool move);
 	bool GetIsMoving();
-	void move(Node maze[MSZ_player][MSZ_player]);
+	void move(Maze maze);
 	void SetDir(double angle);
 	void SimulateMotion(double map[MSZ_player][MSZ_player], Node maze[MSZ_player][MSZ_player]);
 

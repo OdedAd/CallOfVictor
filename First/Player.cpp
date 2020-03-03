@@ -88,12 +88,12 @@ bool Player::GetIsMoving()
 	return m_isMoving;
 }
 
-void Player::move(Node maze[MSZ_player][MSZ_player])
+void Player::move(Maze maze)
 {
 	int x = m_location->getPoint().getRow();
 	int y = m_location->getPoint().getCol();
 
-	if (m_isMoving && (maze[x + m_dirx][y + m_diry].GetValue() == SPACE || maze[x + m_dirx][y + m_diry].GetValue() == SPACE ))
+	if (m_isMoving && (maze.get_at_pos(x + m_dirx,y + m_diry).GetValue() == SPACE || maze.get_at_pos(x + m_dirx,y + m_diry).GetValue() == SPACE ))
 	{
 		m_location->getPoint().setRow(x + m_dirx);
 		m_location->getPoint().setCol(y + m_diry);

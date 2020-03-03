@@ -1,4 +1,5 @@
 #pragma once
+#include "Maze.h"
 #include "Node.h"
 const int MSZ = 100;
 const double delta = 0.0001;
@@ -12,7 +13,7 @@ public:
 	void showMe();
 	void SetIsMoving(bool move);
 	bool GetIsMoving();
-	void move(Node maze[MSZ][MSZ]);
+	void move(Maze maze);
 	double getX();
 	double getY();
 	void SetDir(double angle);
