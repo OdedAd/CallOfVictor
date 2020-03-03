@@ -15,5 +15,6 @@ public:
 private:
 	Point2D leftTop, rightBottom, center;
 	int width, height;
+	double** map;
 };
 
