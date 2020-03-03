@@ -154,6 +154,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="PickupObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point2D.cpp" />
     <ClCompile Include="Room.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="Granade.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="PickupObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Room.h" />
