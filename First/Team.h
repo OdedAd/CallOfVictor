@@ -22,6 +22,11 @@ public:
 
 	std::vector<Player*>& get_teammates();
 	void add_player(Player* player);
-	int* get_color();
+	const int* get_color() const;
+
+	bool operator!=(const Team& rhs) const {
+		return
+			m_color_ == rhs.get_color();
+	}
 };
 

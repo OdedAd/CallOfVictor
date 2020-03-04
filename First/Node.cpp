@@ -34,6 +34,11 @@ void Node::set_point(Point2D point)
 	this->point_ = point;
 }
 
+void Node::set_target(Point2D* target)
+{
+	target_ = target;
+}
+
 int Node::get_value()
 {
 	return value_;

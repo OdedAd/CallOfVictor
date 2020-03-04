@@ -32,6 +32,7 @@ private:
 public:
 	void set_value(int value);
 	void set_point(Point2D point);
+	void set_target(Point2D* target);
 	int get_value();
 	double get_g();
 	double compute_h();

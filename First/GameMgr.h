@@ -17,8 +17,8 @@ public:
 	void generate_teams();
 	Maze& get_maze();
 	std::vector<Team>& get_teams();
-	Point2D& find_nearest_pickup(PickupType type);
-	Point2D& find_nearest_enemy(Team& my_team,bool& is_shootable);
+	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
+	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target);
 private:
 	Maze maze_;

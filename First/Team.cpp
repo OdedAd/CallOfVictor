@@ -20,7 +20,7 @@ void Team::add_player(Player* player)
 	m_players_.push_back(player);
 }
 
-int* Team::get_color()
+const int* Team::get_color() const
 {
 	return m_color_;
 }

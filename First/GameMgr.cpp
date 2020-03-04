@@ -62,18 +62,72 @@ std::vector<Team>& GameMgr::get_teams()
 	return this->teams_;
 }
 
-Point2D& GameMgr::find_nearest_pickup(PickupType type)
-{
-	Point2D p;
 
-	return p;
+///<summary>
+/// Find the nearest pickup of the given type
+//  reletive to the given location using heuristic distance.
+/// If there is no such PickupObject , nullptr is returned.
+///</summary>
+Point2D& GameMgr::find_nearest_pickup(Point2D& location, PickupType type)
+{
+	Point2D* p = nullptr;
+	Node tempNode;
+	tempNode.set_point(location);
+	double minDistance = -1;
+	double curDistance;
+
+	for (PickupObject curPickup : pickup_objects_)
+	{
+		if (curPickup.get_type() == type)
+		{
+			tempNode.set_target(curPickup.get_position());
+			curDistance = tempNode.compute_h();
+			if (minDistance == -1  || curDistance < minDistance)
+			{
+				minDistance = curDistance;
+				p = curPickup.get_position();
+			}
+		}
+	}
+
+
+	return *p;
 }
 
-Point2D& GameMgr::find_nearest_enemy(Team& my_team,bool& is_shootable)
-{
-	Point2D p;
 
-	return p;
+///<summary>
+/// Find the nearest pickup of the given type
+//  reletive to the given location using heuristic distance.
+/// If there is no such PickupObject , nullptr is returned.
+///</summary>
+Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable)
+{
+	Point2D* p = nullptr;
+	Node tempNode;
+	tempNode.set_point(location);
+	double minDistance = -1;
+	double curDistance;
+
+	for (Team curTeam : teams_)
+	{
+		if (curTeam != my_team)
+		{
+			for (Player* curPlayer : curTeam.get_teammates())
+			{
+				tempNode.set_target(&curPlayer->get_location()->get_point());
+				curDistance = tempNode.compute_h();
+				if (minDistance == -1 || curDistance < minDistance)
+				{
+					minDistance = curDistance;
+					p = &curPlayer->get_location()->get_point();
+				}
+
+			}
+		}
+	}
+
+
+	return *p;
 }
 
 Node* GameMgr::a_star(Point2D& start, Point2D& target)
