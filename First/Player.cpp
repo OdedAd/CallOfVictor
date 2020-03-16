@@ -1,9 +1,10 @@
 #include "Player.h"
 #include "GLUT.H"
 
+#include "GameMgr.h"
 
-Player::Player(Team* team, Node* location, const int max_ammo, const int maxHP) :
-	m_team_(team), m_location_(location),
+Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, const int maxHP) :
+	m_mgr_(mgr), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
 {
@@ -70,6 +71,52 @@ void Player::reload()
 ///</summary>
 void Player::fight()
 {
+	bool is_shootable;
+	Point2D target_location;
+	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
+
+	//Node* path;
+	//path = m_mgr_->a_star(m_location_->get_point() , target_location);
+	m_cur_path_to_target_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+}
+
+///<summary>
+/// The brain of the player, will decide what kind of target to look for 
+/// according to the player status(HP and ammo).
+///</summary>
+void Player::choose_direction()
+{
+	if (m_cur_hp_ >= 5)
+	{
+		fight();
+	}
+	else if (m_cur_hp_ < 3)
+	{
+		heal();
+	}
+	else if (m_ammo_ >= 5)
+	{
+		run_away();
+	}
+	else if (m_ammo_ < 5)
+	{
+		reload();
+	}
+
+
+	if (m_cur_path_to_target_ != nullptr && m_cur_path_to_target_->get_parent() != nullptr)
+	{
+		Node* next_node = new Node(m_cur_path_to_target_->get_point(), m_cur_path_to_target_->get_target(), m_cur_path_to_target_->get_value()
+			, m_cur_path_to_target_->get_g(), m_cur_path_to_target_->get_parent());
+
+		while (next_node->get_parent() != nullptr &&
+			next_node->get_parent()->get_point() != m_location_->get_point())
+		{
+			next_node = next_node->get_parent();
+		}
+
+		set_dir(m_location_->get_point().get_angle_between_two_points(next_node->get_point()));
+	}
 
 }
 
@@ -88,20 +135,21 @@ bool Player::get_is_moving() const
 	return m_is_moving_;
 }
 
-void Player::move(Maze maze) const
+void Player::move(Maze& maze)
 {
+
+	//choose_direction();
+
 	int x = m_location_->get_point().get_row();
 	int y = m_location_->get_point().get_col();
 
-	if (m_is_moving_ && (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE || maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE ))
+	if (m_is_moving_ && (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE || maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == PATH ))
 	{
 		m_location_->get_point().set_row(x + m_dirx_);
 		m_location_->get_point().set_col(y + m_diry_);
-		//TODO:
-		//will need to add setValue to the node i am at (he is now SPACE) and the new node (he is now PLAYER).
-		//right now this function holds a copy of the maze and can't effect his nodes, so either the method will
-		// recive somthing else or some other function in another class will recive the node coordinates and will 
-		// deal with the change in my behalf.
+
+		maze.get_at_pos(x + m_dirx_, y + m_diry_).set_value(PLAYER); //upadte the new location
+		maze.get_at_pos(x, y).set_value(SPACE); //upadte the old location
 
 	}
 

@@ -1,14 +1,19 @@
 #pragma once
 
+//#include "GameMgr.h"
 #include "Maze.h"
 #include "Team.h"
 #include "Node.h"
 
+class GameMgr;
+
 class Player
 {
 private:
+	GameMgr* m_mgr_;
 	Team* m_team_;
 	Node* m_location_;
+	Node* m_cur_path_to_target_;
 
 	int m_ammo_;
 	const int m_max_ammo_;
@@ -24,7 +29,7 @@ private:
 
 public:
 
-	Player(Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
+	Player(GameMgr* mgr ,Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
 
 	void show_me() const;
 
@@ -49,11 +54,18 @@ public:
 	void fight();
 
 
+	///<summary>
+	/// The brain of the player, will decide what kind of target to look for 
+	/// according to the player status(HP and ammo).
+	///</summary>
+	void choose_direction();
+
+
 	Node* get_location() const;
 
 	void set_is_moving(bool move);
 	bool get_is_moving() const;
-	void move(Maze maze) const;
+	void move(Maze& maze);
 	void set_dir(double angle);
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 

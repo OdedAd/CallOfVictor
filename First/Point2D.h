@@ -1,4 +1,11 @@
 #pragma once
+
+//#include "Utils.h"
+
+#ifndef PI
+#define PI 3.14
+#endif
+
 class Point2D
 {
 public:
@@ -11,6 +18,15 @@ public:
 	{
 		return row_ == other.row_ && col_ == other.col_;
 	}
+
+	bool operator != (const Point2D& other)
+	{
+		return !(*this == other);
+	}
+
+	double get_angle_between_two_points(const Point2D& other);
+	
+
 private:
 	int row_, col_;
 };

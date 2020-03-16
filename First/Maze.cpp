@@ -29,7 +29,6 @@ void Maze::setup_maze()
 		rooms_[num_existing_rooms_] = generate_room();
 	}
 
-
 	for (auto k = 0; k < 30; k++)
 	{
 		i = rand() % maze_size;

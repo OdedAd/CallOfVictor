@@ -1,6 +1,13 @@
 #pragma once
 #include "Bullet.h"
 #include "Node.h"
+#include "Utils.h"
+
+//const double PI = 3.14;
+
+#ifndef PI
+#define PI 3.14
+#endif
 
 const int NUM_BULLETS = 16;
 

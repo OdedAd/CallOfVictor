@@ -1,6 +1,6 @@
 #include "Granade.h"
 
-const double PI = 3.14;
+//const double PI = 3.14;
 
 
 

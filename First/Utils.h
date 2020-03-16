@@ -5,6 +5,7 @@
 
 class Maze;
 static const int maze_size = 100;
+
 class Utils
 {
 

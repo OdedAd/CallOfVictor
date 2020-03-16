@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Maze.h"
 #include "Team.h"
 #include "Node.h"
@@ -21,7 +22,13 @@ public:
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target);
 private:
+	void check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
+		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
+	void check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
+		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
+
 	Maze maze_;
 	std::vector<Team> teams_;
 	std::vector<PickupObject> pickup_objects_;
+
 };
