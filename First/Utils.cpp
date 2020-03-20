@@ -2,56 +2,61 @@
 
 #include "Maze.h"
 
-Point2D& Utils::FindMaximumInMatrix(Maze maze)
+Point2D& Utils::find_maximum_in_matrix(Maze& maze)
 {
-	Point2D* maxValueLocation = new Point2D();
-	int rowIndex, colIndex;
-	double curValue, maxValue;
+	Point2D* max_value_location = new Point2D();
 
-	maxValueLocation->set_row(0);
-	maxValueLocation->set_col(0);
-	maxValue = maze.get_at_pos(0,0).get_value();
+	max_value_location->set_row(0);
+	max_value_location->set_col(0);
+	double max_value = maze.get_at_pos(0, 0).get_value();
 
-	for (rowIndex = 0; rowIndex < maze_size; rowIndex++)
+	for (auto row_index = 0; row_index < maze_size; row_index++)
 	{
-		for (colIndex = 0; colIndex < maze_size; colIndex++)
+		for (auto col_index = 0; col_index < maze_size; col_index++)
 		{
-			curValue = maze.get_at_pos(rowIndex,colIndex).get_value();
-			if (maxValue < curValue)
+			double cur_value = maze.get_at_pos(row_index, col_index).get_value();
+			if (max_value < cur_value)
 			{
-				maxValueLocation->set_row(rowIndex);
-				maxValueLocation->set_col(colIndex);
-				maxValue = maze.get_at_pos(rowIndex,colIndex).get_value();
+				max_value_location->set_row(row_index);
+				max_value_location->set_col(col_index);
+				max_value = maze.get_at_pos(row_index,col_index).get_value();
 			}
 		}
 	}
 
-	return *maxValueLocation;
+	return *max_value_location;
 }
 
-Point2D& Utils::FindMinimumInMatrix(Maze maze)
+void Utils::clear_temporary_maze(Node** matrix,const int size)
 {
-	Point2D* minValueLocation = new Point2D();
-	int rowIndex, colIndex;
-	double curValue , minValue;
-
-	minValueLocation->set_row(0);
-	minValueLocation->set_col(0);
-	minValue = maze.get_at_pos(0,0).get_value();
-
-	for (rowIndex = 0; rowIndex < maze_size; rowIndex++)
+	for (auto i = 0; i < size; ++i)
 	{
-		for (colIndex = 0; colIndex < maze_size; colIndex++)
+		delete[] matrix[i];
+	}
+	delete[] matrix;
+}
+
+Point2D& Utils::find_minimum_in_matrix(Maze& maze)
+{
+	Point2D* min_value_location = new Point2D();
+
+	min_value_location->set_row(0);
+	min_value_location->set_col(0);
+	double min_value = maze.get_at_pos(0, 0).get_value();
+
+	for (int row_index = 0; row_index < maze_size; row_index++)
+	{
+		for (int col_index = 0; col_index < maze_size; col_index++)
 		{
-			curValue = maze.get_at_pos(rowIndex,colIndex).get_value();
-			if (minValue > curValue)
+			double cur_value = maze.get_at_pos(row_index, col_index).get_value();
+			if (min_value > cur_value)
 			{
-				minValueLocation->set_row(rowIndex);
-				minValueLocation->set_col(colIndex);
-				minValue = maze.get_at_pos(rowIndex,colIndex).get_value();
+				min_value_location->set_row(row_index);
+				min_value_location->set_col(col_index);
+				min_value = maze.get_at_pos(row_index,col_index).get_value();
 			}
 		}
 	}
 
-	return *minValueLocation;
+	return *min_value_location;
 }

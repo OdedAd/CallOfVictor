@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "GameMgr.h"
 #include "Maze.h"
 #include "Team.h"
 #include "Node.h"

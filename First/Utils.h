@@ -5,13 +5,15 @@
 
 class Maze;
 static const int maze_size = 100;
+static const int num_of_rooms = 20;
 
 class Utils
 {
 
 public:
-	Point2D& FindMinimumInMatrix(Maze maze);
-	Point2D& FindMaximumInMatrix(Maze maze);
+	static Point2D& find_minimum_in_matrix(Maze& maze);
+	static Point2D& find_maximum_in_matrix(Maze& maze);
+	static void clear_temporary_maze(Node** matrix, const int size);
 
 
 private:

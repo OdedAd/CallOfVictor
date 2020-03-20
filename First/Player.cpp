@@ -8,8 +8,6 @@ Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, con
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
 {
-	double len;
-
 	//random starting direction, later when we add the brain of the player 
 	//the direction will be chosen somewhat intelligently before each move.  
 	m_dirx_ = (int)(rand() % 3) - 1;

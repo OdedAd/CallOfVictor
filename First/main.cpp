@@ -20,8 +20,8 @@ using namespace std;
 
 GameMgr game_mgr;
 
-const int W = 600; // window width
-const int H = 600; // window height
+const int width = 600; // window width
+const int height = 600; // window height
 
 double map[maze_size][maze_size] = { 0 };
 
@@ -84,11 +84,10 @@ void draw_maze()
 
 void draw_map()
 {
-	int i, j;
 	double sz, xx, yy;
 
-	for (i = 0; i < maze_size; i++)
-		for (j = 0; j < maze_size; j++)
+	for (auto i = 0; i < maze_size; i++)
+		for (auto j = 0; j < maze_size; j++)
 		{
 			if (game_mgr.get_maze().get_at_pos(i,j).get_value() == SPACE)
 			{
@@ -128,9 +127,7 @@ void generate_map()
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		//cout<<"here +"<<i<<endl;
 		pg->simulate_explosion(map,game_mgr.get_maze());
-		//cout<<"here after +"<<i<<endl;
 		delete pg;
 	}
 }
@@ -142,7 +139,7 @@ void display()
 
 	draw_maze();
 
-	if (pg != NULL)
+	if (pg != nullptr)
 	{
 	//	pb->showMe();
 		pg->show_me();
@@ -184,7 +181,7 @@ void idle()
 
 	if (move_on)
 	{
-		if (pg != NULL)
+		if (pg != nullptr)
 		{
 			//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
 			//		pb->move();
@@ -204,7 +201,7 @@ void idle()
 	glutPostRedisplay();// calls indirectly to display
 }
 
-void Menu(const int choice)
+void menu(const int choice)
 {
 	if (choice == 1) // generate security map
 	{
@@ -216,7 +213,7 @@ void Menu(const int choice)
 	{
 		glutDisplayFunc(display);
 //		pb->SetIsMoving(true);
-		if(pg != NULL)
+		if(pg != nullptr)
 		{
 			pg->explode();
 		}
@@ -238,8 +235,8 @@ void mouse(const int button,const int state,const int x,const int y)
 	double xx, yy;
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		xx = 2 * (double)x / W - 1;
-		yy = 2 * ((double)H - y) / H - 1;
+		xx = 2 * (double)x / width - 1;
+		yy = 2 * ((double)height - y) / height - 1;
 
 //		pb = new Bullet(xx,yy);
 		pg = new Granade(xx, yy);
@@ -255,7 +252,7 @@ void main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutInitWindowSize(W, H);
+	glutInitWindowSize(width, height);
 	glutInitWindowPosition(200, 100);
 	glutCreateWindow("Dungeon ");
 
@@ -263,7 +260,7 @@ void main(int argc, char* argv[])
 	glutIdleFunc(idle); // idle: when nothing happens
 	glutMouseFunc(mouse);
 	// menu
-	glutCreateMenu(Menu);
+	glutCreateMenu(menu);
 	glutAddMenuEntry("Generate map", 1);
 	glutAddMenuEntry("Explode", 2);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);

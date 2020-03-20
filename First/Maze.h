@@ -6,7 +6,7 @@
 #include "Room.h"
 #include "Utils.h"
 
-const int num_of_rooms = 20;
+
 
 
 class Maze

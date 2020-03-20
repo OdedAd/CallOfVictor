@@ -1,10 +1,25 @@
 #include "Maze.h"
 #include <iostream>
 
-Node** Maze::get_sub_matrix(Point2D top_left, Point2D bottom_right)
+Node** Maze::get_sub_matrix(const Point2D top_left, const Point2D bottom_right)
 {
+	const auto rows = bottom_right.get_row() - top_left.get_row(); 
+	const auto cols = bottom_right.get_col() - top_left.get_col();
+	auto sub_maze = new Node*[rows];
+	for (auto i = 0; i < rows; ++i)
+	{
+		sub_maze[i] = new Node[cols];
+	}
 
-	return nullptr;
+	for (int i = top_left.get_row(); i < bottom_right.get_row(); ++i)
+	{
+		for (int j = top_left.get_col(); j < bottom_right.get_col(); ++j)
+		{
+			sub_maze[i-top_left.get_row()][j - top_left.get_col()] = maze_[i][j];
+		}
+	}
+	
+	return sub_maze;
 }
 
 Node& Maze::get_at_pos(const int i, const int j)
