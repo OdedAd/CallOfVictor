@@ -103,23 +103,22 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, PickupType type)
 Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable)
 {
 	Point2D* p = nullptr;
-	Node tempNode;
-	tempNode.set_point(location);
-	double minDistance = -1;
-	double curDistance;
+	Node temp_node;
+	temp_node.set_point(location);
+	double min_distance = -1;
 
-	for (Team curTeam : teams_)
+	for (Team cur_team : teams_)
 	{
-		if (curTeam != my_team)
+		if (!cur_team.compare_color(my_team.get_color()))
 		{
-			for (Player* curPlayer : curTeam.get_teammates())
+			for (Player* cur_player : cur_team.get_teammates())
 			{
-				tempNode.set_target(&curPlayer->get_location()->get_point());
-				curDistance = tempNode.compute_h();
-				if (minDistance == -1 || curDistance < minDistance)
+				temp_node.set_target(&cur_player->get_location()->get_point());
+				const double cur_distance = temp_node.compute_h();
+				if (min_distance == -1 || cur_distance < min_distance)
 				{
-					minDistance = curDistance;
-					p = &curPlayer->get_location()->get_point();
+					min_distance = cur_distance;
+					p = &cur_player->get_location()->get_point();
 				}
 
 			}
@@ -193,15 +192,15 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 
 	pt.set_row(row);
 	pt.set_col(col);
-	int curNodeValue = maze_.get_at_pos(row, col).get_value();
+	int cur_node_value = maze_.get_at_pos(row, col).get_value();
 
-	if (curNodeValue != WALL)
+	if (cur_node_value != WALL)
 	{
-		if (curNodeValue == SPACE)
+		if (cur_node_value == SPACE)
 			cost = 0.5; // space cost
 		//else if (curNodeValue == PICKUP) // pickup 
 		//	cost = 0.5;
-		else if (curNodeValue == PLAYER) // player 
+		else if (cur_node_value == PLAYER) // player 
 			cost = 5;
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 

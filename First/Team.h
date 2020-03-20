@@ -23,6 +23,7 @@ public:
 	std::vector<Player*>& get_teammates();
 	void add_player(Player* player);
 	const int* get_color() const;
+	bool compare_color(const int* other_color);
 
 	bool operator!=(const Team& rhs) const {
 		return

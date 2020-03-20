@@ -24,3 +24,15 @@ const int* Team::get_color() const
 {
 	return m_color_;
 }
+
+bool Team::compare_color(const int* other_color)
+{
+	for (int i = 0; i < COLOR_LENGTH; ++i)
+	{
+		if(m_color_[i] != other_color[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}

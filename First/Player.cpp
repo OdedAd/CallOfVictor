@@ -1,4 +1,7 @@
 #include "Player.h"
+
+#include <iostream>
+
 #include "GLUT.H"
 
 #include "GameMgr.h"
@@ -70,6 +73,8 @@ void Player::reload()
 void Player::fight()
 {
 	bool is_shootable;
+	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
+		<<" col = " << m_location_->get_point().get_col() << std::endl;
 	Point2D target_location;
 	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
 
@@ -114,6 +119,8 @@ void Player::choose_direction()
 		}
 
 		set_dir(m_location_->get_point().get_angle_between_two_points(next_node->get_point()));
+		
+		delete next_node;
 	}
 
 }
@@ -136,10 +143,14 @@ bool Player::get_is_moving() const
 void Player::move(Maze& maze)
 {
 
-	//choose_direction();
+	choose_direction();
+	m_is_moving_ = true;
 
 	int x = m_location_->get_point().get_row();
 	int y = m_location_->get_point().get_col();
+
+	std::cout<< "x = " <<x<<" y = "<<y<<std::endl;
+	
 
 	if (m_is_moving_ && (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE || maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == PATH ))
 	{
@@ -148,15 +159,16 @@ void Player::move(Maze& maze)
 
 		maze.get_at_pos(x + m_dirx_, y + m_diry_).set_value(PLAYER); //upadte the new location
 		maze.get_at_pos(x, y).set_value(SPACE); //upadte the old location
-
+		std::cout<< "x = " <<x<<" y = "<<y<<std::endl;
 	}
-
+	m_is_moving_ = false;
 }
 
+//Changes = Rounded here
 void Player::set_dir(double angle)
 {
-	m_dirx_ = cos(angle);
-	m_diry_ = sin(angle);
+	m_dirx_ = (int)round(cos(angle));
+	m_diry_ = (int)round(sin(angle));
 }
 
 //NOT DONE. maybe will be needed for the danger map. TBD.

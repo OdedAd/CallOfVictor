@@ -39,17 +39,18 @@ void init()
 
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
+
 }
 
 void draw_maze()
 {
 	double sz, x, y;
 
-	for(auto i=0;i<maze_size;i++)
+	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
 		{
 			// set color
-			switch (game_mgr.get_maze().get_at_pos(i,j).get_value())
+			switch (game_mgr.get_maze().get_at_pos(i, j).get_value())
 			{
 			case SPACE:
 				glColor3d(1, 1, 1); // white
@@ -69,14 +70,14 @@ void draw_maze()
 			}
 			// draw rectangle
 			sz = 2.0 / maze_size;
-			x = j * sz -1;
-			y = i * sz -1;
+			x = j * sz - 1;
+			y = i * sz - 1;
 
 			glBegin(GL_POLYGON);
-				glVertex2d(x, y);
-				glVertex2d(x+sz, y);
-				glVertex2d(x + sz, y+sz);
-				glVertex2d(x, y + sz);
+			glVertex2d(x, y);
+			glVertex2d(x + sz, y);
+			glVertex2d(x + sz, y + sz);
+			glVertex2d(x, y + sz);
 
 			glEnd();
 		}
@@ -89,7 +90,7 @@ void draw_map()
 	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
 		{
-			if (game_mgr.get_maze().get_at_pos(i,j).get_value() == SPACE)
+			if (game_mgr.get_maze().get_at_pos(i, j).get_value() == SPACE)
 			{
 				double c;
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
@@ -113,7 +114,7 @@ void generate_map()
 {
 	const int num_tries = 3000;
 	int col, row;
-	double x, y,sz;
+	double x, y, sz;
 	Granade* pg = nullptr;
 
 	for (auto i = 0; i < num_tries; i++)
@@ -122,12 +123,12 @@ void generate_map()
 		{
 			col = rand() % maze_size;
 			row = rand() % maze_size;
-		} while (game_mgr.get_maze().get_at_pos(row,col).get_value() != SPACE);
+		} while (game_mgr.get_maze().get_at_pos(row, col).get_value() != SPACE);
 		sz = 2.0 / maze_size;
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		pg->simulate_explosion(map,game_mgr.get_maze());
+		pg->simulate_explosion(map, game_mgr.get_maze());
 		delete pg;
 	}
 }
@@ -141,7 +142,7 @@ void display()
 
 	if (pg != nullptr)
 	{
-	//	pb->showMe();
+		//	pb->showMe();
 		pg->show_me();
 	}
 
@@ -171,12 +172,12 @@ bool check_is_space(const double dx, const double dy)
 {
 	int i = maze_size * (dy + 1) / 2;
 	int j = maze_size * (dx + 1) / 2;
-	return  game_mgr.get_maze().get_at_pos(i,j).get_value() == SPACE;
+	return  game_mgr.get_maze().get_at_pos(i, j).get_value() == SPACE;
 }
 
 void idle()
 {
-	
+
 	Sleep(100);
 
 	if (move_on)
@@ -212,8 +213,8 @@ void menu(const int choice)
 	else if (choice == 2) // generate security map
 	{
 		glutDisplayFunc(display);
-//		pb->SetIsMoving(true);
-		if(pg != nullptr)
+		//		pb->SetIsMoving(true);
+		if (pg != nullptr)
 		{
 			pg->explode();
 		}
@@ -230,7 +231,7 @@ void menu(const int choice)
 	}
 }
 
-void mouse(const int button,const int state,const int x,const int y)
+void mouse(const int button, const int state, const int x, const int y)
 {
 	double xx, yy;
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -238,14 +239,17 @@ void mouse(const int button,const int state,const int x,const int y)
 		xx = 2 * (double)x / width - 1;
 		yy = 2 * ((double)height - y) / height - 1;
 
-//		pb = new Bullet(xx,yy);
+		//		pb = new Bullet(xx,yy);
 		pg = new Granade(xx, yy);
+		cout << "player moving" << endl;
+		game_mgr.get_teams()[0].get_teammates()[0]->move(game_mgr.get_maze());
+		cout << "end of player moving" << endl;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
-//		pb->SetIsMoving(true);
-//		pg->explode();
-//		move_on = true;
+		//		pb->SetIsMoving(true);
+		//		pg->explode();
+		//		move_on = true;
 	}
 }
 void main(int argc, char* argv[])
