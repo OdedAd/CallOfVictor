@@ -196,12 +196,13 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 
 	if (cur_node_value != WALL)
 	{
-		if (cur_node_value == SPACE)
-			cost = 0.5; // space cost
+		if (cur_node_value == SPACE || cur_node_value == PATH)
+			cost = 0.5; // space or path cost
 		//else if (curNodeValue == PICKUP) // pickup 
-		//	cost = 0.5;
+		//	cost = 0.1;
 		else if (cur_node_value == PLAYER) // player 
-			cost = 5;
+			cost = 2;
+
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
 		const auto black_it = find(black.begin(), black.end(), *pn1);
@@ -212,6 +213,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 			gray.push_back(*pn1);
 		}
 	}
+
 }
 
 

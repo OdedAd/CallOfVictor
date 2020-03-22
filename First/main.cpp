@@ -68,6 +68,7 @@ void draw_maze()
 				//glColor3d(1, 0, 0); // red
 				break;
 			}
+
 			// draw rectangle
 			sz = 2.0 / maze_size;
 			x = j * sz - 1;
@@ -178,7 +179,7 @@ bool check_is_space(const double dx, const double dy)
 void idle()
 {
 
-	Sleep(100);
+	//Sleep(100);
 
 	if (move_on)
 	{

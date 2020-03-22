@@ -13,10 +13,11 @@ Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, con
 {
 	//random starting direction, later when we add the brain of the player 
 	//the direction will be chosen somewhat intelligently before each move.  
-	m_dirx_ = (int)(rand() % 3) - 1;
-	m_diry_ = (int)(rand() % 3) - 1;
+	m_dirx_ = 0;//(int)(rand() % 3) - 1;
+	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
 
+	m_cur_target_node_ = nullptr;
 }
 
 void Player::show_me() const
@@ -41,6 +42,7 @@ void Player::show_me() const
 	glVertex2d(xx + sz, yy + sz);
 	glVertex2d(xx, yy + sz);
 	glEnd();
+
 }
 
 ///<summary>
@@ -78,10 +80,14 @@ void Player::fight()
 	Point2D target_location;
 	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
 
-	//Node* path;
-	//path = m_mgr_->a_star(m_location_->get_point() , target_location);
-	m_cur_path_to_target_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+	std::cout << "in fight function: target_location row = " << target_location.get_row()
+		<< " col = " << target_location.get_col() << std::endl;
+
+	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
 }
+
+static Point2D nextPoint;
+
 
 ///<summary>
 /// The brain of the player, will decide what kind of target to look for 
@@ -107,23 +113,25 @@ void Player::choose_direction()
 	}
 
 
-	if (m_cur_path_to_target_ != nullptr && m_cur_path_to_target_->get_parent() != nullptr)
+	if (m_cur_target_node_ != nullptr && m_cur_target_node_->get_parent() != nullptr)
 	{
-		Node* next_node = new Node(m_cur_path_to_target_->get_point(), m_cur_path_to_target_->get_target(), m_cur_path_to_target_->get_value()
-			, m_cur_path_to_target_->get_g(), m_cur_path_to_target_->get_parent());
+		Node* next_node = new Node(m_cur_target_node_->get_point(), m_cur_target_node_->get_target(), m_cur_target_node_->get_value()
+			, m_cur_target_node_->get_g(), m_cur_target_node_->get_parent());
 
 		while (next_node->get_parent() != nullptr &&
 			next_node->get_parent()->get_point() != m_location_->get_point())
 		{
+			m_cur_path_to_target_.push(&next_node->get_point());
 			next_node = next_node->get_parent();
 		}
+		m_cur_path_to_target_.push(new Point2D (next_node->get_point().get_row() , next_node->get_point().get_col()));// possible waste of memory
 
-		set_dir(m_location_->get_point().get_angle_between_two_points(next_node->get_point()));
-		
 		delete next_node;
 	}
 
 }
+
+
 
 Node* Player::get_location() const
 {
@@ -142,28 +150,52 @@ bool Player::get_is_moving() const
 
 void Player::move(Maze& maze)
 {
-
-	choose_direction();
-	m_is_moving_ = true;
-
-	int x = m_location_->get_point().get_row();
-	int y = m_location_->get_point().get_col();
-
-	std::cout<< "x = " <<x<<" y = "<<y<<std::endl;
-	
-
-	if (m_is_moving_ && (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE || maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == PATH ))
+	if (m_is_moving_)
 	{
-		m_location_->get_point().set_row(x + m_dirx_);
-		m_location_->get_point().set_col(y + m_diry_);
+		//maybe this two variables can be class members and not static.
+		static int old_value = 0; // the last value of the node.
+		static int step_counter = 0;
 
-		maze.get_at_pos(x + m_dirx_, y + m_diry_).set_value(PLAYER); //upadte the new location
-		maze.get_at_pos(x, y).set_value(SPACE); //upadte the old location
-		std::cout<< "x = " <<x<<" y = "<<y<<std::endl;
+		int cur_old_value = old_value;
+
+		if (m_cur_path_to_target_.empty() || step_counter > 10) //every 10 steps reset the m_cur_path_to_target_ and make new one.
+		{
+			while (m_cur_path_to_target_.empty() == false)
+				m_cur_path_to_target_.pop();
+			step_counter = 0;
+
+			choose_direction();
+		}
+
+		Point2D* nextPoint = m_cur_path_to_target_.top();
+		m_cur_path_to_target_.pop(); //remove the top point from the stack
+
+		m_is_moving_ = true;
+
+		int cur_x = m_location_->get_point().get_row();
+		int cur_y = m_location_->get_point().get_col();
+
+		std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
+
+		int next_x = nextPoint->get_row();
+		int next_y = nextPoint->get_col();
+
+		if (m_is_moving_ && (maze.get_at_pos(next_x, next_y).get_value() == SPACE || maze.get_at_pos(next_x, next_y).get_value() == PATH))
+		{
+			m_location_->set_point(*nextPoint);
+
+			old_value = maze.get_at_pos(next_x, next_y).get_value();
+			maze.get_at_pos(next_x, next_y).set_value(PLAYER); //upadte the new location
+			maze.get_at_pos(cur_x, cur_y).set_value(cur_old_value); //upadte the old location
+
+			std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
+			std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
+		}
+		++step_counter;
 	}
-	m_is_moving_ = false;
 }
 
+//deprecated
 //Changes = Rounded here
 void Player::set_dir(double angle)
 {

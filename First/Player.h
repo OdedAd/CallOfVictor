@@ -3,6 +3,7 @@
 #include "Maze.h"
 #include "Team.h"
 #include "Node.h"
+#include <stack>
 
 class GameMgr;
 
@@ -12,14 +13,15 @@ private:
 	GameMgr* m_mgr_;
 	Team* m_team_;
 	Node* m_location_;
-	Node* m_cur_path_to_target_;
+	Node* m_cur_target_node_;
+	std::stack<Point2D*> m_cur_path_to_target_;
 
 	int m_ammo_;
 	const int m_max_ammo_;
 	int m_cur_hp_;
 	const int m_max_hp_;
 
-	int m_dirx_, m_diry_;
+	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 
 
@@ -65,7 +67,7 @@ public:
 	void set_is_moving(bool move);
 	bool get_is_moving() const;
 	void move(Maze& maze);
-	void set_dir(double angle);
+	void set_dir(double angle); //deprecated
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 
 
