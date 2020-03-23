@@ -24,6 +24,7 @@ const int width = 600; // window width
 const int height = 600; // window height
 
 double map[maze_size][maze_size] = { 0 };
+//double** map;
 
 Bullet* pb = nullptr;
 Granade* pg;
@@ -64,8 +65,11 @@ void draw_maze()
 			case TARGET:
 				glColor3d(1, 0, 0); // red
 				break;
-			case PLAYER:
-				//glColor3d(1, 0, 0); // red
+			case PICKUP_AMMO:
+				glColor3d(1, 0.64, 0); // orange
+				break;
+			case PICKUP_MED:
+				glColor3d(0.64, 0, 1); // orange
 				break;
 			}
 
@@ -209,6 +213,7 @@ void menu(const int choice)
 	{
 		move_on = false;
 		generate_map();
+		//map = game_mgr.get_maze().get_room_at(0).get_map();
 		glutDisplayFunc(display_map);
 	}
 	else if (choice == 2) // generate security map
@@ -243,7 +248,9 @@ void mouse(const int button, const int state, const int x, const int y)
 		//		pb = new Bullet(xx,yy);
 		pg = new Granade(xx, yy);
 		cout << "player moving" << endl;
+		game_mgr.get_teams()[0].get_teammates()[0]->set_is_moving(true);
 		game_mgr.get_teams()[0].get_teammates()[0]->move(game_mgr.get_maze());
+		game_mgr.get_teams()[0].get_teammates()[0]->set_is_moving(false);
 		cout << "end of player moving" << endl;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)

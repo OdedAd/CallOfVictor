@@ -13,6 +13,8 @@ class GameMgr
 {
 public:
 	void generate_maze();
+	void init_pickup(const PickupType type, const int color_type);
+	void generate_pickups();
 	void init_game();
 	void add_team(const Team& team);
 	void generate_teams();

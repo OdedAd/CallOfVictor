@@ -6,6 +6,7 @@
 class Maze;
 static const int maze_size = 100;
 static const int num_of_rooms = 20;
+static const int num_of_pickups = 5;
 
 class Utils
 {

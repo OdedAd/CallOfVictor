@@ -5,7 +5,7 @@
 #include "Node.h"
 #include "Room.h"
 #include "Utils.h"
-
+#include "Granade.h"
 
 
 
@@ -29,5 +29,6 @@ public:
 	void add_node(int row, int col, Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
              std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq);
 	int get_num_existing_rooms()const;
+	void generate_map_for_room(Room& room);
 };
 

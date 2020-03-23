@@ -10,7 +10,8 @@ const int GRAY = 5; // Fringe
 const int BLACK = 6; // VISITED
 
 const int PLAYER = 7; // player
-const int PICKUP = 8; // player
+const int PICKUP_MED = 8; // player
+const int PICKUP_AMMO = 9;
 
 
 

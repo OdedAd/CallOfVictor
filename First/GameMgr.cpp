@@ -7,6 +7,7 @@ void GameMgr::init_game()
 {
 	generate_maze();
 	generate_teams();
+	generate_pickups();
 }
 
 ///
@@ -16,6 +17,28 @@ void GameMgr::generate_maze()
 {
 	this->maze_.setup_maze();
 }
+
+///
+///Initialize the pickups
+///
+void GameMgr::generate_pickups()
+{
+	for (int i = 0; i < num_of_pickups; i++)
+	{
+		init_pickup(PickupType::ammo,PICKUP_AMMO);
+		init_pickup(PickupType::med_kit,PICKUP_MED);
+	}
+}
+
+void GameMgr::init_pickup(const PickupType type, const int color_type)
+{
+	const auto room = maze_.get_room_at(rand()%num_of_rooms);
+	const auto location = room.get_random_point_in_room();
+	const auto pickup_object = PickupObject(location,type);
+	pickup_objects_.push_back(pickup_object);
+	maze_.get_at_pos(location->get_row(),location->get_col()).set_value(color_type);
+}
+
 
 ///
 ///Initialize the teams.
@@ -65,31 +88,29 @@ std::vector<Team>& GameMgr::get_teams()
 
 ///<summary>
 /// Find the nearest pickup of the given type
-//  reletive to the given location using heuristic distance.
+//  relative to the given location using heuristic distance.
 /// If there is no such PickupObject , nullptr is returned.
 ///</summary>
 Point2D& GameMgr::find_nearest_pickup(Point2D& location, PickupType type)
 {
 	Point2D* p = nullptr;
-	Node tempNode;
-	tempNode.set_point(location);
-	double minDistance = -1;
-	double curDistance;
+	Node temp_node;
+	temp_node.set_point(location);
+	double min_distance = -1;
 
-	for (PickupObject curPickup : pickup_objects_)
+	for (PickupObject cur_pickup : pickup_objects_)
 	{
-		if (curPickup.get_type() == type)
+		if (cur_pickup.get_type() == type)
 		{
-			tempNode.set_target(curPickup.get_position());
-			curDistance = tempNode.compute_h();
-			if (minDistance == -1  || curDistance < minDistance)
+			temp_node.set_target(cur_pickup.get_position());
+			double cur_distance = temp_node.compute_h();
+			if (min_distance == -1  || cur_distance < min_distance)
 			{
-				minDistance = curDistance;
-				p = curPickup.get_position();
+				min_distance = cur_distance;
+				p = cur_pickup.get_position();
 			}
 		}
 	}
-
 
 	return *p;
 }
@@ -124,7 +145,6 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team,bool& is_s
 			}
 		}
 	}
-
 
 	return *p;
 }
@@ -213,7 +233,6 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 			gray.push_back(*pn1);
 		}
 	}
-
 }
 
 

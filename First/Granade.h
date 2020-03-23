@@ -10,6 +10,7 @@
 #endif
 
 const int NUM_BULLETS = 16;
+class Bullet;
 
 class Granade
 {
