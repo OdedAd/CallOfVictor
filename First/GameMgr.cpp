@@ -91,7 +91,7 @@ std::vector<Team>& GameMgr::get_teams()
 //  relative to the given location using heuristic distance.
 /// If there is no such PickupObject , nullptr is returned.
 ///</summary>
-Point2D& GameMgr::find_nearest_pickup(Point2D& location, PickupType type)
+Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 {
 	Point2D* p = nullptr;
 	Node temp_node;

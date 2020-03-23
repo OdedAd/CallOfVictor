@@ -69,7 +69,8 @@ public:
 	void move(Maze& maze);
 	void set_dir(double angle); //deprecated
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
-
+	void set_hp(int value);
+	void set_ammo(int value);
 
 };
 

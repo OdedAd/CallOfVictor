@@ -209,15 +209,15 @@ void idle()
 
 void menu(const int choice)
 {
-	if (choice == 1) // generate security map
+	switch(choice)
 	{
+	case 1:
 		move_on = false;
 		generate_map();
 		//map = game_mgr.get_maze().get_room_at(0).get_map();
 		glutDisplayFunc(display_map);
-	}
-	else if (choice == 2) // generate security map
-	{
+		break;
+	case 2:
 		glutDisplayFunc(display);
 		//		pb->SetIsMoving(true);
 		if (pg != nullptr)
@@ -234,6 +234,14 @@ void menu(const int choice)
 		}
 
 		move_on = true;
+		break;
+	case 3:
+		game_mgr.get_teams()[0].get_teammates()[0]->set_hp(2);
+		break;
+	case 4:
+		game_mgr.get_teams()[0].get_teammates()[0]->set_ammo(0);
+		game_mgr.get_teams()[0].get_teammates()[0]->set_hp(4);
+		break;
 	}
 }
 
@@ -275,6 +283,8 @@ void main(int argc, char* argv[])
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Generate map", 1);
 	glutAddMenuEntry("Explode", 2);
+	glutAddMenuEntry("LowerHP", 3);
+	glutAddMenuEntry("LowerAMMO", 4);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	init();

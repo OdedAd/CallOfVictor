@@ -58,7 +58,15 @@ void Player::run_away()
 ///</summary>
 void Player::heal()
 {
+	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
+		<<" col = " << m_location_->get_point().get_col() << std::endl;
+	
+	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
 
+	std::cout << "in fight function: target_location row = " << target.get_row()
+		<< " col = " << target.get_col() << std::endl;
+	
+	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
 }
 
 ///<summary>
@@ -66,7 +74,15 @@ void Player::heal()
 ///</summary>
 void Player::reload()
 {
+	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
+		<<" col = " << m_location_->get_point().get_col() << std::endl;
+	
+	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
 
+	std::cout << "in fight function: target_location row = " << target.get_row()
+		<< " col = " << target.get_col() << std::endl;
+	
+	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
 }
 
 ///<summary>
@@ -95,6 +111,8 @@ static Point2D nextPoint;
 ///</summary>
 void Player::choose_direction()
 {
+	//Very very problematic
+	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
 	if (m_cur_hp_ >= 5)
 	{
 		fight();
@@ -130,8 +148,6 @@ void Player::choose_direction()
 	}
 
 }
-
-
 
 Node* Player::get_location() const
 {
@@ -217,4 +233,14 @@ void Player::simulate_motion(double map[maze_size][maze_size], Maze maze) const
 		y += m_diry_;
 		
 	}
+}
+
+void Player::set_hp(const int value)
+{
+	this->m_cur_hp_ = value;
+}
+
+void Player::set_ammo(const int value)
+{
+	this->m_ammo_ = value;
 }
