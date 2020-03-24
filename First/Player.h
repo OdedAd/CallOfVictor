@@ -24,8 +24,9 @@ private:
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 
-
 	const double player_delta_ = 0.0001;
+
+	void fill_path_stack();
 
 
 public:

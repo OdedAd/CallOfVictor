@@ -110,7 +110,7 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 
 	for (PickupObject cur_pickup : pickup_objects_)
 	{
-		if (cur_pickup.get_type() == type)
+		if (cur_pickup.get_type() == type && cur_pickup.get_quantity() > 0)
 		{
 			temp_node.set_target(cur_pickup.get_position());
 			double cur_distance = temp_node.compute_h();
@@ -252,4 +252,59 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 void GameMgr::add_team(const Team& team)
 {
 	this->teams_.push_back(team);
+}
+
+
+bool GameMgr::shoot(Player* calling_player, Point2D& target)
+{
+	Room& targets_room = maze_.get_room_at(target);
+	Room& player_room = maze_.get_room_at(calling_player->get_location()->get_point());
+
+	if (player_room == targets_room)
+		return true;
+	else
+		return false;
+}
+
+bool GameMgr::pickup(Player* calling_player, Point2D& target)
+{
+	Node* target_node = &maze_.get_at_pos(target.get_row(), target.get_col());
+	int target_value = target_node->get_value();
+	if (target_value == PICKUP_AMMO || target_value == PICKUP_MED)
+	{
+		int distance = (int)calling_player->get_location()->get_point().get_distance(target);
+		PickupObject* targetPickupObject = get_pickup_at_pos(target);
+		int quantity = targetPickupObject->get_quantity();
+
+		if (distance == 1 && quantity > 0)
+		{
+			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
+			return true;
+		}
+		else
+			return false;
+	}
+	else
+		throw("at GameMgr::pickup , the given target point is not a pickup object");
+}
+
+
+
+Player* GameMgr::get_player_at_pos(Point2D& position)
+{
+	for (Team curTeam : teams_)
+		for (Player* curPlayer : curTeam.get_teammates())
+			if (curPlayer->get_location()->get_point() == position)
+				return curPlayer;
+
+	throw("at GameMgr::get_player_at_pos , the given position is not a player");
+}
+
+PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
+{
+	for (PickupObject& curPickup : pickup_objects_)
+		if (*(curPickup.get_position()) == position)
+			return &curPickup;
+
+	throw("at GameMgr::get_pickup_at_pos , the given position is not a PickupObject");
 }

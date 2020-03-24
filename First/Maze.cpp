@@ -63,6 +63,32 @@ Room& Maze::get_room_at(const unsigned short index)
 	return rooms_[index];
 }
 
+Room& Maze::get_room_at(const Point2D& point)
+{
+	int target_room_index = 0;
+	bool isFound = false;
+
+	if (point.get_row() >= maze_size || point.get_col() >= maze_size)
+	{
+		throw "get_room_at: Point out of bounds!";
+	}
+
+	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (isFound == false); ++cur_room_index)
+	{
+		if ((rooms_[target_room_index].get_left_top().get_row() < point.get_row() && point.get_row() < rooms_[target_room_index].get_right_bottom().get_row())
+			&& (rooms_[target_room_index].get_right_bottom().get_col() < point.get_col() && point.get_col() < rooms_[target_room_index].get_left_top().get_col()))
+		{
+			target_room_index = cur_room_index;
+			isFound == true;
+		}
+	}
+
+	if(isFound)
+		return rooms_[target_room_index];
+	else
+		throw "get_room_at: Point not in room!";
+}
+
 Room& Maze::generate_room()
 {
 	Room* pr = nullptr;

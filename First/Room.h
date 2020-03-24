@@ -15,6 +15,11 @@ public:
 	Point2D* get_random_point_in_room() const;
 	void set_map(double** new_map);
 	double** get_map() const;
+
+	bool operator == (const Room& other)
+	{
+		return center_ == other.get_center();
+	}
 	
 private:
 	Point2D left_top_, right_bottom_, center_;

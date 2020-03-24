@@ -21,6 +21,7 @@ public:
 	Node& get_at_pos(int i,int j);
 	void setup_maze();
 	Room& get_room_at(unsigned short index);
+	Room& get_room_at(const Point2D& point);
 	Room& generate_room();
 	void dig_tunnels();
 	void generate_path(Point2D start,Point2D target);

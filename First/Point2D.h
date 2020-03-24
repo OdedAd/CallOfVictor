@@ -26,6 +26,7 @@ public:
 
 	double get_angle_between_two_points(const Point2D& other);
 	
+	double get_distance(Point2D& target) const;
 
 private:
 	int row_, col_;

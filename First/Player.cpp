@@ -6,6 +6,7 @@
 
 #include "GameMgr.h"
 
+
 Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, const int maxHP) :
 	m_mgr_(mgr), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
@@ -58,15 +59,29 @@ void Player::run_away()
 ///</summary>
 void Player::heal()
 {
-	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
+	std::cout<< "in heal function: my location row = " << m_location_->get_point().get_row()
 		<<" col = " << m_location_->get_point().get_col() << std::endl;
 	
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
 
-	std::cout << "in fight function: target_location row = " << target.get_row()
+	std::cout << "in heal function: target_location row = " << target.get_row()
 		<< " col = " << target.get_col() << std::endl;
 	
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+
+	bool isSuccessful = false;
+	isSuccessful = m_mgr_->pickup(this, target);
+
+	if (isSuccessful) //picked up the medkit successfully, heal up.
+	{
+		m_cur_hp_ += m_max_hp_;
+		m_is_moving_ = false;
+	}
+	else //couldn't pick up the medkit, need to move closer.
+	{
+		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+		m_is_moving_ = true;
+	}
 }
 
 ///<summary>
@@ -74,15 +89,27 @@ void Player::heal()
 ///</summary>
 void Player::reload()
 {
-	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
+	std::cout<< "in reload function: my location row = " << m_location_->get_point().get_row()
 		<<" col = " << m_location_->get_point().get_col() << std::endl;
 	
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
 
-	std::cout << "in fight function: target_location row = " << target.get_row()
+	std::cout << "in reload function: target_location row = " << target.get_row()
 		<< " col = " << target.get_col() << std::endl;
+
+	bool isSuccessful = false;
+	isSuccessful = m_mgr_->pickup(this , target);
 	
-	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+	if (isSuccessful) //picked up the ammo successfully, stock up on ammo.
+	{
+		m_ammo_ = m_max_ammo_;
+		m_is_moving_ = false;
+	}
+	else //couldn't pick up the ammo, need to move closer.
+	{
+		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+		m_is_moving_ = true;
+	}
 }
 
 ///<summary>
@@ -102,8 +129,6 @@ void Player::fight()
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
 }
 
-static Point2D nextPoint;
-
 
 ///<summary>
 /// The brain of the player, will decide what kind of target to look for 
@@ -113,7 +138,7 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= 5)
+	if (m_cur_hp_ >= m_max_hp_/2)
 	{
 		fight();
 	}
@@ -131,6 +156,15 @@ void Player::choose_direction()
 	}
 
 
+	if (m_is_moving_)
+		fill_path_stack();
+
+
+}
+
+
+void Player::fill_path_stack()
+{
 	if (m_cur_target_node_ != nullptr && m_cur_target_node_->get_parent() != nullptr)
 	{
 		Node* next_node = new Node(m_cur_target_node_->get_point(), m_cur_target_node_->get_target(), m_cur_target_node_->get_value()
@@ -142,11 +176,10 @@ void Player::choose_direction()
 			m_cur_path_to_target_.push(&next_node->get_point());
 			next_node = next_node->get_parent();
 		}
-		m_cur_path_to_target_.push(new Point2D (next_node->get_point().get_row() , next_node->get_point().get_col()));// possible waste of memory
+		m_cur_path_to_target_.push(new Point2D(next_node->get_point().get_row(), next_node->get_point().get_col()));// possible waste of memory
 
 		delete next_node;
 	}
-
 }
 
 Node* Player::get_location() const
@@ -166,27 +199,26 @@ bool Player::get_is_moving() const
 
 void Player::move(Maze& maze)
 {
+	//maybe this two variables can be class members and not static.
+	static int old_value = 0; // the last value of the node.
+	static int step_counter = 0;
+
+	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	{
+		while (m_cur_path_to_target_.empty() == false)
+			m_cur_path_to_target_.pop();
+		step_counter = 0;
+
+		choose_direction();
+	}
+
 	if (m_is_moving_)
 	{
-		//maybe this two variables can be class members and not static.
-		static int old_value = 0; // the last value of the node.
-		static int step_counter = 0;
 
 		int cur_old_value = old_value;
 
-		if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
-		{
-			while (m_cur_path_to_target_.empty() == false)
-				m_cur_path_to_target_.pop();
-			step_counter = 0;
-
-			choose_direction();
-		}
-
 		Point2D* nextPoint = m_cur_path_to_target_.top();
 		m_cur_path_to_target_.pop(); //remove the top point from the stack
-
-		m_is_moving_ = true;
 
 		int cur_x = m_location_->get_point().get_row();
 		int cur_y = m_location_->get_point().get_col();
@@ -207,8 +239,10 @@ void Player::move(Maze& maze)
 			std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
 			std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
 		}
-		++step_counter;
 	}
+
+	++step_counter;
+
 }
 
 //deprecated

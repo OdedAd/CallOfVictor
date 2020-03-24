@@ -24,7 +24,9 @@ public:
 	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target);
-	
+	bool shoot(Player* calling_player, Point2D& target);
+	bool pickup(Player* calling_player, Point2D& target);
+
 	GameMgr(GameMgr const&) = delete;
 	GameMgr(GameMgr const &&) = delete;
 	void operator=(GameMgr const&) = delete;
@@ -40,4 +42,8 @@ private:
 	Maze maze_;
 	std::vector<Team> teams_;
 	std::vector<PickupObject> pickup_objects_;
+
+	Player* get_player_at_pos(Point2D& position);
+	PickupObject* get_pickup_at_pos(Point2D& position);
+
 };
