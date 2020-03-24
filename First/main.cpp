@@ -18,8 +18,6 @@
 
 using namespace std;
 
-GameMgr game_mgr;
-
 const int width = 600; // window width
 const int height = 600; // window height
 
@@ -35,8 +33,8 @@ void init()
 	srand(time(nullptr)); // pseudo randomization
 
 	glClearColor(0.7, 0.7, 0.7, 0);
-
-	game_mgr.init_game();
+	
+	GameMgr::get_instance().init_game();
 
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
@@ -51,7 +49,7 @@ void draw_maze()
 		for (auto j = 0; j < maze_size; j++)
 		{
 			// set color
-			switch (game_mgr.get_maze().get_at_pos(i, j).get_value())
+			switch (GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value())
 			{
 			case SPACE:
 				glColor3d(1, 1, 1); // white
@@ -95,7 +93,7 @@ void draw_map()
 	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
 		{
-			if (game_mgr.get_maze().get_at_pos(i, j).get_value() == SPACE)
+			if (GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value() == SPACE)
 			{
 				double c;
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
@@ -128,12 +126,12 @@ void generate_map()
 		{
 			col = rand() % maze_size;
 			row = rand() % maze_size;
-		} while (game_mgr.get_maze().get_at_pos(row, col).get_value() != SPACE);
+		} while (GameMgr::get_instance().get_maze().get_at_pos(row, col).get_value() != SPACE);
 		sz = 2.0 / maze_size;
 		x = col * sz - 1;
 		y = row * sz - 1;
 		pg = new Granade(x, y);
-		pg->simulate_explosion(map, game_mgr.get_maze());
+		pg->simulate_explosion(map, GameMgr::get_instance().get_maze());
 		delete pg;
 	}
 }
@@ -151,7 +149,7 @@ void display()
 		pg->show_me();
 	}
 
-	for (Team cur_team : game_mgr.get_teams())
+	for (Team cur_team : GameMgr::get_instance().get_teams())
 	{
 		for (Player* cur_player : cur_team.get_teammates())
 		{
@@ -177,7 +175,7 @@ bool check_is_space(const double dx, const double dy)
 {
 	int i = maze_size * (dy + 1) / 2;
 	int j = maze_size * (dx + 1) / 2;
-	return  game_mgr.get_maze().get_at_pos(i, j).get_value() == SPACE;
+	return  GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value() == SPACE;
 }
 
 void idle()
@@ -191,16 +189,16 @@ void idle()
 		{
 			//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
 			//		pb->move();
-			pg->move_bullets(game_mgr.get_maze());
+			pg->move_bullets(GameMgr::get_instance().get_maze());
 
 			//		move_on = pg->GetIsMoving();
 		}
 
-		for (Team cur_team : game_mgr.get_teams())
+		for (Team cur_team : GameMgr::get_instance().get_teams())
 		{
 			for (Player* cur_player : cur_team.get_teammates())
 			{
-				cur_player->move(game_mgr.get_maze());
+				cur_player->move(GameMgr::get_instance().get_maze());
 			}
 		}
 	}
@@ -225,7 +223,7 @@ void menu(const int choice)
 			pg->explode();
 		}
 
-		for (Team cur_team : game_mgr.get_teams())
+		for (Team cur_team : GameMgr::get_instance().get_teams())
 		{
 			for (Player* cur_player : cur_team.get_teammates())
 			{
@@ -236,11 +234,11 @@ void menu(const int choice)
 		move_on = true;
 		break;
 	case 3:
-		game_mgr.get_teams()[0].get_teammates()[0]->set_hp(2);
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(2);
 		break;
 	case 4:
-		game_mgr.get_teams()[0].get_teammates()[0]->set_ammo(0);
-		game_mgr.get_teams()[0].get_teammates()[0]->set_hp(4);
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_ammo(0);
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(4);
 		break;
 	}
 }
@@ -256,9 +254,9 @@ void mouse(const int button, const int state, const int x, const int y)
 		//		pb = new Bullet(xx,yy);
 		pg = new Granade(xx, yy);
 		cout << "player moving" << endl;
-		game_mgr.get_teams()[0].get_teammates()[0]->set_is_moving(true);
-		game_mgr.get_teams()[0].get_teammates()[0]->move(game_mgr.get_maze());
-		game_mgr.get_teams()[0].get_teammates()[0]->set_is_moving(false);
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(false);
 		cout << "end of player moving" << endl;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)

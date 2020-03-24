@@ -10,6 +10,16 @@ void GameMgr::init_game()
 	generate_pickups();
 }
 
+GameMgr& GameMgr::get_instance()
+{
+	static GameMgr* instance;
+	if(instance == nullptr)
+	{
+		instance = new GameMgr();
+	}
+	return *instance;
+}
+
 ///
 ///Initialize the maze.
 ///

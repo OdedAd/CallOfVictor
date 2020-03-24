@@ -174,7 +174,7 @@ void Player::move(Maze& maze)
 
 		int cur_old_value = old_value;
 
-		if (m_cur_path_to_target_.empty() || step_counter > 10) //every 10 steps reset the m_cur_path_to_target_ and make new one.
+		if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 		{
 			while (m_cur_path_to_target_.empty() == false)
 				m_cur_path_to_target_.pop();

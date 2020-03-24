@@ -12,6 +12,7 @@ const int num_of_teams = 2;
 class GameMgr
 {
 public:
+	static GameMgr& get_instance();
 	void generate_maze();
 	void init_pickup(const PickupType type, const int color_type);
 	void generate_pickups();
@@ -23,14 +24,20 @@ public:
 	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target);
+	
+	GameMgr(GameMgr const&) = delete;
+	GameMgr(GameMgr const &&) = delete;
+	void operator=(GameMgr const&) = delete;
+	
 private:
 	void check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
 		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
 	void check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
 		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
 
+	GameMgr() = default;
+
 	Maze maze_;
 	std::vector<Team> teams_;
 	std::vector<PickupObject> pickup_objects_;
-
 };
