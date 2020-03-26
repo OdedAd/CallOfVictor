@@ -144,14 +144,16 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team,bool& is_s
 		{
 			for (Player* cur_player : cur_team.get_teammates())
 			{
-				temp_node.set_target(&cur_player->get_location()->get_point());
-				const double cur_distance = temp_node.compute_h();
-				if (min_distance == -1 || cur_distance < min_distance)
+				if (cur_player->get_hp() > 0)
 				{
-					min_distance = cur_distance;
-					p = &cur_player->get_location()->get_point();
+					temp_node.set_target(&cur_player->get_location()->get_point());
+					const double cur_distance = temp_node.compute_h();
+					if (min_distance == -1 || cur_distance < min_distance)
+					{
+						min_distance = cur_distance;
+						p = &cur_player->get_location()->get_point();
+					}
 				}
-
 			}
 		}
 	}
@@ -231,7 +233,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 		//else if (curNodeValue == PICKUP) // pickup 
 		//	cost = 0.1;
 		else if (cur_node_value == PLAYER) // player 
-			cost = 2;
+			cost = 5;
 
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
@@ -257,13 +259,30 @@ void GameMgr::add_team(const Team& team)
 
 bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
-	Room& targets_room = maze_.get_room_at(target);
-	Room& player_room = maze_.get_room_at(calling_player->get_location()->get_point());
+	Player* targetPlayer = get_player_at_pos(target);
 
-	if (player_room == targets_room)
-		return true;
-	else
-		return false;
+	try
+	{
+		Room& targets_room = maze_.get_room_at(target);
+		Room& player_room = maze_.get_room_at(calling_player->get_location()->get_point());
+		if (player_room == targets_room)
+		{
+
+
+			int max_damage = targetPlayer->get_max_hp();
+			int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
+			if (damage < 0) damage = 0;
+
+			targetPlayer->get_hit(damage);
+			return true;
+		}
+	}
+	catch (...) {}; //if we get to the catch it means one of the points was not in a room
+					// and because the points are the location of a player and he can only be
+					// on a space or a path it means that he is in a PATH and we don't shoot
+					// in PATH so he will need to keep going.
+
+	return false;
 }
 
 bool GameMgr::pickup(Player* calling_player, Point2D& target)

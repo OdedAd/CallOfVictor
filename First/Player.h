@@ -20,6 +20,7 @@ private:
 	const int m_max_ammo_;
 	int m_cur_hp_;
 	const int m_max_hp_;
+	int m_old_value = 0;
 
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
@@ -62,6 +63,10 @@ public:
 	///</summary>
 	void choose_direction();
 
+	///<summary>
+	/// Reaction to getting hit.
+	///</summary>
+	void get_hit(int damage);
 
 	Node* get_location() const;
 
@@ -71,7 +76,12 @@ public:
 	void set_dir(double angle); //deprecated
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 	void set_hp(int value);
+	int get_hp();
+	int get_max_hp();
 	void set_ammo(int value);
+	int get_ammo();
+	int get_old_value();
+
 
 };
 

@@ -19,6 +19,7 @@ private:
 public:
 	Node** get_sub_matrix(Point2D,Point2D);
 	Node& get_at_pos(int i,int j);
+	Node& get_at_pos(Point2D& position);
 	void setup_maze();
 	Room& get_room_at(unsigned short index);
 	Room& get_room_at(const Point2D& point);

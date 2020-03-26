@@ -74,7 +74,7 @@ void Player::heal()
 
 	if (isSuccessful) //picked up the medkit successfully, heal up.
 	{
-		m_cur_hp_ += m_max_hp_;
+		m_cur_hp_ = m_max_hp_;
 		m_is_moving_ = false;
 	}
 	else //couldn't pick up the medkit, need to move closer.
@@ -126,7 +126,19 @@ void Player::fight()
 	std::cout << "in fight function: target_location row = " << target_location.get_row()
 		<< " col = " << target_location.get_col() << std::endl;
 
-	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+	bool isSuccessful = false;
+	isSuccessful = m_mgr_->shoot(this, target_location);
+
+	if (isSuccessful)
+	{
+		--m_ammo_;
+		m_is_moving_ = false;
+	}
+	else
+	{
+		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+		m_is_moving_ = true;
+	}
 }
 
 
@@ -182,6 +194,12 @@ void Player::fill_path_stack()
 	}
 }
 
+void Player::get_hit(int damage)
+{
+	m_cur_hp_ -= damage;
+
+}
+
 Node* Player::get_location() const
 {
 	return m_location_;
@@ -200,7 +218,7 @@ bool Player::get_is_moving() const
 void Player::move(Maze& maze)
 {
 	//maybe this two variables can be class members and not static.
-	static int old_value = 0; // the last value of the node.
+	//static int old_value = 0; // the last value of the node.
 	static int step_counter = 0;
 
 	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
@@ -215,7 +233,7 @@ void Player::move(Maze& maze)
 	if (m_is_moving_)
 	{
 
-		int cur_old_value = old_value;
+		int cur_old_value = m_old_value;
 
 		Point2D* nextPoint = m_cur_path_to_target_.top();
 		m_cur_path_to_target_.pop(); //remove the top point from the stack
@@ -232,7 +250,7 @@ void Player::move(Maze& maze)
 		{
 			m_location_->set_point(*nextPoint);
 
-			old_value = maze.get_at_pos(next_x, next_y).get_value();
+			m_old_value = maze.get_at_pos(next_x, next_y).get_value();
 			maze.get_at_pos(next_x, next_y).set_value(PLAYER); //upadte the new location
 			maze.get_at_pos(cur_x, cur_y).set_value(cur_old_value); //upadte the old location
 
@@ -274,7 +292,27 @@ void Player::set_hp(const int value)
 	this->m_cur_hp_ = value;
 }
 
+int Player::get_hp()
+{
+	return m_cur_hp_;
+}
+
+int Player::get_max_hp()
+{
+	return m_max_hp_;
+}
+
 void Player::set_ammo(const int value)
 {
 	this->m_ammo_ = value;
+}
+
+int Player::get_ammo()
+{
+	return m_ammo_;
+}
+
+int Player::get_old_value()
+{
+	return m_old_value;
 }
