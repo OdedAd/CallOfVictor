@@ -57,8 +57,8 @@ void Player::run_away()
 
 	//get heat map in room -NOT YET
 
-	std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
-		<< " col = " << m_location_->get_point().get_col() << std::endl;
+	//std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
+		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 	//get cover (find minimum in that matrix)
 	if (m_is_running_for_hp_cond_)
 	{
@@ -73,8 +73,8 @@ void Player::run_away()
 		}
 		else
 		{
-			std::cout << "in run function: target_location row = " << target.get_row()
-				<< " col = " << target.get_col() << std::endl;
+			//std::cout << "in run function: target_location row = " << target.get_row()
+				//<< " col = " << target.get_col() << std::endl;
 			//move to the minimum target
 			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
 		}
@@ -86,13 +86,13 @@ void Player::run_away()
 ///</summary>
 void Player::heal()
 {
-	std::cout << "in heal function: my location row = " << m_location_->get_point().get_row()
-		<< " col = " << m_location_->get_point().get_col() << std::endl;
+	//std::cout << "in heal function: my location row = " << m_location_->get_point().get_row()
+		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
 
-	std::cout << "in heal function: target_location row = " << target.get_row()
-		<< " col = " << target.get_col() << std::endl;
+	//std::cout << "in heal function: target_location row = " << target.get_row()
+		//<< " col = " << target.get_col() << std::endl;
 
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
 
@@ -117,13 +117,13 @@ void Player::heal()
 ///</summary>
 void Player::reload()
 {
-	std::cout << "in reload function: my location row = " << m_location_->get_point().get_row()
-		<< " col = " << m_location_->get_point().get_col() << std::endl;
+	//std::cout << "in reload function: my location row = " << m_location_->get_point().get_row()
+		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
 
-	std::cout << "in reload function: target_location row = " << target.get_row()
-		<< " col = " << target.get_col() << std::endl;
+	//std::cout << "in reload function: target_location row = " << target.get_row()
+		//<< " col = " << target.get_col() << std::endl;
 
 	bool is_successful = false;
 	is_successful = m_mgr_->pickup(this, target);
@@ -147,26 +147,32 @@ void Player::reload()
 void Player::fight()
 {
 	bool is_shootable;
-	std::cout << "in fight function: my location row = " << m_location_->get_point().get_row()
-		<< " col = " << m_location_->get_point().get_col() << std::endl;
+	//std::cout << "in fight function: my location row = " << m_location_->get_point().get_row()
+		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 	Point2D target_location;
 	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
-
-	std::cout << "in fight function: target_location row = " << target_location.get_row()
-		<< " col = " << target_location.get_col() << std::endl;
-
-	bool is_successful = false;
-	is_successful = m_mgr_->shoot(this, target_location);
-
-	if (is_successful)
+	if (target_location.get_col() == -1 && target_location.get_row() == -1)
 	{
-		--m_ammo_;
 		m_is_moving_ = false;
 	}
 	else
 	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
-		m_is_moving_ = true;
+		//std::cout << "in fight function: target_location row = " << target_location.get_row()
+			//<< " col = " << target_location.get_col() << std::endl;
+
+		bool is_successful = false;
+		is_successful = m_mgr_->shoot(this, target_location);
+
+		if (is_successful)
+		{
+			--m_ammo_;
+			m_is_moving_ = false;
+		}
+		else
+		{
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+			m_is_moving_ = true;
+		}
 	}
 }
 
@@ -179,7 +185,7 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_ / 2)
+	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0)
 	{
 		fight();
 	}
@@ -223,6 +229,11 @@ void Player::fill_path_stack()
 void Player::get_hit(const int damage)
 {
 	m_cur_hp_ -= damage;
+	if (m_cur_hp_ <= 0)
+	{
+		std::cout << "HEREEEEEeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" << std::endl;
+		GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
+	}
 }
 
 Node* Player::get_location() const
@@ -246,12 +257,12 @@ void Player::move(Maze& maze)
 	//static int old_value = 0; // the last value of the node.
 	static int step_counter = 0;
 
-	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || step_counter > 0) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();
 		step_counter = 0;
-
+		
 		choose_direction();
 	}
 
@@ -271,7 +282,8 @@ void Player::move(Maze& maze)
 		int next_x = nextPoint->get_row();
 		int next_y = nextPoint->get_col();
 
-		if (m_is_moving_ && (maze.get_at_pos(next_x, next_y).get_value() == SPACE || maze.get_at_pos(next_x, next_y).get_value() == PATH))
+		if (m_is_moving_ && (maze.get_at_pos(next_x, next_y).get_value() == SPACE || maze.get_at_pos(next_x, next_y).get_value() == PICKUP_AMMO
+			|| maze.get_at_pos(next_x, next_y).get_value() == PICKUP_MED))
 		{
 			m_location_->set_point(*nextPoint);
 
@@ -340,4 +352,9 @@ int Player::get_ammo() const
 int Player::get_old_value() const
 {
 	return m_old_value;
+}
+
+Team* Player::get_team() const
+{
+	return this->m_team_;
 }

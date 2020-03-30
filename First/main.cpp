@@ -34,12 +34,11 @@ void init()
 
 	glClearColor(0.7, 0.7, 0.7, 0);
 
-	GameMgr::get_instance().init_game();
-	GameMgr::get_instance().generate_map();
-
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
+	GameMgr::get_instance().init_game();
 
+	//GameMgr::get_instance().generate_map();
 }
 
 void draw_maze()
@@ -153,9 +152,9 @@ void display()
 		pg->show_me();
 	}
 
-	for (Team cur_team : GameMgr::get_instance().get_teams())
+	for (auto cur_team : GameMgr::get_instance().get_teams())
 	{
-		for (Player* cur_player : cur_team.get_teammates())
+		for (Player* cur_player : cur_team->get_teammates())
 		{
 			cur_player->show_me();
 		}
@@ -186,8 +185,7 @@ void idle()
 {
 
 	//Sleep(100);
-
-	if (move_on)
+	if (move_on && !GameMgr::get_instance().is_game_over())
 	{
 		if (pg != nullptr)
 		{
@@ -198,19 +196,15 @@ void idle()
 			//		move_on = pg->GetIsMoving();
 		}
 
-		for (Team cur_team : GameMgr::get_instance().get_teams())
-		{
-			for (Player* cur_player : cur_team.get_teammates())
-			{
-				if (cur_player->get_hp() > 0)
-				{
-					cur_player->move(GameMgr::get_instance().get_maze());
-				}else
-				{
-					cur_player->set_is_moving(false);
-				}
-			}
-		}
+		GameMgr::get_instance().play_one_turn();
+	}
+
+	if (GameMgr::get_instance().is_game_over())
+	{
+		cout << "Game Over!" << endl;
+		//GameMgr::get_instance().clear_all_resources();
+		exit(0);
+		return;
 	}
 	glutPostRedisplay();// calls indirectly to display
 }
@@ -234,9 +228,9 @@ void menu(const int choice)
 			pg->explode();
 		}
 
-		for (Team cur_team : GameMgr::get_instance().get_teams())
+		for (auto cur_team : GameMgr::get_instance().get_teams())
 		{
-			for (Player* cur_player : cur_team.get_teammates())
+			for (Player* cur_player : cur_team->get_teammates())
 			{
 				cur_player->set_is_moving(true);
 			}
@@ -245,14 +239,14 @@ void menu(const int choice)
 		move_on = true;
 		break;
 	case 3:
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(2);
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(2);
 		break;
 	case 4:
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_ammo(0);
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(4);
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_ammo(0);
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(4);
 		break;
 	case 5:
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(4);
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(4);
 		break;
 	}
 }
@@ -267,11 +261,11 @@ void mouse(const int button, const int state, const int x, const int y)
 
 		//		pb = new Bullet(xx,yy);
 		pg = new Grenade(xx, yy);
-		cout << "player moving" << endl;
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());
-		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(false);
-		cout << "end of player moving" << endl;
+		//cout << "player moving" << endl;
+		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
+		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());
+		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(false);
+		//cout << "end of player moving" << endl;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{

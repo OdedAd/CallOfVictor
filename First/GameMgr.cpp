@@ -1,10 +1,13 @@
 #include "GameMgr.h"
 
+#include <iostream>
+
 ///
 ///Initialize the game. call all relevant initialization function and generate the maze
 ///
 void GameMgr::init_game()
 {
+	is_game_over_ = false;
 	generate_maze();
 	generate_teams();
 	generate_pickups();
@@ -63,7 +66,7 @@ void GameMgr::generate_teams()
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
-		const auto max_num_of_players = 5;
+		const auto max_num_of_players = 2;
 
 		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
 		{
@@ -81,7 +84,7 @@ void GameMgr::generate_teams()
 			maze_.get_at_pos(k, j).set_value(PLAYER);
 			team->add_player(new Player(this, team, &maze_.get_at_pos(k, j)));
 		}
-		this->add_team(*team);
+		this->add_team(team);
 	}
 }
 
@@ -90,7 +93,7 @@ Maze& GameMgr::get_maze()
 	return this->maze_;
 }
 
-std::vector<Team>& GameMgr::get_teams()
+std::vector<Team*>& GameMgr::get_teams()
 {
 	return this->teams_;
 }
@@ -138,11 +141,11 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_
 	temp_node.set_point(location);
 	double min_distance = -1;
 
-	for (Team cur_team : teams_)
+	for (Team* cur_team : teams_)
 	{
-		if (!cur_team.compare_color(my_team.get_color()))
+		if (!cur_team->compare_color(my_team.get_color()))
 		{
-			for (Player* cur_player : cur_team.get_teammates())
+			for (Player* cur_player : cur_team->get_teammates())
 			{
 				if (cur_player->get_hp() > 0)
 				{
@@ -157,7 +160,10 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_
 			}
 		}
 	}
-
+	if (p == nullptr)
+	{
+		p = new Point2D(-1, -1);
+	}
 	return *p;
 }
 
@@ -251,7 +257,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 ///
 ///adds a team to the teams vector
 ///
-void GameMgr::add_team(const Team& team)
+void GameMgr::add_team(Team* team)
 {
 	this->teams_.push_back(team);
 }
@@ -260,6 +266,19 @@ void GameMgr::add_team(const Team& team)
 bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
+	if (calling_player->get_location()->get_point().get_distance(target) < 2)
+	{
+		int max_damage = targetPlayer->get_max_hp();
+		int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
+		if (damage < 0) damage = 0;
+
+		targetPlayer->get_hit(damage);
+		if (targetPlayer->get_hp() <= 0)
+		{
+			targetPlayer->get_team()->reduce_players_alive(1);
+		}
+		return true;
+	}
 
 	try
 	{
@@ -268,12 +287,15 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		if (player_room == targets_room)
 		{
 
-
 			int max_damage = targetPlayer->get_max_hp();
 			int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
 			if (damage < 0) damage = 0;
 
 			targetPlayer->get_hit(damage);
+			if (targetPlayer->get_hp() <= 0)
+			{
+				targetPlayer->get_team()->reduce_players_alive(1);
+			}
 			return true;
 		}
 	}
@@ -344,11 +366,73 @@ double** GameMgr::get_heat_map()
 	return returnedMap;
 }
 
+void GameMgr::play_one_turn()
+{
+	//generate_map();
+	for (auto game_team : teams_)
+	{
+		if (game_team->get_players_alive() <= 0)
+		{
+			std::cout << "Team " << game_team->get_team_name() << " lost!" << std::endl;
+			is_game_over_ = true;
+			return;
+		}
+	}
+	for (auto cur_team : teams_)
+	{
+		for (Player* cur_player : cur_team->get_teammates())
+		{
+			if (cur_player->get_hp() > 0)
+			{
+				cur_player->move(maze_);
+			}
+			else
+			{
+				cur_player->set_is_moving(false);
+			}
+		}
+	}
+	//clear_map();
+}
+
+void GameMgr::clear_map()
+{
+	for (int i = 0; i < maze_size; ++i)
+	{
+		for (int j = 0; j < maze_size; ++j)
+		{
+			map_[i][j] = 0;
+		}
+	}
+}
+
+bool GameMgr::is_game_over() const
+{
+	return this->is_game_over_;
+}
+
+void GameMgr::delete_team_related_allocations()
+{
+	for (auto game_team : teams_)
+	{
+		for (auto player : game_team->get_teammates())
+		{
+			delete player;
+		}
+		delete game_team;
+	}
+}
+
+void GameMgr::clear_all_resources()
+{
+	delete_team_related_allocations();
+}
+
 
 Player* GameMgr::get_player_at_pos(Point2D& position)
 {
-	for (Team curTeam : teams_)
-		for (Player* curPlayer : curTeam.get_teammates())
+	for (auto curTeam : teams_)
+		for (Player* curPlayer : curTeam->get_teammates())
 			if (curPlayer->get_location()->get_point() == position)
 				return curPlayer;
 
@@ -362,4 +446,14 @@ PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
 			return &curPickup;
 
 	throw "at GameMgr::get_pickup_at_pos , the given position is not a PickupObject";
+}
+
+Player& GameMgr::get_player_at_pos_ref(Point2D& position)
+{
+	for (auto curTeam : teams_)
+		for (Player* curPlayer : curTeam->get_teammates())
+			if (curPlayer->get_location()->get_point() == position)
+				return *curPlayer;
+
+	throw "at GameMgr::get_player_at_pos , the given position is not a player";
 }

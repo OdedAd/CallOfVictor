@@ -35,7 +35,7 @@ private:
 public:
 
 	Player(GameMgr* mgr ,Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
-
+	~Player() = default; 
 	void show_me() const;
 
 	///<summary>
@@ -83,6 +83,7 @@ public:
 	void set_ammo(int value);
 	int get_ammo() const;
 	int get_old_value() const;
+	Team* get_team() const;
 
 
 };

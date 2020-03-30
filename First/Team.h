@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #define COLOR_LENGTH 3
 
 class Player;
@@ -15,15 +16,18 @@ private:
 	std::vector<Player*> m_players_;
 
 	//color in RGB
-	 int m_color_[COLOR_LENGTH]; 
+	 int m_color_[COLOR_LENGTH];
+	int players_alive_;
 
 public:
 	Team(const int color[COLOR_LENGTH] = default_color, std::vector<Player*> players = {}) ;
-
 	std::vector<Player*>& get_teammates();
 	void add_player(Player* player);
 	const int* get_color() const;
 	bool compare_color(const int* other_color);
+	void reduce_players_alive(int count);
+	int get_players_alive() const;
+	std::string get_team_name() const;
 
 	bool operator!=(const Team& rhs) const {
 		return
