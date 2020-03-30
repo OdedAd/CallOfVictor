@@ -20,7 +20,7 @@ class Node
 {
 public:
 	Node();
-	~Node();
+	~Node() = default;
 
 	Node(Point2D & pt, Point2D * t, int v, double g, Node * pr);
 
@@ -36,13 +36,13 @@ public:
 	void set_value(int value);
 	void set_point(Point2D point);
 	void set_target(Point2D* target);
-	int get_value();
-	double get_g();
-	double compute_h();
-	double get_f();
+	int get_value() const;
+	double get_g() const;
+	double compute_h() const;
+	double get_f() const;
 	Point2D& get_point();
-	Node* get_parent();
-	Point2D* get_target();
+	Node* get_parent() const;
+	Point2D* get_target() const;
 	bool operator == (const Node &other) {
 		return point_ == other.point_;
 	}

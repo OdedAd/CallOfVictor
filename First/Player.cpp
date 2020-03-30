@@ -7,7 +7,7 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, const int maxHP) :
+Player::Player(GameMgr* mgr, Team* team, Node* location, const int max_ammo, const int maxHP) :
 	m_mgr_(mgr), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
@@ -17,14 +17,15 @@ Player::Player(GameMgr* mgr ,Team* team, Node* location, const int max_ammo, con
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
+	m_is_running_for_hp_cond_ = false;
 
 	m_cur_target_node_ = nullptr;
 }
 
 void Player::show_me() const
 {
-	double y = m_location_->get_point().get_row() ;
-	double x = m_location_->get_point().get_col() ;
+	double y = m_location_->get_point().get_row();
+	double x = m_location_->get_point().get_col();
 
 	int R = m_team_->get_color()[0];
 	int G = m_team_->get_color()[1];
@@ -53,20 +54,31 @@ void Player::run_away()
 {
 	//get the room where the player is now
 	//auto current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
-	
+
 	//get heat map in room -NOT YET
-	
-	std::cout<< "in run function: my location row = " << m_location_->get_point().get_row()
-		<<" col = " << m_location_->get_point().get_col() << std::endl;
+
+	std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
+		<< " col = " << m_location_->get_point().get_col() << std::endl;
 	//get cover (find minimum in that matrix)
-	Point2D target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
-
-	std::cout << "in run function: target_location row = " << target.get_row()
-		<< " col = " << target.get_col() << std::endl;
-	//move to the minimum target
-	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
-
-	
+	if (m_is_running_for_hp_cond_)
+	{
+		heal();
+	}
+	else
+	{
+		Point2D target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
+		if (target == m_location_->get_point())
+		{
+			m_is_running_for_hp_cond_ = true;
+		}
+		else
+		{
+			std::cout << "in run function: target_location row = " << target.get_row()
+				<< " col = " << target.get_col() << std::endl;
+			//move to the minimum target
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+		}
+	}
 }
 
 ///<summary>
@@ -74,23 +86,24 @@ void Player::run_away()
 ///</summary>
 void Player::heal()
 {
-	std::cout<< "in heal function: my location row = " << m_location_->get_point().get_row()
-		<<" col = " << m_location_->get_point().get_col() << std::endl;
-	
+	std::cout << "in heal function: my location row = " << m_location_->get_point().get_row()
+		<< " col = " << m_location_->get_point().get_col() << std::endl;
+
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
 
 	std::cout << "in heal function: target_location row = " << target.get_row()
 		<< " col = " << target.get_col() << std::endl;
-	
+
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
 
-	bool isSuccessful = false;
-	isSuccessful = m_mgr_->pickup(this, target);
+	bool is_successful = false;
+	is_successful = m_mgr_->pickup(this, target);
 
-	if (isSuccessful) //picked up the medkit successfully, heal up.
+	if (is_successful) //picked up the medkit successfully, heal up.
 	{
 		m_cur_hp_ = m_max_hp_;
 		m_is_moving_ = false;
+		m_is_running_for_hp_cond_ = false;
 	}
 	else //couldn't pick up the medkit, need to move closer.
 	{
@@ -104,21 +117,22 @@ void Player::heal()
 ///</summary>
 void Player::reload()
 {
-	std::cout<< "in reload function: my location row = " << m_location_->get_point().get_row()
-		<<" col = " << m_location_->get_point().get_col() << std::endl;
-	
+	std::cout << "in reload function: my location row = " << m_location_->get_point().get_row()
+		<< " col = " << m_location_->get_point().get_col() << std::endl;
+
 	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
 
 	std::cout << "in reload function: target_location row = " << target.get_row()
 		<< " col = " << target.get_col() << std::endl;
 
-	bool isSuccessful = false;
-	isSuccessful = m_mgr_->pickup(this , target);
-	
-	if (isSuccessful) //picked up the ammo successfully, stock up on ammo.
+	bool is_successful = false;
+	is_successful = m_mgr_->pickup(this, target);
+
+	if (is_successful) //picked up the ammo successfully, stock up on ammo.
 	{
 		m_ammo_ = m_max_ammo_;
 		m_is_moving_ = false;
+		m_is_running_for_hp_cond_ = false;
 	}
 	else //couldn't pick up the ammo, need to move closer.
 	{
@@ -133,18 +147,18 @@ void Player::reload()
 void Player::fight()
 {
 	bool is_shootable;
-	std::cout<< "in fight function: my location row = " << m_location_->get_point().get_row()
-		<<" col = " << m_location_->get_point().get_col() << std::endl;
+	std::cout << "in fight function: my location row = " << m_location_->get_point().get_row()
+		<< " col = " << m_location_->get_point().get_col() << std::endl;
 	Point2D target_location;
 	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
 
 	std::cout << "in fight function: target_location row = " << target_location.get_row()
 		<< " col = " << target_location.get_col() << std::endl;
 
-	bool isSuccessful = false;
-	isSuccessful = m_mgr_->shoot(this, target_location);
+	bool is_successful = false;
+	is_successful = m_mgr_->shoot(this, target_location);
 
-	if (isSuccessful)
+	if (is_successful)
 	{
 		--m_ammo_;
 		m_is_moving_ = false;
@@ -165,7 +179,7 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_/2)
+	if (m_cur_hp_ >= m_max_hp_ / 2)
 	{
 		fight();
 	}
@@ -182,11 +196,8 @@ void Player::choose_direction()
 		reload();
 	}
 
-
 	if (m_is_moving_)
 		fill_path_stack();
-
-
 }
 
 
@@ -209,10 +220,9 @@ void Player::fill_path_stack()
 	}
 }
 
-void Player::get_hit(int damage)
+void Player::get_hit(const int damage)
 {
 	m_cur_hp_ -= damage;
-
 }
 
 Node* Player::get_location() const
@@ -293,12 +303,12 @@ void Player::simulate_motion(double map[maze_size][maze_size], Maze maze) const
 	int y = m_location_->get_point().get_col();
 
 
-	while (maze.get_at_pos(x + m_dirx_,y + m_diry_).get_value() == SPACE)
+	while (maze.get_at_pos(x + m_dirx_, y + m_diry_).get_value() == SPACE)
 	{
 		map[x][y] += player_delta_;
 		x += m_dirx_;
 		y += m_diry_;
-		
+
 	}
 }
 
@@ -307,12 +317,12 @@ void Player::set_hp(const int value)
 	this->m_cur_hp_ = value;
 }
 
-int Player::get_hp()
+int Player::get_hp() const
 {
 	return m_cur_hp_;
 }
 
-int Player::get_max_hp()
+int Player::get_max_hp() const
 {
 	return m_max_hp_;
 }
@@ -322,12 +332,12 @@ void Player::set_ammo(const int value)
 	this->m_ammo_ = value;
 }
 
-int Player::get_ammo()
+int Player::get_ammo() const
 {
 	return m_ammo_;
 }
 
-int Player::get_old_value()
+int Player::get_old_value() const
 {
 	return m_old_value;
 }

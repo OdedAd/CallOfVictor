@@ -77,7 +77,7 @@ Point2D& Utils::find_minimum_in_matrix(Maze& maze)
 			//double cur_value = maze.get_at_pos(row_index, col_index).get_value();
 			double cur_value = map[row_index][col_index];
 			if (min_value > cur_value && maze.get_at_pos(row_index,col_index).get_value()!=WALL 
-				&& cur_value>0.0001f)
+				&& cur_value>0.001f)
 			{
 				min_value_location->set_row(row_index);
 				min_value_location->set_col(col_index);

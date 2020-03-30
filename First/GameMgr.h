@@ -6,7 +6,6 @@
 #include "PickupObject.h"
 #include "Player.h"
 #include "Grenade.h"
-#include "Room.h"
 
 const int num_of_teams = 2;
 
@@ -15,7 +14,7 @@ class GameMgr
 public:
 	static GameMgr& get_instance();
 	void generate_maze();
-	void init_pickup(const PickupType type, const int color_type);
+	void init_pickup(PickupType type, const int color_type);
 	void generate_pickups();
 	void init_game();
 	void add_team(const Team& team);
@@ -37,8 +36,8 @@ public:
 private:
 	void check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
 		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
-	void check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
+	void check_node(int row, int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
+	                std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
 
 	GameMgr() = default;
 

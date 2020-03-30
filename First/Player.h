@@ -25,6 +25,8 @@ private:
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 
+	bool m_is_running_for_hp_cond_;
+
 	const double player_delta_ = 0.0001;
 
 	void fill_path_stack();
@@ -76,11 +78,11 @@ public:
 	void set_dir(double angle); //deprecated
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 	void set_hp(int value);
-	int get_hp();
-	int get_max_hp();
+	int get_hp() const;
+	int get_max_hp() const;
 	void set_ammo(int value);
-	int get_ammo();
-	int get_old_value();
+	int get_ammo() const;
+	int get_old_value() const;
 
 
 };

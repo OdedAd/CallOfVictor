@@ -1,8 +1,10 @@
 #include "Grenade.h"
 
-Grenade::Grenade(const double x, const double y): x_(x),y_(y)
+Grenade::Grenade(const double x, const double y)
 {
 	int i;
+	this->x_ = x;
+	this->y_ = y;
 	double alpha, delta = 2*PI/NUM_BULLETS;
 	for (i = 0,alpha = 0; i < NUM_BULLETS; i++,alpha+=delta)
 	{

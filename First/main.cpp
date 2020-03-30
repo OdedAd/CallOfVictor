@@ -33,8 +33,9 @@ void init()
 	srand(time(nullptr)); // pseudo randomization
 
 	glClearColor(0.7, 0.7, 0.7, 0);
-	
+
 	GameMgr::get_instance().init_game();
+	GameMgr::get_instance().generate_map();
 
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
@@ -201,7 +202,13 @@ void idle()
 		{
 			for (Player* cur_player : cur_team.get_teammates())
 			{
-				cur_player->move(GameMgr::get_instance().get_maze());
+				if (cur_player->get_hp() > 0)
+				{
+					cur_player->move(GameMgr::get_instance().get_maze());
+				}else
+				{
+					cur_player->set_is_moving(false);
+				}
 			}
 		}
 	}
@@ -210,7 +217,7 @@ void idle()
 
 void menu(const int choice)
 {
-	switch(choice)
+	switch (choice)
 	{
 	case 1:
 		move_on = false;

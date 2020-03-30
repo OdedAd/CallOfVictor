@@ -13,7 +13,7 @@ void GameMgr::init_game()
 GameMgr& GameMgr::get_instance()
 {
 	static GameMgr* instance;
-	if(instance == nullptr)
+	if (instance == nullptr)
 	{
 		instance = new GameMgr();
 	}
@@ -35,18 +35,18 @@ void GameMgr::generate_pickups()
 {
 	for (int i = 0; i < num_of_pickups; i++)
 	{
-		init_pickup(PickupType::ammo,PICKUP_AMMO);
-		init_pickup(PickupType::med_kit,PICKUP_MED);
+		init_pickup(PickupType::ammo, PICKUP_AMMO);
+		init_pickup(PickupType::med_kit, PICKUP_MED);
 	}
 }
 
 void GameMgr::init_pickup(const PickupType type, const int color_type)
 {
-	const auto room = maze_.get_room_at(rand()%num_of_rooms);
+	const auto room = maze_.get_room_at(rand() % num_of_rooms);
 	const auto location = room.get_random_point_in_room();
-	const auto pickup_object = PickupObject(location,type);
+	const auto pickup_object = PickupObject(location, type);
 	pickup_objects_.push_back(pickup_object);
-	maze_.get_at_pos(location->get_row(),location->get_col()).set_value(color_type);
+	maze_.get_at_pos(location->get_row(), location->get_col()).set_value(color_type);
 }
 
 
@@ -55,10 +55,10 @@ void GameMgr::init_pickup(const PickupType type, const int color_type)
 ///
 void GameMgr::generate_teams()
 {
-	int rooms[2] = {0,maze_.get_num_existing_rooms()-1};
+	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
-		int color[3] = {i%2,0,(i+1)%2};
+		int color[3] = { i % 2,0,(i + 1) % 2 };
 		auto team = new Team(color);
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
@@ -114,7 +114,7 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 		{
 			temp_node.set_target(cur_pickup.get_position());
 			double cur_distance = temp_node.compute_h();
-			if (min_distance == -1  || cur_distance < min_distance)
+			if (min_distance == -1 || cur_distance < min_distance)
 			{
 				min_distance = cur_distance;
 				p = cur_pickup.get_position();
@@ -128,10 +128,10 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 
 ///<summary>
 /// Find the nearest pickup of the given type
-//  reletive to the given location using heuristic distance.
+//  relative to the given location using heuristic distance.
 /// If there is no such PickupObject , nullptr is returned.
 ///</summary>
-Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable)
+Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_shootable)
 {
 	Point2D* p = nullptr;
 	Node temp_node;
@@ -320,7 +320,7 @@ void GameMgr::generate_map()
 		{
 			col = rand() % maze_size;
 			row = rand() % maze_size;
-		} while (maze_.get_at_pos(row, col).get_value() != SPACE);
+		} while (maze_.get_at_pos(row, col).get_value() != SPACE && maze_.get_at_pos(row, col).get_value() != PLAYER);
 		sz = 2.0 / maze_size;
 		x = col * sz - 1;
 		y = row * sz - 1;
@@ -332,8 +332,8 @@ void GameMgr::generate_map()
 
 double** GameMgr::get_heat_map()
 {
-	double** returnedMap = new double*[maze_size];
-	for (int i =0;i<maze_size;i++)
+	double** returnedMap = new double* [maze_size];
+	for (int i = 0; i < maze_size; i++)
 	{
 		returnedMap[i] = new double[maze_size];
 		for (int j = 0; j < maze_size; j++)

@@ -11,10 +11,6 @@ Node::Node()
 }
 
 
-Node::~Node()
-{
-}
-
 Node::Node(Point2D &pt, Point2D* t, int v, double g, Node* pr) {
 	point_ = pt;
 	target_ = t;
@@ -24,12 +20,12 @@ Node::Node(Point2D &pt, Point2D* t, int v, double g, Node* pr) {
 	h_ = compute_h();
 }
 
-void Node::set_value( int value)
+void Node::set_value(const int value)
 {
 	this->value_ = value;
 }
 
-void Node::set_point(Point2D point)
+void Node::set_point(const Point2D point)
 {
 	this->point_ = point;
 }
@@ -39,25 +35,25 @@ void Node::set_target(Point2D* target)
 	target_ = target;
 }
 
-int Node::get_value()
+int Node::get_value() const
 {
 	return value_;
 }
 
-double Node::get_g()
+double Node::get_g() const
 {
 	return g_;
 }
 
 
 
-double Node::compute_h()
+double Node::compute_h() const
 {
 	return sqrt(pow(point_.get_row()-target_->get_row(),2)+
 		pow(point_.get_col() - target_->get_col(), 2));
 }
 
-double Node::get_f()
+double Node::get_f() const
 {
 	return g_+h_;
 }
@@ -67,12 +63,12 @@ Point2D& Node::get_point()
 	return point_;
 }
 
-Node * Node::get_parent()
+Node * Node::get_parent() const
 {
 	return parent_;
 }
 
-Point2D * Node::get_target()
+Point2D * Node::get_target() const
 {
 	return target_;
 }
