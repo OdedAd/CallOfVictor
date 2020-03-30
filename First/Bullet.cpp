@@ -2,10 +2,6 @@
 #include "GLUT.H"
 #include <math.h>
 
-Bullet::Bullet()
-{
-}
-
 Bullet::Bullet(double x, double y)
 {
 	this->x_ = x;
@@ -18,10 +14,6 @@ Bullet::Bullet(double x, double y)
 	is_moving_ = false;
 }
 
-
-Bullet::~Bullet()
-{
-}
 
 void Bullet::show_me() const
 {
@@ -46,9 +38,8 @@ bool Bullet::get_is_moving() const
 
 void Bullet::move(Maze maze)
 {
-	int i, j;
-	i = maze_size * (y_ + 1) / 2;
-	j = maze_size * (x_ + 1) / 2;
+	int i = maze_size * (y_ + 1) / 2;
+	int j = maze_size * (x_ + 1) / 2;
 
 	if (is_moving_)
 	{
@@ -86,12 +77,10 @@ void Bullet::set_dir(double angle)
 
 void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 {
+	int i = maze_size * (y_ + 1) / 2;
+	int j = maze_size * (x_ + 1) / 2;
 
-	int i, j;
-	i = maze_size * (y_ + 1) / 2;
-	j = maze_size * (x_ + 1) / 2;
-
-	while(maze.get_at_pos(i,j).get_value() == SPACE)
+	while(maze.get_at_pos(i,j).get_value() != WALL)
 	{
 		map[i][j] += delta;
 		x_ += 0.001*dirx_;

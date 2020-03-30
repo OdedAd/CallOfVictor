@@ -1,6 +1,13 @@
 #include "Maze.h"
 #include <iostream>
 
+
+/**
+ * \brief get a sub matrix
+ * \param top_left the top left point of room
+ * \param bottom_right the bottom right point of the room
+ * \return sub matrix of nodes from left top to bottom right
+ */
 Node** Maze::get_sub_matrix(const Point2D top_left, const Point2D bottom_right)
 {
 	const auto rows = bottom_right.get_row() - top_left.get_row(); 
@@ -116,7 +123,6 @@ Room& Maze::generate_room()
 
 		}
 	} while (is_overlapping);
-
 	// pr is not overlapping with other rooms
 	for (auto i = pr->get_left_top().get_row(); i <= pr->get_right_bottom().get_row(); i++)
 	{

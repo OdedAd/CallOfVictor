@@ -4,7 +4,7 @@
 #include <vector>
 #include "Bullet.h"
 #include "GLUT.h"
-#include "Granade.h"
+#include "Grenade.h"
 #include "Node.h"
 
 #include "Team.h"
@@ -21,11 +21,11 @@ using namespace std;
 const int width = 600; // window width
 const int height = 600; // window height
 
-double map[maze_size][maze_size] = { 0 };
+//double map[maze_size][maze_size] = { 0 };
 //double** map;
 
 Bullet* pb = nullptr;
-Granade* pg;
+Grenade* pg;
 bool move_on = false;
 
 void init()
@@ -89,6 +89,7 @@ void draw_maze()
 void draw_map()
 {
 	double sz, xx, yy;
+	double** map = GameMgr::get_instance().get_heat_map();
 
 	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
@@ -96,6 +97,7 @@ void draw_map()
 			if (GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value() == SPACE)
 			{
 				double c;
+				//c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
 				glColor3d(c, c, c);
 				// draw rectangle
@@ -112,29 +114,30 @@ void draw_map()
 				glEnd();
 			}
 		}
+	delete map;
 }
-void generate_map()
-{
-	const int num_tries = 3000;
-	int col, row;
-	double x, y, sz;
-	Granade* pg = nullptr;
-
-	for (auto i = 0; i < num_tries; i++)
-	{
-		do
-		{
-			col = rand() % maze_size;
-			row = rand() % maze_size;
-		} while (GameMgr::get_instance().get_maze().get_at_pos(row, col).get_value() != SPACE);
-		sz = 2.0 / maze_size;
-		x = col * sz - 1;
-		y = row * sz - 1;
-		pg = new Granade(x, y);
-		pg->simulate_explosion(map, GameMgr::get_instance().get_maze());
-		delete pg;
-	}
-}
+//void generate_map()
+//{
+//	const int num_tries = 1000;
+//	int col, row;
+//	double x, y, sz;
+//	Grenade* pg = nullptr;
+//
+//	for (auto i = 0; i < num_tries; i++)
+//	{
+//		do
+//		{
+//			col = rand() % maze_size;
+//			row = rand() % maze_size;
+//		} while (GameMgr::get_instance().get_maze().get_at_pos(row, col).get_value() != SPACE);
+//		sz = 2.0 / maze_size;
+//		x = col * sz - 1;
+//		y = row * sz - 1;
+//		pg = new Grenade(x, y);
+//		pg->simulate_explosion(map, GameMgr::get_instance().get_maze());
+//		delete pg;
+//	}
+//}
 
 
 void display()
@@ -211,8 +214,9 @@ void menu(const int choice)
 	{
 	case 1:
 		move_on = false;
-		generate_map();
-		//map = game_mgr.get_maze().get_room_at(0).get_map();
+		//generate_map();
+		//map = game_mgr.get_maze().get_room_at(0).get_room_maze();
+		GameMgr::get_instance().generate_map();
 		glutDisplayFunc(display_map);
 		break;
 	case 2:
@@ -240,6 +244,9 @@ void menu(const int choice)
 		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_ammo(0);
 		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(4);
 		break;
+	case 5:
+		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_hp(4);
+		break;
 	}
 }
 
@@ -252,7 +259,7 @@ void mouse(const int button, const int state, const int x, const int y)
 		yy = 2 * ((double)height - y) / height - 1;
 
 		//		pb = new Bullet(xx,yy);
-		pg = new Granade(xx, yy);
+		pg = new Grenade(xx, yy);
 		cout << "player moving" << endl;
 		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
 		GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());
@@ -281,8 +288,9 @@ void main(int argc, char* argv[])
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Generate map", 1);
 	glutAddMenuEntry("Explode", 2);
-	glutAddMenuEntry("LowerHP", 3);
-	glutAddMenuEntry("LowerAMMO", 4);
+	glutAddMenuEntry("Lower HP", 3);
+	glutAddMenuEntry("Lower AMMO", 4);
+	glutAddMenuEntry("Check Runaway", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	init();

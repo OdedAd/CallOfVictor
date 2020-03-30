@@ -51,7 +51,22 @@ void Player::show_me() const
 ///</summary>
 void Player::run_away()
 {
+	//get the room where the player is now
+	//auto current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
+	
+	//get heat map in room -NOT YET
+	
+	std::cout<< "in run function: my location row = " << m_location_->get_point().get_row()
+		<<" col = " << m_location_->get_point().get_col() << std::endl;
+	//get cover (find minimum in that matrix)
+	Point2D target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
 
+	std::cout << "in run function: target_location row = " << target.get_row()
+		<< " col = " << target.get_col() << std::endl;
+	//move to the minimum target
+	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+
+	
 }
 
 ///<summary>

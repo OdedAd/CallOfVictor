@@ -5,6 +5,7 @@
 #include "Node.h"
 #include "PickupObject.h"
 #include "Player.h"
+#include "Grenade.h"
 #include "Room.h"
 
 const int num_of_teams = 2;
@@ -26,6 +27,8 @@ public:
 	Node* a_star(Point2D& start, Point2D& target);
 	bool shoot(Player* calling_player, Point2D& target);
 	bool pickup(Player* calling_player, Point2D& target);
+	void generate_map();
+	double** get_heat_map();
 
 	GameMgr(GameMgr const&) = delete;
 	GameMgr(GameMgr const &&) = delete;
@@ -45,5 +48,6 @@ private:
 
 	Player* get_player_at_pos(Point2D& position);
 	PickupObject* get_pickup_at_pos(Point2D& position);
+	double map_[maze_size][maze_size];
 
 };

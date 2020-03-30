@@ -150,7 +150,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="CompareNodes.cpp" />
     <ClCompile Include="GameMgr.cpp" />
-    <ClCompile Include="Granade.cpp" />
+    <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -165,7 +165,7 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="CompareNodes.h" />
     <ClInclude Include="GameMgr.h" />
-    <ClInclude Include="Granade.h" />
+    <ClInclude Include="Grenade.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PickupObject.h" />

@@ -1,9 +1,7 @@
 #pragma once
 #include "Bullet.h"
-#include "Node.h"
 #include "Utils.h"
 
-//const double PI = 3.14;
 
 #ifndef PI
 #define PI 3.14
@@ -12,14 +10,14 @@
 const int NUM_BULLETS = 16;
 class Bullet;
 
-class Granade
+class Grenade
 {
 public:
-	Granade();
-	Granade(double x, double y);
-	~Granade();
+	Grenade() = default;
+	Grenade(double x, double y);
+	~Grenade() = default;
 	void explode();
-	void show_me();
+	void show_me() const;
 	void move_bullets(Maze maze);
 	void simulate_explosion(double map[maze_size][maze_size], Maze& maze);
 private:

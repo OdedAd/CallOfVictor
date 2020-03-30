@@ -6,9 +6,10 @@ const double delta = 0.0001;
 class Bullet
 {
 public:
-	Bullet();
+	Bullet() = default;
+	~Bullet() = default;
+	
 	Bullet(double x, double y);
-	~Bullet();
 	void show_me() const;
 	void set_is_moving(bool move);
 	bool get_is_moving() const;

@@ -307,6 +307,42 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		throw("at GameMgr::pickup , the given target point is not a pickup object");
 }
 
+void GameMgr::generate_map()
+{
+	const int num_tries = 1000;
+	int col, row;
+	double x, y, sz;
+	Grenade* pg = nullptr;
+
+	for (auto i = 0; i < num_tries; i++)
+	{
+		do
+		{
+			col = rand() % maze_size;
+			row = rand() % maze_size;
+		} while (maze_.get_at_pos(row, col).get_value() != SPACE);
+		sz = 2.0 / maze_size;
+		x = col * sz - 1;
+		y = row * sz - 1;
+		pg = new Grenade(x, y);
+		pg->simulate_explosion(map_, maze_);
+		delete pg;
+	}
+}
+
+double** GameMgr::get_heat_map()
+{
+	double** returnedMap = new double*[maze_size];
+	for (int i =0;i<maze_size;i++)
+	{
+		returnedMap[i] = new double[maze_size];
+		for (int j = 0; j < maze_size; j++)
+		{
+			returnedMap[i][j] = map_[i][j];
+		}
+	}
+	return returnedMap;
+}
 
 
 Player* GameMgr::get_player_at_pos(Point2D& position)
@@ -316,7 +352,7 @@ Player* GameMgr::get_player_at_pos(Point2D& position)
 			if (curPlayer->get_location()->get_point() == position)
 				return curPlayer;
 
-	throw("at GameMgr::get_player_at_pos , the given position is not a player");
+	throw "at GameMgr::get_player_at_pos , the given position is not a player";
 }
 
 PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
@@ -325,5 +361,5 @@ PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
 		if (*(curPickup.get_position()) == position)
 			return &curPickup;
 
-	throw("at GameMgr::get_pickup_at_pos , the given position is not a PickupObject");
+	throw "at GameMgr::get_pickup_at_pos , the given position is not a PickupObject";
 }

@@ -2,18 +2,11 @@
 #include <math.h>
 #include <iostream>
 
-#include "Granade.h"
+
+#include "GameMgr.h"
+#include "Grenade.h"
 
 using namespace std;
-
-Room::Room()
-{
-}
-
-
-Room::~Room()
-{
-}
 
 Room::Room(int ci, int cj, int w, int h) {
 	center_.set_col(cj);
@@ -24,7 +17,17 @@ Room::Room(int ci, int cj, int w, int h) {
 	right_bottom_.set_row(ci + h / 2);
 	width_ = w;
 	height_ = h;
-	
+
+}
+
+double Room::get_height() const
+{
+	return this->height_;
+}
+
+double Room::get_width() const
+{
+	return this->width_;
 }
 
 Point2D Room::get_left_top() const
@@ -60,18 +63,51 @@ Point2D Room::get_center() const
 
 Point2D* Room::get_random_point_in_room() const
 {
-	const auto row = rand() % (height_-1);
-	const auto col = rand() % (width_-1);
-	return new Point2D(row + left_top_.get_row(),col + left_top_.get_col());
+	const auto row = rand() % (height_ - 1);
+	const auto col = rand() % (width_ - 1);
+	return new Point2D(row + left_top_.get_row(), col + left_top_.get_col());
 }
 
-void Room::set_map(double** new_map)
+Point2D* Room::get_point_in_room() const
 {
-	this->map_ = new_map;
+	int col, row;
+	do
+	{
+		col = left_top_.get_col()+(rand() % (width_-1));
+		row = left_top_.get_row()+(rand() % (col-1));
+	} while (GameMgr::get_instance().get_maze().get_at_pos(row, col).get_value() != SPACE);
+	return new Point2D(row,col);
 }
 
-double** Room::get_map() const
+//void Room::generate_map()
+//{
+//	const int num_tries = 5;
+//	double x, y;
+//	Grenade* pg = nullptr;
+//
+//	map_ = new double*[width_];
+//	for (int i = 0; i < width_; i++)
+//	{
+//		map_[i] = new double[this->height_];
+//		for (int j = 0; j < height_; j++)
+//		{
+//			map_[i][j] = 0;
+//		}
+//	}
+//
+//	for (auto i = 0; i < num_tries; i++)
+//	{
+//		Point2D* pt = get_point_in_room();
+//		pg = new Grenade(pt->get_row(), pt->get_col());
+//		pg->simulate_explosion(this->map_, *this);
+//		//pg->simulate_explosion(map_,GameMgr::get_instance().get_maze());
+//		delete pg;
+//		delete pt;
+//	}
+//}
+
+Node** Room::get_room_maze() const
 {
-	return this->map_;
+	return GameMgr::get_instance().get_maze().get_sub_matrix(left_top_,right_bottom_);
 }
 
