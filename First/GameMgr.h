@@ -7,7 +7,14 @@
 #include "Player.h"
 #include "Grenade.h"
 
+#include "LogicBullet.h"
+
+using namespace std;
+
+
 const int num_of_teams = 2;
+
+//class LogicBullet;
 
 class GameMgr
 {
@@ -21,10 +28,13 @@ public:
 	void generate_teams();
 	Maze& get_maze();
 	std::vector<Team*>& get_teams();
+	vector<LogicBullet*>& get_bullets();
+
 	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target);
 	bool shoot(Player* calling_player, Point2D& target);
+	void hit_player(Point2D& target, const int damage);
 	bool pickup(Player* calling_player, Point2D& target);
 	void generate_map();
 	double** get_heat_map();
@@ -49,6 +59,8 @@ private:
 	Maze maze_;
 	std::vector<Team*> teams_;
 	std::vector<PickupObject> pickup_objects_;
+	vector<LogicBullet*> bullets_;
+
 	bool is_game_over_;
 
 	Player* get_player_at_pos(Point2D& position);

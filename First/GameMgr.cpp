@@ -82,7 +82,7 @@ void GameMgr::generate_teams()
 			} while (maze_.get_at_pos(k, j).get_value() == PLAYER); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Player(this, team, &maze_.get_at_pos(k, j)));
+			team->add_player(new Player(this, team, &maze_.get_at_pos(k, j), 10, 100));
 		}
 		this->add_team(team);
 	}
@@ -96,6 +96,11 @@ Maze& GameMgr::get_maze()
 std::vector<Team*>& GameMgr::get_teams()
 {
 	return this->teams_;
+}
+
+vector<LogicBullet*>& GameMgr::get_bullets()
+{
+	return this->bullets_;
 }
 
 
@@ -266,17 +271,14 @@ void GameMgr::add_team(Team* team)
 bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
+	int max_damage = targetPlayer->get_max_hp() / 2;
+	int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
+	if (damage < 0) damage = 0;
+
 	if (calling_player->get_location()->get_point().get_distance(target) < 2)
 	{
-		int max_damage = targetPlayer->get_max_hp();
-		int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
-		if (damage < 0) damage = 0;
-
-		targetPlayer->get_hit(damage);
-		if (targetPlayer->get_hp() <= 0)
-		{
-			targetPlayer->get_team()->reduce_players_alive(1);
-		}
+		//targetPlayer->get_hit(damage);
+		bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
 		return true;
 	}
 
@@ -286,16 +288,8 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		Room& player_room = maze_.get_room_at(calling_player->get_location()->get_point());
 		if (player_room == targets_room)
 		{
-
-			int max_damage = targetPlayer->get_max_hp();
-			int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
-			if (damage < 0) damage = 0;
-
-			targetPlayer->get_hit(damage);
-			if (targetPlayer->get_hp() <= 0)
-			{
-				targetPlayer->get_team()->reduce_players_alive(1);
-			}
+			//targetPlayer->get_hit(damage);
+			bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, 2));
 			return true;
 		}
 	}
@@ -305,6 +299,13 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 					// in PATH so he will need to keep going.
 
 	return false;
+}
+
+void GameMgr::hit_player(Point2D& target, const int damage)
+{
+	//Player* targetPlayer = get_player_at_pos(target);
+	//targetPlayer->get_hit(damage);
+	get_player_at_pos(target)->get_hit(damage);
 }
 
 bool GameMgr::pickup(Player* calling_player, Point2D& target)
@@ -325,6 +326,8 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		else
 			return false;
 	}
+	else if (target_value == PLAYER)
+		return false;
 	else
 		throw("at GameMgr::pickup , the given target point is not a pickup object");
 }
@@ -375,24 +378,40 @@ void GameMgr::play_one_turn()
 		{
 			std::cout << "Team " << game_team->get_team_name() << " lost!" << std::endl;
 			is_game_over_ = true;
-			return;
 		}
 	}
-	for (auto cur_team : teams_)
+
+	if (is_game_over_ == false)
 	{
-		for (Player* cur_player : cur_team->get_teammates())
+		for (auto cur_team : teams_)
 		{
-			if (cur_player->get_hp() > 0)
+			for (Player* cur_player : cur_team->get_teammates())
 			{
-				cur_player->move(maze_);
-			}
-			else
-			{
-				cur_player->set_is_moving(false);
+				if (cur_player->get_hp() > 0)
+				{
+					cur_player->move(maze_);
+				}
+				else
+				{
+					cur_player->set_is_moving(false);
+				}
 			}
 		}
+
+		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
+			[](const auto b) { return b->get_is_moving() == false; }),
+			bullets_.end());
+
+		for (auto itr = bullets_.begin(); itr != bullets_.end(); ++itr)
+			if ((*itr)->get_is_moving() == true)
+				(*itr)->move(maze_);
+		//else
+			//bullets_.erase(itr);
+
+		
+
+		//clear_map();
 	}
-	//clear_map();
 }
 
 void GameMgr::clear_map()

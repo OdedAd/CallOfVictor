@@ -7,19 +7,25 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, Team* team, Node* location, const int max_ammo, const int maxHP) :
+Player::Player(GameMgr* mgr, Team* team, Node* location, const int max_ammo, const int maxHP, int grenade_cost) :
 	m_mgr_(mgr), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
 {
-	//random starting direction, later when we add the brain of the player 
-	//the direction will be chosen somewhat intelligently before each move.  
+	//random starting direction, later when we add the brain of the player
+	//the direction will be chosen somewhat intelligently before each move.
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
 	m_is_running_for_hp_cond_ = false;
+	m_collision = false;
 
 	m_cur_target_node_ = nullptr;
+
+	if (grenade_cost < 0)
+		m_grenade_cost = max_ammo / 2;
+	else
+		m_grenade_cost = grenade_cost;
 }
 
 void Player::show_me() const
@@ -77,6 +83,7 @@ void Player::run_away()
 				//<< " col = " << target.get_col() << std::endl;
 			//move to the minimum target
 			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+			m_is_moving_ = true;
 		}
 	}
 }
@@ -161,17 +168,36 @@ void Player::fight()
 			//<< " col = " << target_location.get_col() << std::endl;
 
 		bool is_successful = false;
-		is_successful = m_mgr_->shoot(this, target_location);
-
-		if (is_successful)
+		double distance_from_target = m_location_->get_point().get_distance(target_location);
+		if (distance_from_target < 0 && m_ammo_ >= m_grenade_cost)
 		{
-			--m_ammo_;
-			m_is_moving_ = false;
+			//is_successful = m_mgr_->throw_grenade(this, target_location);
+
+			if (is_successful)
+			{
+				m_ammo_ -= m_grenade_cost;
+				m_is_moving_ = false;
+			}
+			else
+			{
+				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+				m_is_moving_ = true;
+			}
 		}
 		else
 		{
-			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
-			m_is_moving_ = true;
+			is_successful = m_mgr_->shoot(this, target_location);
+
+			if (is_successful)
+			{
+				--m_ammo_;
+				m_is_moving_ = false;
+			}
+			else
+			{
+				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
+				m_is_moving_ = true;
+			}
 		}
 	}
 }
@@ -189,18 +215,20 @@ void Player::choose_direction()
 	{
 		fight();
 	}
-	else if (m_cur_hp_ < 3)
+	else if (m_cur_hp_ < m_max_hp_ / 4)
 	{
 		heal();
 	}
-	else if (m_ammo_ >= 5)
-	{
-		run_away();
-	}
-	else if (m_ammo_ < 5)
+	//else if (m_ammo_ >= 5)
+	//{
+		//run_away();
+	//}
+	else if (m_ammo_ < 5 || m_collision == true)
 	{
 		reload();
 	}
+	else
+		heal();
 
 	if (m_is_moving_)
 		fill_path_stack();
@@ -233,6 +261,7 @@ void Player::get_hit(const int damage)
 	{
 		std::cout << "HEREEEEEeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" << std::endl;
 		GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
+		get_team()->reduce_players_alive(1);
 	}
 }
 
@@ -262,7 +291,7 @@ void Player::move(Maze& maze)
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();
 		step_counter = 0;
-		
+
 		choose_direction();
 	}
 
@@ -282,8 +311,9 @@ void Player::move(Maze& maze)
 		int next_x = nextPoint->get_row();
 		int next_y = nextPoint->get_col();
 
-		if (m_is_moving_ && (maze.get_at_pos(next_x, next_y).get_value() == SPACE || maze.get_at_pos(next_x, next_y).get_value() == PICKUP_AMMO
-			|| maze.get_at_pos(next_x, next_y).get_value() == PICKUP_MED))
+		int next_value = maze.get_at_pos(next_x, next_y).get_value();
+		if (next_value == SPACE || next_value == PICKUP_AMMO
+			|| next_value == PICKUP_MED)
 		{
 			m_location_->set_point(*nextPoint);
 
@@ -293,7 +323,11 @@ void Player::move(Maze& maze)
 
 			std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
 			std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
+
+			m_collision = false;
 		}
+		else if (next_value == PLAYER)
+			m_collision = true;
 	}
 
 	++step_counter;

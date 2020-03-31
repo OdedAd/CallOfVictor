@@ -54,6 +54,12 @@
     <ClCompile Include="Grenade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LogicGrenade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicBullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node.h">
@@ -90,6 +96,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Grenade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicGrenade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicBullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -17,6 +17,7 @@ private:
 	std::stack<Point2D*> m_cur_path_to_target_;
 
 	int m_ammo_;
+	int m_grenade_cost;
 	const int m_max_ammo_;
 	int m_cur_hp_;
 	const int m_max_hp_;
@@ -26,6 +27,7 @@ private:
 	bool m_is_moving_;
 
 	bool m_is_running_for_hp_cond_;
+	bool m_collision;
 
 	const double player_delta_ = 0.0001;
 
@@ -34,8 +36,8 @@ private:
 
 public:
 
-	Player(GameMgr* mgr ,Team* team, Node* location, int max_ammo = 10, int maxHP = 10);
-	~Player() = default; 
+	Player(GameMgr* mgr ,Team* team, Node* location, int max_ammo = 10, int maxHP = 10, int grenade_cost = -1);
+	~Player() = default;
 	void show_me() const;
 
 	///<summary>

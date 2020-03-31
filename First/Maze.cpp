@@ -87,8 +87,8 @@ Room& Maze::get_room_at(const Point2D& point)
 
 	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (isFound == false); ++cur_room_index)
 	{
-		if ((rooms_[cur_room_index].get_left_top().get_row() <= point.get_row() && point.get_row() <= rooms_[cur_room_index].get_right_bottom().get_row())
-			&& (rooms_[cur_room_index].get_left_top().get_col() <= point.get_col() && point.get_col() <= rooms_[cur_room_index].get_right_bottom().get_col()))
+		if ((rooms_[cur_room_index].get_left_top().get_row() - 1 <= point.get_row() && point.get_row() <= rooms_[cur_room_index].get_right_bottom().get_row() + 1)
+			&& (rooms_[cur_room_index].get_left_top().get_col() - 1 <= point.get_col() && point.get_col() <= rooms_[cur_room_index].get_right_bottom().get_col() + 1))
 		{
 			target_room_index = cur_room_index;
 			isFound = true;

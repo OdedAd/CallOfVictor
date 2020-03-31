@@ -152,13 +152,20 @@ void display()
 		pg->show_me();
 	}
 
+
 	for (auto cur_team : GameMgr::get_instance().get_teams())
 	{
 		for (Player* cur_player : cur_team->get_teammates())
 		{
-			cur_player->show_me();
+			if (cur_player->get_hp() > 0)
+			{
+				cur_player->show_me();
+			}
 		}
 	}
+
+	for (auto cur_bullet : GameMgr::get_instance().get_bullets())
+		cur_bullet->show_me();
 
 	glutSwapBuffers();// show what was drawn in "frame buffer"
 }
@@ -225,28 +232,35 @@ void menu(const int choice)
 		//		pb->SetIsMoving(true);
 		if (pg != nullptr)
 		{
-			pg->explode();
+			//pg->explode();
 		}
 
 		for (auto cur_team : GameMgr::get_instance().get_teams())
-		{
 			for (Player* cur_player : cur_team->get_teammates())
-			{
 				cur_player->set_is_moving(true);
-			}
-		}
 
 		move_on = true;
 		break;
+
 	case 3:
-		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(2);
+		for (auto cur_team : GameMgr::get_instance().get_teams())
+			for (Player* cur_player : cur_team->get_teammates())
+				cur_player->set_hp(1);
 		break;
+
 	case 4:
-		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_ammo(0);
-		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(4);
+		for (auto cur_team : GameMgr::get_instance().get_teams())
+			for (Player* cur_player : cur_team->get_teammates())
+			{
+				cur_player->set_hp(10);
+				cur_player->set_ammo(0);
+			}
 		break;
+
 	case 5:
-		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_hp(4);
+		for (auto cur_team : GameMgr::get_instance().get_teams())
+			for (Player* cur_player : cur_team->get_teammates())
+				cur_player->set_hp(4);
 		break;
 	}
 }
@@ -288,9 +302,9 @@ void main(int argc, char* argv[])
 	// menu
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Generate map", 1);
-	glutAddMenuEntry("Explode", 2);
-	glutAddMenuEntry("Lower HP", 3);
-	glutAddMenuEntry("Lower AMMO", 4);
+	glutAddMenuEntry("Start Game", 2);
+	glutAddMenuEntry("Check Heal", 3);
+	glutAddMenuEntry("Check Reload", 4);
 	glutAddMenuEntry("Check Runaway", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
