@@ -15,7 +15,7 @@ private:
 	Node* m_location_;
 	Node* m_cur_target_node_;
 	std::stack<Point2D*> m_cur_path_to_target_;
-	
+
 	const int m_ID_;
 	int m_ammo_;
 	int m_grenade_cost;
@@ -29,6 +29,7 @@ private:
 
 	bool m_is_running_for_hp_cond_;
 	bool m_collision;
+	int m_idle_counter;
 
 	const double player_delta_ = 0.0001;
 

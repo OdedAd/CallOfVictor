@@ -67,7 +67,7 @@ void GameMgr::generate_teams()
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
-		const auto max_num_of_players = 2;
+		const auto max_num_of_players = 5;
 
 		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
 		{
@@ -179,7 +179,7 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_
 	return *p;
 }
 
-Node* GameMgr::a_star(Point2D& start, Point2D& target)
+Node* GameMgr::a_star(Point2D& start, Point2D& target, Team* callers_team)
 {
 	std::priority_queue <Node*, std::vector<Node*>, CompareNodes> pq;
 	std::vector<Node> gray;
@@ -208,7 +208,7 @@ Node* GameMgr::a_star(Point2D& start, Point2D& target)
 			}
 			black.push_back(*pn);
 			// check the neighbors
-			check_neighbors(pn, gray, black, pq);
+			check_neighbors(pn, gray, black, pq, callers_team);
 		}
 	}
 
@@ -216,26 +216,26 @@ Node* GameMgr::a_star(Point2D& start, Point2D& target)
 }
 
 void GameMgr::check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq)
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team)
 {
 	// try down
 	if (pn->get_point().get_row() < maze_size - 1)
-		check_node(pn->get_point().get_row() + 1, pn->get_point().get_col(), pn, gray, black, pq);
+		check_node(pn->get_point().get_row() + 1, pn->get_point().get_col(), pn, gray, black, pq, callers_team);
 	// try up
 	if (pn->get_point().get_row() > 0)
-		check_node(pn->get_point().get_row() - 1, pn->get_point().get_col(), pn, gray, black, pq);
+		check_node(pn->get_point().get_row() - 1, pn->get_point().get_col(), pn, gray, black, pq, callers_team);
 	// try left
 	if (pn->get_point().get_col() > 0)
-		check_node(pn->get_point().get_row(), pn->get_point().get_col() - 1, pn, gray, black, pq);
+		check_node(pn->get_point().get_row(), pn->get_point().get_col() - 1, pn, gray, black, pq, callers_team);
 	// try right
 	if (pn->get_point().get_col() < maze_size - 1)
-		check_node(pn->get_point().get_row(), pn->get_point().get_col() + 1, pn, gray, black, pq);
+		check_node(pn->get_point().get_row(), pn->get_point().get_col() + 1, pn, gray, black, pq, callers_team);
 
 	//TODO: add diagonal movement support
 }
 
 void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq)
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team)
 {
 	Point2D pt;
 	double cost = 0;
@@ -251,10 +251,10 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 		//else if (curNodeValue == PICKUP) // pickup 
 		//	cost = 0.1;
 		else if (cur_node_value == PLAYER) // player
-			//if (get_player_at_pos(pt)->get_team() == )
-				cost = 50;
-			//else
-				//cost 5;
+			if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
+				cost = 500;
+			else
+				cost = 5;
 
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
@@ -284,7 +284,7 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 	int start_i = calling_player_point.get_row();
 	int start_j = calling_player_point.get_col();
 
-	int max_damage = targetPlayer->get_max_hp() / 4;
+	int max_damage = targetPlayer->get_max_hp() / 5;
 
 	if (calling_player_point.get_distance(target) < 5)
 	{

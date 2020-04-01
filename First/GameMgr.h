@@ -35,7 +35,7 @@ public:
 
 	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
-	Node* a_star(Point2D& start, Point2D& target);
+	Node* a_star(Point2D& start, Point2D& target, Team* callers_team = nullptr);
 	bool shoot(Player* calling_player, Point2D& target);
 	void hit_player(Point2D& target, const int damage);
 	bool pickup(Player* calling_player, Point2D& target);
@@ -49,13 +49,13 @@ public:
 	GameMgr(GameMgr const&) = delete;
 	GameMgr(GameMgr const &&) = delete;
 	void operator=(GameMgr const&) = delete;
-	
+
 private:
 	void delete_team_related_allocations();
 	void check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
+		std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team = nullptr);
 	void check_node(int row, int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-	                std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq);
+	                std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team = nullptr);
 
 	GameMgr() = default;
 

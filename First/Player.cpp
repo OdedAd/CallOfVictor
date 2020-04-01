@@ -26,6 +26,8 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 		m_grenade_cost = max_ammo / 2;
 	else
 		m_grenade_cost = grenade_cost;
+
+	m_idle_counter = 0;
 }
 
 void Player::show_me() const
@@ -82,7 +84,7 @@ void Player::run_away()
 			//std::cout << "in run function: target_location row = " << target.get_row()
 				//<< " col = " << target.get_col() << std::endl;
 			//move to the minimum target
-			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 			m_is_moving_ = true;
 		}
 	}
@@ -101,7 +103,7 @@ void Player::heal()
 	//std::cout << "in heal function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
 
-	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 
 	bool is_successful = false;
 	is_successful = m_mgr_->pickup(this, target);
@@ -114,7 +116,7 @@ void Player::heal()
 	}
 	else //couldn't pick up the medkit, need to move closer.
 	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 		m_is_moving_ = true;
 	}
 }
@@ -143,7 +145,7 @@ void Player::reload()
 	}
 	else //couldn't pick up the ammo, need to move closer.
 	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target);
+		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 		m_is_moving_ = true;
 	}
 }
@@ -169,7 +171,7 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (distance_from_target < 10 && m_ammo_ >= m_grenade_cost)
+		if (distance_from_target < 7 && m_ammo_ >= m_grenade_cost)
 		{
 			is_successful = m_mgr_->throw_grenade(this, target_location);
 
@@ -178,13 +180,9 @@ void Player::fight()
 				m_ammo_ -= m_grenade_cost;
 				m_is_moving_ = false;
 			}
-			else
-			{
-				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
-				m_is_moving_ = true;
-			}
+
 		}
-		else
+		else if(m_ammo_ > 0)
 		{
 			is_successful = m_mgr_->shoot(this, target_location);
 
@@ -193,11 +191,15 @@ void Player::fight()
 				--m_ammo_;
 				m_is_moving_ = false;
 			}
-			else
-			{
-				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location);
-				m_is_moving_ = true;
-			}
+
+		}
+		else //no ammo
+			reload();
+
+		if (is_successful == false)
+		{
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location, m_team_);
+			m_is_moving_ = true;
 		}
 	}
 }
@@ -211,8 +213,9 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0 || m_collision == true) //the collision flag is to get rid of
-																		// two player stuck in  a corridor.
+	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0
+		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}
@@ -299,9 +302,9 @@ void Player::move(Maze& maze)
 		choose_direction();
 	}
 
-	if (m_is_moving_)
+	if (m_is_moving_ && m_cur_path_to_target_.empty() == false)
 	{
-
+		m_idle_counter = 0;
 		int cur_old_value = m_old_value;
 
 		Point2D* nextPoint = m_cur_path_to_target_.top();
@@ -333,6 +336,8 @@ void Player::move(Maze& maze)
 		else if (next_value == PLAYER)
 			m_collision = true;
 	}
+	else
+		++m_idle_counter;
 
 	++step_counter;
 
