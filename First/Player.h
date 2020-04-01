@@ -15,7 +15,8 @@ private:
 	Node* m_location_;
 	Node* m_cur_target_node_;
 	std::stack<Point2D*> m_cur_path_to_target_;
-
+	
+	const int m_ID_;
 	int m_ammo_;
 	int m_grenade_cost;
 	const int m_max_ammo_;
@@ -36,7 +37,7 @@ private:
 
 public:
 
-	Player(GameMgr* mgr ,Team* team, Node* location, int max_ammo = 10, int maxHP = 10, int grenade_cost = -1);
+	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int maxHP = 10, int grenade_cost = -1);
 	~Player() = default;
 	void show_me() const;
 
@@ -86,6 +87,7 @@ public:
 	int get_ammo() const;
 	int get_old_value() const;
 	Team* get_team() const;
+	int get_ID() const;
 
 
 };

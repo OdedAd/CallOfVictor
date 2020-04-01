@@ -7,8 +7,8 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, Team* team, Node* location, const int max_ammo, const int maxHP, int grenade_cost) :
-	m_mgr_(mgr), m_team_(team), m_location_(location),
+Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP, int grenade_cost) :
+	m_mgr_(mgr), m_ID_(id), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
 {
@@ -259,9 +259,11 @@ void Player::fill_path_stack()
 void Player::get_hit(const int damage)
 {
 	m_cur_hp_ -= damage;
+	std::cout << "Player " << m_ID_ << " Recived : " << damage << " damage " << std::endl;
+
 	if (m_cur_hp_ <= 0)
 	{
-		std::cout << "HEREEEEEeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" << std::endl;
+		std::cout << "Player " << m_ID_ << " died" << std::endl;
 		GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
 		get_team()->reduce_players_alive(1);
 	}
@@ -308,7 +310,7 @@ void Player::move(Maze& maze)
 		int cur_x = m_location_->get_point().get_row();
 		int cur_y = m_location_->get_point().get_col();
 
-		std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
+		//std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
 
 		int next_x = nextPoint->get_row();
 		int next_y = nextPoint->get_col();
@@ -323,8 +325,8 @@ void Player::move(Maze& maze)
 			maze.get_at_pos(next_x, next_y).set_value(PLAYER); //upadte the new location
 			maze.get_at_pos(cur_x, cur_y).set_value(cur_old_value); //upadte the old location
 
-			std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
-			std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
+			//std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
+			//std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
 
 			m_collision = false;
 		}
@@ -393,4 +395,9 @@ int Player::get_old_value() const
 Team* Player::get_team() const
 {
 	return this->m_team_;
+}
+
+int Player::get_ID() const
+{
+	return m_ID_;
 }

@@ -58,6 +58,7 @@ void GameMgr::init_pickup(const PickupType type, const int color_type)
 ///
 void GameMgr::generate_teams()
 {
+	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
@@ -82,7 +83,7 @@ void GameMgr::generate_teams()
 			} while (maze_.get_at_pos(k, j).get_value() == PLAYER); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Player(this, team, &maze_.get_at_pos(k, j), 10, 100));
+			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), 10, 100));
 		}
 		this->add_team(team);
 	}
