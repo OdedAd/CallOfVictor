@@ -169,9 +169,9 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (distance_from_target < 0 && m_ammo_ >= m_grenade_cost)
+		if (distance_from_target < 10 && m_ammo_ >= m_grenade_cost)
 		{
-			//is_successful = m_mgr_->throw_grenade(this, target_location);
+			is_successful = m_mgr_->throw_grenade(this, target_location);
 
 			if (is_successful)
 			{
@@ -211,7 +211,8 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0)
+	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0 || m_collision == true) //the collision flag is to get rid of
+																		// two player stuck in  a corridor.
 	{
 		fight();
 	}
@@ -219,11 +220,12 @@ void Player::choose_direction()
 	{
 		heal();
 	}
+	// TODO: return this when run away works.
 	//else if (m_ammo_ >= 5)
 	//{
 		//run_away();
 	//}
-	else if (m_ammo_ < 5 || m_collision == true)
+	else if (m_ammo_ < 5 )
 	{
 		reload();
 	}
@@ -286,7 +288,7 @@ void Player::move(Maze& maze)
 	//static int old_value = 0; // the last value of the node.
 	static int step_counter = 0;
 
-	if (m_cur_path_to_target_.empty() || step_counter > 0) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();

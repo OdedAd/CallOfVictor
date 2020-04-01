@@ -167,6 +167,9 @@ void display()
 	for (auto cur_bullet : GameMgr::get_instance().get_bullets())
 		cur_bullet->show_me();
 
+	for (auto cur_grenade : GameMgr::get_instance().get_grenades())
+		cur_grenade->show_me();
+
 	glutSwapBuffers();// show what was drawn in "frame buffer"
 }
 
@@ -194,14 +197,14 @@ void idle()
 	//Sleep(100);
 	if (move_on && !GameMgr::get_instance().is_game_over())
 	{
-		if (pg != nullptr)
-		{
-			//		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
-			//		pb->move();
-			pg->move_bullets(GameMgr::get_instance().get_maze());
+		//if (pg != nullptr)
+		//{
+			////		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
+			////		pb->move();
+			//pg->move_bullets(GameMgr::get_instance().get_maze());
 
-			//		move_on = pg->GetIsMoving();
-		}
+			////		move_on = pg->GetIsMoving();
+		//}
 
 		GameMgr::get_instance().play_one_turn();
 	}
@@ -230,10 +233,10 @@ void menu(const int choice)
 	case 2:
 		glutDisplayFunc(display);
 		//		pb->SetIsMoving(true);
-		if (pg != nullptr)
-		{
-			//pg->explode();
-		}
+		//if (pg != nullptr)
+		//{
+		//	pg->explode();
+		//}
 
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
@@ -275,6 +278,8 @@ void mouse(const int button, const int state, const int x, const int y)
 
 		//		pb = new Bullet(xx,yy);
 		pg = new Grenade(xx, yy);
+		GameMgr::get_instance().get_grenades().push_back(new Grenade(xx, yy));
+
 		//cout << "player moving" << endl;
 		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
 		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());

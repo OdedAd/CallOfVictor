@@ -25,10 +25,13 @@ public:
 	void generate_pickups();
 	void init_game();
 	void add_team(Team* team);
+	bool throw_grenade(Player* calling_player, Point2D& target);
 	void generate_teams();
 	Maze& get_maze();
 	std::vector<Team*>& get_teams();
-	vector<LogicBullet*>& get_bullets();
+	//vector<LogicBullet*>& get_bullets();
+	vector<Bullet*>& get_bullets();
+	vector<Grenade*>& get_grenades();
 
 	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
@@ -59,7 +62,9 @@ private:
 	Maze maze_;
 	std::vector<Team*> teams_;
 	std::vector<PickupObject> pickup_objects_;
-	vector<LogicBullet*> bullets_;
+	//vector<LogicBullet*> bullets_;
+	vector<Bullet*> bullets_;
+	vector<Grenade*> grenades_;
 
 	bool is_game_over_;
 

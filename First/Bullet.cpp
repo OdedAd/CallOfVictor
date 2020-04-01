@@ -2,7 +2,10 @@
 #include "GLUT.H"
 #include <math.h>
 
-Bullet::Bullet(double x, double y)
+#include "GameMgr.h"
+
+
+Bullet::Bullet(double x, double y, int stopping_power)
 {
 	this->x_ = x;
 	this->y_ = y;
@@ -12,6 +15,19 @@ Bullet::Bullet(double x, double y)
 	dirx_ /= len;
 	diry_ /= len;
 	is_moving_ = false;
+
+	m_stopping_power = stopping_power;
+}
+
+Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
+{
+	this->x_ = (j*2.0)/(double)maze_size - 1;
+	this->y_ = (i*2.0)/(double)maze_size - 1;
+
+	m_stopping_power = stopping_power;
+
+	set_dir(Point2D(i,j).get_angle_between_two_points(target_location));
+	is_moving_ = true;
 }
 
 
@@ -36,26 +52,37 @@ bool Bullet::get_is_moving() const
 	return is_moving_;
 }
 
-void Bullet::move(Maze maze)
+void Bullet::move(Maze& maze)
 {
-	int i = maze_size * (y_ + 1) / 2;
-	int j = maze_size * (x_ + 1) / 2;
+	int i;
+	int j;
 
-	if (is_moving_)
+	int cur_value;
+	double start_x = x_;
+	double start_y = y_;
+
+	while (is_moving_)
 	{
-		if (maze.get_at_pos(i,j).get_value() == SPACE)
+		i = maze_size * (y_ + 1) / 2;
+		j = maze_size * (x_ + 1) / 2;
+		cur_value = maze.get_at_pos(i, j).get_value();
+		if (cur_value == SPACE)
 		{
 			x_ += 0.001 * dirx_;
 			y_ += 0.001 * diry_;
 		}
-		if (maze.get_at_pos(i,j).get_value() == PLAYER)
+		else if (cur_value == PLAYER)
 		{
-			//TODO: 
-			//add somthing to hurt the player. signel damage at a node or somthing
-			//(will send the node coordinates to someone else and he will handle the damage part).
+			const auto distance = sqrt(pow(x_ - start_x, 2)
+				+ pow(y_ - start_y, 2));
+			int damage = m_stopping_power - distance;
+			if (damage < 0) damage = 0;
+			GameMgr::get_instance().hit_player(Point2D(i , j), damage);
 
 			is_moving_ = false;
 		}
+		else
+			is_moving_ = false;
 	}
 }
 

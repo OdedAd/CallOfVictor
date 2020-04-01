@@ -98,9 +98,15 @@ std::vector<Team*>& GameMgr::get_teams()
 	return this->teams_;
 }
 
-vector<LogicBullet*>& GameMgr::get_bullets()
+//vector<LogicBullet*>& GameMgr::get_bullets()
+vector<Bullet*>& GameMgr::get_bullets()
 {
 	return this->bullets_;
+}
+
+vector<Grenade*>& GameMgr::get_grenades()
+{
+	return this->grenades_;
 }
 
 
@@ -135,9 +141,9 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 
 
 ///<summary>
-/// Find the nearest pickup of the given type
+/// Find the nearest enemy
 //  relative to the given location using heuristic distance.
-/// If there is no such PickupObject , nullptr is returned.
+/// If there is no such enemy , nullptr is returned.
 ///</summary>
 Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_shootable)
 {
@@ -243,8 +249,11 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 			cost = 0.5; // space or path cost
 		//else if (curNodeValue == PICKUP) // pickup 
 		//	cost = 0.1;
-		else if (cur_node_value == PLAYER) // player 
-			cost = 5;
+		else if (cur_node_value == PLAYER) // player
+			//if (get_player_at_pos(pt)->get_team() == )
+				cost = 50;
+			//else
+				//cost 5;
 
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
@@ -267,29 +276,51 @@ void GameMgr::add_team(Team* team)
 	this->teams_.push_back(team);
 }
 
+bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
+{
+	Player* targetPlayer = get_player_at_pos(target);
+	Point2D calling_player_point = calling_player->get_location()->get_point();
+	int start_i = calling_player_point.get_row();
+	int start_j = calling_player_point.get_col();
+
+	int max_damage = targetPlayer->get_max_hp() / 4;
+
+	if (calling_player_point.get_distance(target) < 5)
+	{
+		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
+		grenades_.push_back(new Grenade(start_i, start_j, max_damage));
+		return true;
+	}
+	else
+		return false;
+}
 
 bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
-	int max_damage = targetPlayer->get_max_hp() / 2;
-	int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
-	if (damage < 0) damage = 0;
+	Point2D calling_player_point = calling_player->get_location()->get_point();
+	int start_i = calling_player_point.get_row();
+	int start_j = calling_player_point.get_col();
 
-	if (calling_player->get_location()->get_point().get_distance(target) < 2)
+	int max_damage = targetPlayer->get_max_hp() / 2;
+	//int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
+	//if (damage < 0) damage = 0;
+
+	if (calling_player_point.get_distance(target) < 2)
 	{
-		//targetPlayer->get_hit(damage);
-		bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
+		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
+		bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
 		return true;
 	}
 
 	try
 	{
 		Room& targets_room = maze_.get_room_at(target);
-		Room& player_room = maze_.get_room_at(calling_player->get_location()->get_point());
+		Room& player_room = maze_.get_room_at(calling_player_point);
 		if (player_room == targets_room)
 		{
-			//targetPlayer->get_hit(damage);
-			bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, 2));
+			//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, 2));
+			bullets_.push_back(new Bullet(start_i, start_j, target, 2));
 			return true;
 		}
 	}
@@ -398,6 +429,14 @@ void GameMgr::play_one_turn()
 			}
 		}
 
+		grenades_.erase(std::remove_if(grenades_.begin(), grenades_.end(),
+			[](const auto g) { return g->get_is_exploded() == true; }),
+			grenades_.end());
+
+		for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
+			if ((*itr)->get_is_exploded() == false)
+				(*itr)->explode(maze_);
+
 		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
 			[](const auto b) { return b->get_is_moving() == false; }),
 			bullets_.end());
@@ -408,7 +447,6 @@ void GameMgr::play_one_turn()
 		//else
 			//bullets_.erase(itr);
 
-		
 
 		//clear_map();
 	}

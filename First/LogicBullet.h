@@ -1,6 +1,5 @@
 #pragma once
 #include "Maze.h"
-#include "Node.h"
 #include "Point2D.h"
 
 
