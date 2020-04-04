@@ -179,7 +179,7 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (distance_from_target < 7 && m_ammo_ >= m_grenade_cost)
+		if (m_ammo_ >= m_grenade_cost && distance_from_target > 4 && distance_from_target < 10)
 		{
 			is_successful = m_mgr_->throw_grenade(this, target_location);
 

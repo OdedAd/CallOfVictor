@@ -180,7 +180,7 @@ bool check_is_space(const double dx, const double dy)
 void idle()
 {
 
-	//Sleep(100);
+	Sleep(50);
 	if (move_on && !GameMgr::get_instance().is_game_over())
 	{
 		//if (pg != nullptr)

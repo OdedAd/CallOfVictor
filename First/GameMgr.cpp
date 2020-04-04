@@ -10,8 +10,9 @@ void GameMgr::init_game()
 	is_game_over_ = false;
 	generate_maze();
 	generate_map();
-	generate_teams();
 	generate_pickups();
+	generate_teams();
+
 }
 
 GameMgr& GameMgr::get_instance()
@@ -69,6 +70,7 @@ void GameMgr::generate_teams()
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
 		const auto max_num_of_players = 5;
+		int curValue;
 
 		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
 		{
@@ -81,7 +83,9 @@ void GameMgr::generate_teams()
 			{
 				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
 				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-			} while (maze_.get_at_pos(k, j).get_value() == PLAYER); //collision prevention
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
 			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), 10, 100));
