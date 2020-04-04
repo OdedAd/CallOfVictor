@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Maze.h"
-#include "Team.h"
-#include "Node.h"
 #include <stack>
+#include "Maze.h"
+#include "Node.h"
 
 class GameMgr;
+class Team;
 
 class Player
 {

@@ -15,7 +15,7 @@ class Grenade
 public:
 	Grenade() = default;
 	Grenade(double x, double y);
-	~Grenade() = default;
+	~Grenade();
 	void explode();
 	void show_me() const;
 	void move_bullets(Maze maze);

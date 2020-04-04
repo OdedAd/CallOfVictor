@@ -14,6 +14,14 @@ Grenade::Grenade(const double x, const double y)
 
 }
 
+Grenade::~Grenade()
+{
+	for (auto bullet : bullets_)
+	{
+		delete bullet;
+	}
+}
+
 void Grenade::explode()
 {
 	for (int i = 0; i < NUM_BULLETS; i++)
