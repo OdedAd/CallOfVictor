@@ -223,11 +223,10 @@ void Player::choose_direction()
 	{
 		heal();
 	}
-	// TODO: return this when run away works.
-	//else if (m_ammo_ >= 5)
-	//{
-		//run_away();
-	//}
+	else if (m_ammo_ >= 5)
+	{
+		run_away();
+	}
 	else if (m_ammo_ < 5 )
 	{
 		reload();

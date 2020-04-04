@@ -16,7 +16,7 @@ class Bullet;
 class Grenade
 {
 public:
-	Grenade() = default;
+	//Grenade() = default;
 	Grenade(double x, double y, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE);  //openGL cord
 	Grenade(int i, int j, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE); // maze cord
 	~Grenade();
