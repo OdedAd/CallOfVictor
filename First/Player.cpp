@@ -134,20 +134,28 @@ void Player::reload()
 	//std::cout << "in reload function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
 
-	bool is_successful = false;
-	is_successful = m_mgr_->pickup(this, target);
+	if (target.get_col() != -1) //a target was found, procced to pickup.
+	{
+		bool is_successful = false;
+		is_successful = m_mgr_->pickup(this, target);
 
-	if (is_successful) //picked up the ammo successfully, stock up on ammo.
-	{
-		m_ammo_ = m_max_ammo_;
-		m_is_moving_ = false;
-		m_is_running_for_hp_cond_ = false;
+		if (is_successful) //picked up the ammo successfully, stock up on ammo.
+		{
+			m_ammo_ = m_max_ammo_;
+			m_is_moving_ = false;
+			m_is_running_for_hp_cond_ = false;
+		}
+		else //couldn't pick up the ammo, need to move closer.
+		{
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
+			m_is_moving_ = true;
+		}
 	}
-	else //couldn't pick up the ammo, need to move closer.
+	else //no ammo available, abandon all hope like a headless chicken
 	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
-		m_is_moving_ = true;
+		run_away();
 	}
+
 }
 
 ///<summary>
@@ -213,7 +221,7 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0
+	if ((m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0)
 		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
 		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
 	{

@@ -9,6 +9,7 @@ void GameMgr::init_game()
 {
 	is_game_over_ = false;
 	generate_maze();
+	generate_map();
 	generate_teams();
 	generate_pickups();
 }
@@ -118,7 +119,7 @@ vector<Grenade*>& GameMgr::get_grenades()
 ///</summary>
 Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 {
-	Point2D* p = nullptr;
+	Point2D p = Point2D(-1,-1);
 	Node temp_node;
 	temp_node.set_point(location);
 	double min_distance = -1;
@@ -132,12 +133,12 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 			if (min_distance == -1 || cur_distance < min_distance)
 			{
 				min_distance = cur_distance;
-				p = cur_pickup.get_position();
+				p = *cur_pickup.get_position();
 			}
 		}
 	}
 
-	return *p;
+	return p;
 }
 
 
@@ -344,13 +345,14 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 {
 	Node* target_node = &maze_.get_at_pos(target.get_row(), target.get_col());
 	int target_value = target_node->get_value();
-	if (target_value == PICKUP_AMMO || target_value == PICKUP_MED)
+	int distance = (int)calling_player->get_location()->get_point().get_distance(target);
+
+	if (target_value == PICKUP_AMMO || target_value == PICKUP_MED || distance <= 1)
 	{
-		int distance = (int)calling_player->get_location()->get_point().get_distance(target);
 		PickupObject* targetPickupObject = get_pickup_at_pos(target);
 		int quantity = targetPickupObject->get_quantity();
 
-		if (distance == 1 && quantity > 0)
+		if (quantity > 0)
 		{
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
 			return true;
@@ -377,7 +379,7 @@ void GameMgr::generate_map()
 		{
 			col = rand() % maze_size;
 			row = rand() % maze_size;
-		} while (maze_.get_at_pos(row, col).get_value() != SPACE && maze_.get_at_pos(row, col).get_value() != PLAYER);
+		} while (maze_.get_at_pos(row, col).get_value() != SPACE);
 
 		x = col * size_factor - 1;
 		y = row * size_factor - 1;
@@ -403,7 +405,7 @@ double** GameMgr::get_heat_map()
 
 void GameMgr::play_one_turn()
 {
-	generate_map();
+	//generate_map();
 	for (auto game_team : teams_)
 	{
 		if (game_team->get_players_alive() <= 0)
