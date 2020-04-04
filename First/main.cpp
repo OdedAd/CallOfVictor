@@ -1,20 +1,9 @@
 #include <iostream>
-#include <queue>
 #include <time.h>
 #include <vector>
-#include "Bullet.h"
 #include "GLUT.h"
-#include "Grenade.h"
-#include "Node.h"
-
-#include "Team.h"
-#include "Player.h"
 #include <windows.h> 
-
-
 #include "GameMgr.h"
-#include "Maze.h"
-
 
 using namespace std;
 
@@ -24,7 +13,7 @@ const int height = 600; // window height
 //double map[maze_size][maze_size] = { 0 };
 //double** map;
 
-Bullet* pb = nullptr;
+//Bullet* pb = nullptr;
 Grenade* pg;
 bool move_on = false;
 
@@ -37,8 +26,6 @@ void init()
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
 	GameMgr::get_instance().init_game();
-
-	//GameMgr::get_instance().generate_map();
 }
 
 void draw_maze()
@@ -88,7 +75,7 @@ void draw_maze()
 
 void draw_map()
 {
-	double sz, xx, yy;
+	double sz = sz = 2.0 / maze_size, xx, yy;
 	double** map = GameMgr::get_instance().get_heat_map();
 
 	for (auto i = 0; i < maze_size; i++)
@@ -101,7 +88,6 @@ void draw_map()
 				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
 				glColor3d(c, c, c);
 				// draw rectangle
-				sz = 2.0 / maze_size;
 				xx = (j * sz - 1);
 				yy = i * sz - 1;
 
@@ -114,7 +100,7 @@ void draw_map()
 				glEnd();
 			}
 		}
-	delete map;
+	Utils::clear_temporary_map(map,maze_size);
 }
 //void generate_map()
 //{
@@ -212,10 +198,10 @@ void idle()
 	if (GameMgr::get_instance().is_game_over())
 	{
 		cout << "Game Over!" << endl;
-		//GameMgr::get_instance().clear_all_resources();
+		GameMgr::get_instance().clear_all_resources();
 		exit(0);
-		return;
 	}
+	
 	glutPostRedisplay();// calls indirectly to display
 }
 

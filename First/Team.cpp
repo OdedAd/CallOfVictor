@@ -11,6 +11,14 @@ Team::Team(const int color[COLOR_LENGTH], const std::vector<Player*> players) :
 		m_color_[i] = color[i];
 }
 
+Team::~Team()
+{
+	for (auto player : this->m_players_)
+	{
+		delete player;
+	}
+}
+
 
 std::vector<Player*>& Team::get_teammates()
 {
@@ -47,7 +55,7 @@ void Team::reduce_players_alive(const int count)
 
 int Team::get_players_alive() const
 {
-	std::cout << "players of team = " <<get_team_name()<< players_alive_ << std::endl;
+	std::cout << "players of team = " << get_team_name() << players_alive_ << std::endl;
 	return this->players_alive_;
 }
 
@@ -56,7 +64,7 @@ std::string Team::get_team_name() const
 	std::string str;
 	for (auto m_color : m_color_)
 	{
-		str+=std::to_string(m_color);
+		str += std::to_string(m_color);
 	}
 	return str;
 }

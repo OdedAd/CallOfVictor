@@ -47,7 +47,7 @@ void Utils::clear_temporary_map(double** map, const int size)
 	delete[] map;
 }
 
-void Utils::print_map(double** map)
+void Utils::print_map(double map[maze_size][maze_size])
 {
 	for (int i = 0; i < maze_size; ++i)
 	{

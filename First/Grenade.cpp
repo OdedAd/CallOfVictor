@@ -19,6 +19,19 @@ Grenade::Grenade(const double x, const double y, int megatons , int fuze )
 
 Grenade::Grenade(const int i, const int j, int megatons, int fuze)
 {
+	
+}
+
+Grenade::~Grenade()
+{
+	for (auto bullet : bullets_)
+	{
+		delete bullet;
+	}
+}
+
+void Grenade::explode()
+{
 	int indx;
 	this->x_ = (j * 2.0) / (double)maze_size - 1;
 	this->y_ = (i * 2.0) / (double)maze_size - 1;

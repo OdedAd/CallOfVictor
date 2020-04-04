@@ -368,8 +368,8 @@ void GameMgr::generate_map()
 {
 	const int num_tries = 1000;
 	int col, row;
-	double x, y, sz;
-	Grenade* pg = nullptr;
+	double x, y;
+	const auto size_factor = 2.0 / maze_size;
 
 	for (auto i = 0; i < num_tries; i++)
 	{
@@ -378,10 +378,10 @@ void GameMgr::generate_map()
 			col = rand() % maze_size;
 			row = rand() % maze_size;
 		} while (maze_.get_at_pos(row, col).get_value() != SPACE && maze_.get_at_pos(row, col).get_value() != PLAYER);
-		sz = 2.0 / maze_size;
-		x = col * sz - 1;
-		y = row * sz - 1;
-		pg = new Grenade(x, y);
+
+		x = col * size_factor - 1;
+		y = row * size_factor - 1;
+		Grenade* pg = new Grenade(x, y);
 		pg->simulate_explosion(map_, maze_);
 		delete pg;
 	}
@@ -403,7 +403,7 @@ double** GameMgr::get_heat_map()
 
 void GameMgr::play_one_turn()
 {
-	//generate_map();
+	generate_map();
 	for (auto game_team : teams_)
 	{
 		if (game_team->get_players_alive() <= 0)
@@ -451,6 +451,7 @@ void GameMgr::play_one_turn()
 
 		//clear_map();
 	}
+	clear_map();
 }
 
 void GameMgr::clear_map()
@@ -473,10 +474,6 @@ void GameMgr::delete_team_related_allocations()
 {
 	for (auto game_team : teams_)
 	{
-		for (auto player : game_team->get_teammates())
-		{
-			delete player;
-		}
 		delete game_team;
 	}
 }
@@ -485,7 +482,6 @@ void GameMgr::clear_all_resources()
 {
 	delete_team_related_allocations();
 }
-
 
 Player* GameMgr::get_player_at_pos(Point2D& position)
 {
