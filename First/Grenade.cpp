@@ -1,12 +1,14 @@
 #include "Grenade.h"
 
-Grenade::Grenade(const double x, const double y, int megatons , int fuze )
+#include <iostream>
+
+Grenade::Grenade(const double x, const double y, int megatons, int fuze)
 {
 	int i;
 	this->x_ = x;
 	this->y_ = y;
-	double alpha, delta = 2*PI/NUM_BULLETS;
-	for (i = 0,alpha = 0; i < NUM_BULLETS; i++,alpha+=delta)
+	double alpha, delta = 2 * PI / NUM_BULLETS;
+	for (i = 0, alpha = 0; i < NUM_BULLETS; i++, alpha += delta)
 	{
 		bullets_[i] = new Bullet(x, y, megatons);
 		bullets_[i]->set_dir(alpha);
@@ -77,15 +79,23 @@ void Grenade::move_bullets(Maze& maze)
 
 void Grenade::simulate_explosion(double map[maze_size][maze_size], Maze& maze)
 {
+	if (bullets_[12]->get_y() < -1)
+	{
+		std::cout<<"here"<<std::endl;
+	}
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
 		bullets_[i]->set_is_moving(true);
+		if (abs(bullets_[i]->get_y()) > 10)
+			bullets_[i]->set_y(bullets_[i]->get_y() / 10);
+		if (abs(bullets_[i]->get_x()) > 10)
+			bullets_[i]->set_x(bullets_[i]->get_x() / 10);
 		bullets_[i]->simulate_motion(map, maze);
 	}
 
 }
 
-bool Grenade::get_is_exploded()
+bool Grenade::get_is_exploded() const
 {
 	return isExploded;
 }

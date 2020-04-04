@@ -1,22 +1,31 @@
 #include "Bullet.h"
-#include "GLUT.H"
-#include <math.h>
 
 #include "GameMgr.h"
+#include "GLUT.H"
 
 
-Bullet::Bullet(double x, double y, int stopping_power)
+void Bullet::set_y(const double get_y)
+{
+	this->y_ = get_y;
+}
+
+void Bullet::set_x(const double x)
+{
+	this->x_ = x;
+}
+
+Bullet::Bullet(const double x, const double y, const int stopping_power)
 {
 	this->x_ = x;
 	this->y_ = y;
-	dirx_ = (rand() % 101)-50;
-	diry_ = (rand() % 101)-50;
-	const auto len = sqrt(dirx_ * dirx_ + diry_ * diry_);
-	dirx_ /= len;
-	diry_ /= len;
+	//dirx_ = (rand() % 101)-50;
+	//diry_ = (rand() % 101)-50;
+	//const auto len = sqrt(dirx_ * dirx_ + diry_ * diry_);
+	//dirx_ /= len;
+	//diry_ /= len;
 	is_moving_ = false;
 
-	m_stopping_power = stopping_power;
+	m_stopping_power_ = stopping_power;
 }
 
 Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
@@ -24,7 +33,7 @@ Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
 	this->x_ = (j*2.0)/(double)maze_size - 1;
 	this->y_ = (i*2.0)/(double)maze_size - 1;
 
-	m_stopping_power = stopping_power;
+	m_stopping_power_ = stopping_power;
 
 	set_dir(Point2D(i,j).get_angle_between_two_points(target_location));
 	is_moving_ = true;
@@ -75,7 +84,7 @@ void Bullet::move(Maze& maze)
 		{
 			const auto distance = sqrt(pow(x_ - start_x, 2)
 				+ pow(y_ - start_y, 2));
-			int damage = m_stopping_power - distance;
+			int damage = m_stopping_power_ - distance;
 			if (damage < 0) damage = 0;
 			GameMgr::get_instance().hit_player(Point2D(i , j), damage);
 
