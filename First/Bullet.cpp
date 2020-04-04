@@ -3,17 +3,6 @@
 #include "GameMgr.h"
 #include "GLUT.H"
 
-
-void Bullet::set_y(const double get_y)
-{
-	this->y_ = get_y;
-}
-
-void Bullet::set_x(const double x)
-{
-	this->x_ = x;
-}
-
 Bullet::Bullet(const double x, const double y, const int stopping_power)
 {
 	this->x_ = x;
@@ -30,12 +19,12 @@ Bullet::Bullet(const double x, const double y, const int stopping_power)
 
 Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
 {
-	this->x_ = (j*2.0)/(double)maze_size - 1;
-	this->y_ = (i*2.0)/(double)maze_size - 1;
+	this->x_ = (j * 2.0) / (double)maze_size - 1;
+	this->y_ = (i * 2.0) / (double)maze_size - 1;
 
 	m_stopping_power_ = stopping_power;
 
-	set_dir(Point2D(i,j).get_angle_between_two_points(target_location));
+	set_dir(Point2D(i, j).get_angle_between_two_points(target_location));
 	is_moving_ = true;
 }
 
@@ -45,7 +34,7 @@ void Bullet::show_me() const
 	glColor3d(0, 0, 0);
 	glBegin(GL_POLYGON);
 	glVertex2d(x_ - 0.01, y_);
-	glVertex2d(x_ , y_+ 0.01);
+	glVertex2d(x_, y_ + 0.01);
 	glVertex2d(x_ + 0.01, y_);
 	glVertex2d(x_, y_ - 0.01);
 	glEnd();
@@ -86,7 +75,7 @@ void Bullet::move(Maze& maze)
 				+ pow(y_ - start_y, 2));
 			int damage = m_stopping_power_ - distance;
 			if (damage < 0) damage = 0;
-			GameMgr::get_instance().hit_player(Point2D(i , j), damage);
+			GameMgr::get_instance().hit_player(Point2D(i, j), damage);
 
 			is_moving_ = false;
 		}
@@ -116,13 +105,16 @@ void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 	int i = maze_size * (y_ + 1) / 2;
 	int j = maze_size * (x_ + 1) / 2;
 
-	while(maze.get_at_pos(i,j).get_value() != WALL)
+	try
 	{
-		map[i][j] += delta;
-		x_ += 0.001*dirx_;
-		y_ += 0.001*diry_;
-		i = maze_size * (y_ + 1) / 2;
-		j = maze_size * (x_ + 1) / 2;
-	}
+		while (maze.get_at_pos(i, j).get_value() != WALL)
+		{
+			map[i][j] += delta;
+			x_ += 0.001 * dirx_;
+			y_ += 0.001 * diry_;
+			i = maze_size * (y_ + 1) / 2;
+			j = maze_size * (x_ + 1) / 2;
+		}
+	}catch (...){}//if i and j get fucked up do nothing with this
 
 }

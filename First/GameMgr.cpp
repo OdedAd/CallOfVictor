@@ -9,6 +9,7 @@ void GameMgr::init_game()
 {
 	is_game_over_ = false;
 	generate_maze();
+	generate_map();
 	generate_teams();
 	generate_pickups();
 }
@@ -366,7 +367,7 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 
 void GameMgr::generate_map()
 {
-	const int num_tries = 1000;
+	const int num_tries = 3000;
 	int col, row;
 	double x, y;
 	const auto size_factor = 2.0 / maze_size;
@@ -377,7 +378,7 @@ void GameMgr::generate_map()
 		{
 			col = rand() % maze_size;
 			row = rand() % maze_size;
-		} while (maze_.get_at_pos(row, col).get_value() != SPACE && maze_.get_at_pos(row, col).get_value() != PLAYER);
+		} while (maze_.get_at_pos(row, col).get_value() != SPACE);
 
 		x = col * size_factor - 1;
 		y = row * size_factor - 1;

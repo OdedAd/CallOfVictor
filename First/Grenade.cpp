@@ -79,20 +79,11 @@ void Grenade::move_bullets(Maze& maze)
 
 void Grenade::simulate_explosion(double map[maze_size][maze_size], Maze& maze)
 {
-	if (bullets_[12]->get_y() < -1)
-	{
-		std::cout<<"here"<<std::endl;
-	}
 	for (int i = 0; i < NUM_BULLETS; i++)
 	{
 		bullets_[i]->set_is_moving(true);
-		if (abs(bullets_[i]->get_y()) > 10)
-			bullets_[i]->set_y(bullets_[i]->get_y() / 10);
-		if (abs(bullets_[i]->get_x()) > 10)
-			bullets_[i]->set_x(bullets_[i]->get_x() / 10);
 		bullets_[i]->simulate_motion(map, maze);
 	}
-
 }
 
 bool Grenade::get_is_exploded() const

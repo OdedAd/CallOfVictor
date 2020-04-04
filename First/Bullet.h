@@ -8,8 +8,6 @@ public:
 	Bullet() = default;
 	~Bullet() = default;
 
-	void set_y(double get_y);
-	void set_x(double x);
 	Bullet(double x, double y, int stopping_power = 10); //openGL cord
 	Bullet(int i, int j, const Point2D& target_location, int stopping_power = 10);// maze cord
 	void show_me() const;
