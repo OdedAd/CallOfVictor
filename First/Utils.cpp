@@ -88,7 +88,7 @@ Point2D& Utils::find_minimum_in_matrix(Maze& maze)
 	}
 
 	clear_temporary_map(map,maze_size);
-	std::cout << GameMgr::get_instance().get_maze().get_at_pos(*min_value_location).get_value()<<std::endl;
+	//std::cout << GameMgr::get_instance().get_maze().get_at_pos(*min_value_location).get_value()<<std::endl;
 	
 	return *min_value_location;
 }

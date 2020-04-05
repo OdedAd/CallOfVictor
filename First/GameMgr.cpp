@@ -49,9 +49,9 @@ void GameMgr::init_pickup(const PickupType type, const int color_type)
 {
 	const auto room = maze_.get_room_at(rand() % num_of_rooms);
 	const auto location = room.get_random_point_in_room();
+	maze_.get_at_pos(location->get_row(), location->get_col()).set_value(color_type);
 	const auto pickup_object = PickupObject(location, type);
 	pickup_objects_.push_back(pickup_object);
-	maze_.get_at_pos(location->get_row(), location->get_col()).set_value(color_type);
 }
 
 
@@ -69,7 +69,7 @@ void GameMgr::generate_teams()
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
-		const auto max_num_of_players = 5;
+		const auto max_num_of_players = 2;
 		int curValue;
 
 		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
@@ -88,7 +88,9 @@ void GameMgr::generate_teams()
 			} while (curValue != SPACE); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), 10, 100));
+			int playerMaxAmmo = 10;
+			int playerMaxHP = 1000;
+			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), playerMaxAmmo, playerMaxHP));
 		}
 		this->add_team(team);
 	}
@@ -305,14 +307,18 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
+
 	int start_i = calling_player_point.get_row();
 	int start_j = calling_player_point.get_col();
+	double angle = Point2D(start_i, start_j).get_angle_between_two_points(target);
+	start_i += (int)round(cos(angle));
+	start_j += (int)round(sin(angle));
 
-	int max_damage = targetPlayer->get_max_hp() / 2;
+	int max_damage = targetPlayer->get_max_hp() / 4;
 	//int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
 	//if (damage < 0) damage = 0;
 
-	if (calling_player_point.get_distance(target) < 2)
+	if (calling_player_point.get_distance(target) <= 1)
 	{
 		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
 		bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
@@ -326,7 +332,7 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		if (player_room == targets_room)
 		{
 			//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, 2));
-			bullets_.push_back(new Bullet(start_i, start_j, target, 2));
+			bullets_.push_back(new Bullet(start_i, start_j, target, 10));
 			return true;
 		}
 	}

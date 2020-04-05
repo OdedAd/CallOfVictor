@@ -65,7 +65,8 @@ Point2D* Room::get_random_point_in_room() const
 {
 	const auto row = rand() % (height_ - 1);
 	const auto col = rand() % (width_ - 1);
-	return new Point2D(row + left_top_.get_row(), col + left_top_.get_col());
+	Point2D* newPoint = new Point2D(row + left_top_.get_row(), col + left_top_.get_col());
+	return newPoint;
 }
 
 Point2D* Room::get_point_in_room() const
