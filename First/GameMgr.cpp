@@ -111,10 +111,9 @@ vector<Grenade*>& GameMgr::get_grenades()
 	return this->grenades_;
 }
 
-
 ///<summary>
 /// Find the nearest pickup of the given type
-//  relative to the given location using heuristic distance.
+///  relative to the given location using heuristic distance.
 /// If there is no such PickupObject , nullptr is returned.
 ///</summary>
 Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
@@ -141,10 +140,9 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 	return *p;
 }
 
-
 ///<summary>
 /// Find the nearest enemy
-//  relative to the given location using heuristic distance.
+///  relative to the given location using heuristic distance.
 /// If there is no such enemy , nullptr is returned.
 ///</summary>
 Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_shootable)
@@ -269,7 +267,6 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 	}
 }
 
-
 ///
 ///adds a team to the teams vector
 ///
@@ -311,7 +308,7 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	if (calling_player_point.get_distance(target) < 2)
 	{
 		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
-		bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
+		bullets_.push_back(new Bullet(start_i, start_j, target, max_damage));
 		return true;
 	}
 
@@ -383,6 +380,32 @@ void GameMgr::generate_map()
 		x = col * size_factor - 1;
 		y = row * size_factor - 1;
 		Grenade* pg = new Grenade(x, y);
+		pg->simulate_explosion(map_, maze_);
+		delete pg;
+	}
+}
+
+void GameMgr::clear_room_map(Room& room)
+{
+	for (auto i = room.get_left_top().get_row(); i < room.get_right_bottom().get_row(); i++)
+	{
+		for (auto j = room.get_left_top().get_col(); j < room.get_right_bottom().get_col(); j++)
+		{
+			map_[i][j] = 0;
+		}
+	}
+}
+
+void GameMgr::generate_map_for_room(Room& room)
+{
+	const auto num_tries = room.get_height() * room.get_width();
+	clear_room_map(room);
+
+	for (auto i = 0; i < num_tries; i++)
+	{
+		const auto pt = room.get_random_point_in_room();
+
+		auto pg = new Grenade(pt->get_row(), pt->get_col());
 		pg->simulate_explosion(map_, maze_);
 		delete pg;
 	}

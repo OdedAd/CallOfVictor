@@ -1,8 +1,5 @@
 #include "Bullet.h"
-
 #include <iostream>
-
-
 #include "GameMgr.h"
 #include "GLUT.H"
 
@@ -24,7 +21,7 @@ Bullet::Bullet(const double x, const double y, const int stopping_power)
 	m_stopping_power_ = stopping_power;
 }
 
-Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
+Bullet::Bullet(const int i, const int j, const Point2D& target_location, const int stopping_power)
 {
 	this->x_ = (j * 2.0) / (double)maze_size - 1;
 	this->y_ = (i * 2.0) / (double)maze_size - 1;
@@ -34,7 +31,6 @@ Bullet::Bullet(int i, int j, const Point2D& target_location, int stopping_power)
 	set_dir(Point2D(i, j).get_angle_between_two_points(target_location));
 	is_moving_ = true;
 }
-
 
 void Bullet::show_me() const
 {
@@ -101,7 +97,7 @@ double Bullet::get_y() const
 	return y_;
 }
 
-void Bullet::set_dir(double angle)
+void Bullet::set_dir(const double angle)
 {
 	dirx_ = cos(angle);
 	diry_ = sin(angle);
@@ -122,9 +118,10 @@ void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 			i = maze_size * (y_ + 1) / 2;
 			j = maze_size * (x_ + 1) / 2;
 		}
-	}catch (const std::runtime_error& re)
-	{
-		std::cout<< "ex = " << re.what()<<std::endl;
-	}//if i and j get fucked up do nothing with this
+	}
+	catch (const std::runtime_error& re)
+	{//if i and j get fucked up do nothing with this
+		std::cout << "ex = " << re.what() << std::endl;
+	}
 
 }

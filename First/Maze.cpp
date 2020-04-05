@@ -1,7 +1,6 @@
 #include "Maze.h"
 #include <iostream>
 
-
 /**
  * \brief get a sub matrix
  * \param top_left the top left point of room
@@ -192,7 +191,7 @@ void Maze::generate_path(Point2D start, Point2D target)
 }
 
 void Maze::add_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq)
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq) const
 {
 	// try down
 	if (pn->get_point().get_row() < maze_size - 1)
@@ -209,7 +208,7 @@ void Maze::add_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& b
 }
 
 void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
-	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq)
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq) const
 {
 	Point2D pt;
 	double cost;
@@ -237,4 +236,9 @@ void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node>& g
 int Maze::get_num_existing_rooms() const
 {
 	return num_existing_rooms_;
+}
+
+void Maze::generate_map_for_room(Room& room)
+{
+	
 }

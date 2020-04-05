@@ -21,7 +21,7 @@ Point2D& Utils::find_maximum_in_matrix(Maze& maze)
 			{
 				max_value_location->set_row(row_index);
 				max_value_location->set_col(col_index);
-				max_value = maze.get_at_pos(row_index,col_index).get_value();
+				max_value = maze.get_at_pos(row_index, col_index).get_value();
 			}
 		}
 	}
@@ -29,7 +29,7 @@ Point2D& Utils::find_maximum_in_matrix(Maze& maze)
 	return *max_value_location;
 }
 
-void Utils::clear_temporary_maze(Node** matrix,const int size)
+void Utils::clear_temporary_maze(Node** matrix, const int size)
 {
 	for (auto i = 0; i < size; ++i)
 	{
@@ -53,7 +53,7 @@ void Utils::print_map(double map[maze_size][maze_size])
 	{
 		for (int j = 0; j < maze_size; ++j)
 		{
-			std::cout<< "row = " << i <<", col = "<< j<<", value = "<< map[i][j]<< std::endl;
+			std::cout << "row = " << i << ", col = " << j << ", value = " << map[i][j] << std::endl;
 		}
 	}
 }
@@ -76,9 +76,9 @@ Point2D& Utils::find_minimum_in_matrix(Maze& maze)
 		{
 			//double cur_value = maze.get_at_pos(row_index, col_index).get_value();
 			double cur_value = map[row_index][col_index];
-			if (min_value > cur_value && (maze.get_at_pos(row_index,col_index).get_value()==SPACE ||
-				maze.get_at_pos(row_index,col_index).get_value()==PLAYER) 
-				&& cur_value>0.001f)
+			if (min_value > cur_value && (maze.get_at_pos(row_index, col_index).get_value() == SPACE ||
+				maze.get_at_pos(row_index, col_index).get_value() == PLAYER)
+				&& cur_value > 0.001f)
 			{
 				min_value_location->set_row(row_index);
 				min_value_location->set_col(col_index);
@@ -87,8 +87,38 @@ Point2D& Utils::find_minimum_in_matrix(Maze& maze)
 		}
 	}
 
-	clear_temporary_map(map,maze_size);
+	clear_temporary_map(map, maze_size);
 	//std::cout << GameMgr::get_instance().get_maze().get_at_pos(*min_value_location).get_value()<<std::endl;
+
+	return *min_value_location;
+}
+
+Point2D& Utils::find_minimum_in_room(Maze& maze, Room& room)
+{
+	Point2D* min_value_location = new Point2D();
+	double** map = GameMgr::get_instance().get_heat_map();
 	
+	min_value_location->set_row(room.get_left_top().get_row());
+	min_value_location->set_col(room.get_left_top().get_col());
+	double min_value = 100;
+
+	for (int row_index = room.get_left_top().get_row(); row_index < room.get_right_bottom().get_row(); row_index++)
+	{
+		for (int col_index = room.get_left_top().get_col(); col_index < room.get_right_bottom().get_col(); col_index++)
+		{
+			double cur_value = map[row_index][col_index];
+			if (min_value > cur_value && (maze.get_at_pos(row_index, col_index).get_value() == SPACE ||
+				maze.get_at_pos(row_index, col_index).get_value() == PLAYER)
+				&& cur_value > 0.001f)
+			{
+				min_value_location->set_row(row_index);
+				min_value_location->set_col(col_index);
+				min_value = cur_value;
+			}
+		}
+	}
+
+	clear_temporary_map(map, maze_size);
+
 	return *min_value_location;
 }
