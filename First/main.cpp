@@ -77,15 +77,15 @@ void draw_map()
 {
 	double sz = sz = 2.0 / maze_size, xx, yy;
 	double** map = GameMgr::get_instance().get_heat_map();
+	auto maze = GameMgr::get_instance().get_maze();
 
 	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
 		{
-			if (GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value() == SPACE)
+			if (maze.get_at_pos(i, j).get_value() == SPACE)
 			{
-				double c;
-				//c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
-				c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
+				double c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
+				//double c = 1 - map[i][j];// 1(white) is very safe, 0(black) is very dangerous
 				glColor3d(c, c, c);
 				// draw rectangle
 				xx = (j * sz - 1);
@@ -241,7 +241,7 @@ void menu(const int choice)
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
 			{
-				cur_player->set_hp(10);
+				cur_player->set_hp(40);
 				cur_player->set_ammo(0);
 			}
 		break;
@@ -249,7 +249,7 @@ void menu(const int choice)
 	case 5:
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
-				cur_player->set_hp(4);
+				cur_player->set_hp(40);
 		break;
 	}
 }
@@ -263,14 +263,16 @@ void mouse(const int button, const int state, const int x, const int y)
 		yy = 2 * ((double)height - y) / height - 1;
 
 		//		pb = new Bullet(xx,yy);
-		pg = new Grenade(xx, yy);
-		GameMgr::get_instance().get_grenades().push_back(new Grenade(xx, yy));
+		//pg = new Grenade(xx, yy);
+		//GameMgr::get_instance().get_grenades().push_back(new Grenade(xx, yy));
 
-		//cout << "player moving" << endl;
-		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(true);
-		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->move(GameMgr::get_instance().get_maze());
-		//GameMgr::get_instance().get_teams()[0].get_teammates()[0]->set_is_moving(false);
-		//cout << "end of player moving" << endl;
+		//cout<< GameMgr::get_instance().get_grenades().size()<<endl;
+
+		cout << "player moving" << endl;
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_is_moving(true);
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->move(GameMgr::get_instance().get_maze());
+		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_is_moving(false);
+		cout << "end of player moving" << endl;
 	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{

@@ -16,20 +16,20 @@ private:
 	Node* m_cur_target_node_;
 	std::stack<Point2D*> m_cur_path_to_target_;
 
-	const int m_ID_;
+	const int m_id_;
 	int m_ammo_;
-	int m_grenade_cost;
+	int m_grenade_cost_;
 	const int m_max_ammo_;
 	int m_cur_hp_;
 	const int m_max_hp_;
-	int m_old_value = 0;
+	int m_old_value_ = 0;
 
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 
 	bool m_is_running_for_hp_cond_;
-	bool m_collision;
-	int m_idle_counter;
+	bool m_collision_;
+	int m_idle_counter_;
 
 	const double player_delta_ = 0.0001;
 
@@ -38,7 +38,7 @@ private:
 
 public:
 
-	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int maxHP = 10, int grenade_cost = -1);
+	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int max_hp = 10, int grenade_cost = -1);
 	~Player() = default;
 	void show_me() const;
 
@@ -88,8 +88,7 @@ public:
 	int get_ammo() const;
 	int get_old_value() const;
 	Team* get_team() const;
-	int get_ID() const;
-
-
+	int get_id() const;
+	bool is_in_room() const;
 };
 

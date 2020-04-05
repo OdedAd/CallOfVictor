@@ -81,27 +81,27 @@ Room& Maze::get_room_at(const unsigned short index)
 Room& Maze::get_room_at(const Point2D& point)
 {
 	int target_room_index = 0;
-	bool isFound = false;
+	bool is_found = false;
 
 	if (point.get_row() >= maze_size || point.get_col() >= maze_size)
 	{
-		throw "get_room_at: Point out of bounds!";
+		throw std::invalid_argument("get_room_at: Point out of bounds!");
 	}
 
-	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (isFound == false); ++cur_room_index)
+	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (is_found == false); ++cur_room_index)
 	{
 		if ((rooms_[cur_room_index].get_left_top().get_row() - 1 <= point.get_row() && point.get_row() <= rooms_[cur_room_index].get_right_bottom().get_row() + 1)
 			&& (rooms_[cur_room_index].get_left_top().get_col() - 1 <= point.get_col() && point.get_col() <= rooms_[cur_room_index].get_right_bottom().get_col() + 1))
 		{
 			target_room_index = cur_room_index;
-			isFound = true;
+			is_found = true;
 		}
 	}
 
-	if (isFound)
+	if (is_found)
 		return rooms_[target_room_index];
-	else
-		throw "get_room_at: Point not in room!";
+	
+	throw std::runtime_error("get_room_at: Point not in room!");
 }
 
 Room& Maze::generate_room()
@@ -236,9 +236,4 @@ void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node>& g
 int Maze::get_num_existing_rooms() const
 {
 	return num_existing_rooms_;
-}
-
-void Maze::generate_map_for_room(Room& room)
-{
-	
 }

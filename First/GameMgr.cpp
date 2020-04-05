@@ -427,7 +427,7 @@ double** GameMgr::get_heat_map()
 
 void GameMgr::play_one_turn()
 {
-	generate_map();
+	//generate_map();
 	for (auto game_team : teams_)
 	{
 		if (game_team->get_players_alive() <= 0)
@@ -439,12 +439,22 @@ void GameMgr::play_one_turn()
 
 	if (is_game_over_ == false)
 	{
+		Room current_room = maze_.get_room_at(0);
 		for (auto cur_team : teams_)
 		{
 			for (Player* cur_player : cur_team->get_teammates())
 			{
 				if (cur_player->get_hp() > 0)
 				{
+					if (cur_player->is_in_room())
+					{
+						//need to be changed so if all players are in different room it won't calculate a lot of things
+						if (current_room.get_left_top() != maze_.get_room_at(cur_player->get_location()->get_point()).get_left_top())
+						{
+							current_room = maze_.get_room_at(cur_player->get_location()->get_point());
+							generate_map_for_room(current_room);
+						}
+					}
 					cur_player->move(maze_);
 				}
 				else
@@ -475,7 +485,7 @@ void GameMgr::play_one_turn()
 
 		//clear_map();
 	}
-	clear_map();
+	//clear_map();
 }
 
 void GameMgr::clear_map()
