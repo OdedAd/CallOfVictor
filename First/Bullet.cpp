@@ -1,7 +1,14 @@
 #include "Bullet.h"
 
+#include <iostream>
+
+
 #include "GameMgr.h"
 #include "GLUT.H"
+
+namespace std {
+	class runtime_error;
+}
 
 Bullet::Bullet(const double x, const double y, const int stopping_power)
 {
@@ -115,6 +122,9 @@ void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 			i = maze_size * (y_ + 1) / 2;
 			j = maze_size * (x_ + 1) / 2;
 		}
-	}catch (...){}//if i and j get fucked up do nothing with this
+	}catch (const std::runtime_error& re)
+	{
+		std::cout<< "ex = " << re.what()<<std::endl;
+	}//if i and j get fucked up do nothing with this
 
 }

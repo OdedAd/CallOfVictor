@@ -238,7 +238,6 @@ void Player::choose_direction()
 		fill_path_stack();
 }
 
-
 void Player::fill_path_stack()
 {
 	if (m_cur_target_node_ != nullptr && m_cur_target_node_->get_parent() != nullptr)
