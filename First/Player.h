@@ -1,8 +1,12 @@
 #pragma once
 
 #include <stack>
+#include <iostream>
+
 #include "Maze.h"
 #include "Node.h"
+#include "GLUT.H"
+
 
 class GameMgr;
 class Team;

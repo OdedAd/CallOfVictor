@@ -121,11 +121,10 @@ vector<Grenade*>& GameMgr::get_grenades()
 ///<summary>
 /// Find the nearest pickup of the given type
 //  relative to the given location using heuristic distance.
-/// If there is no such PickupObject , nullptr is returned.
+/// If there is no such PickupObject , target doesn't change.
 ///</summary>
-Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
+void GameMgr::find_nearest_pickup(Point2D& location, Point2D& target, const PickupType type)
 {
-	Point2D p = Point2D(-1,-1);
 	Node temp_node;
 	temp_node.set_point(location);
 	double min_distance = -1;
@@ -139,12 +138,10 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 			if (min_distance == -1 || cur_distance < min_distance)
 			{
 				min_distance = cur_distance;
-				p = *cur_pickup.get_position();
+				target = *cur_pickup.get_position();
 			}
 		}
 	}
-
-	return p;
 }
 
 
@@ -314,7 +311,7 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	start_i += (int)round(cos(angle));
 	start_j += (int)round(sin(angle));
 
-	int max_damage = targetPlayer->get_max_hp() / 4;
+	int max_damage = targetPlayer->get_max_hp() / 10;
 	//int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
 	//if (damage < 0) damage = 0;
 
@@ -344,6 +341,22 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	return false;
 }
 
+bool GameMgr::stab(Player* calling_player, Point2D& target)
+{
+	Player* targetPlayer = get_player_at_pos(target);
+	Point2D calling_player_point = calling_player->get_location()->get_point();
+
+	int max_damage = targetPlayer->get_max_hp() / 2;
+
+	if (calling_player_point.get_distance(target) <= 1)
+	{
+		hit_player(target, max_damage);
+		return true;
+	}
+
+	return false;
+}
+
 void GameMgr::hit_player(Point2D& target, const int damage)
 {
 	//Player* targetPlayer = get_player_at_pos(target);
@@ -362,7 +375,7 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		PickupObject* targetPickupObject = get_pickup_at_pos(target);
 		int quantity = targetPickupObject->get_quantity();
 
-		if (quantity > 0)
+		if (distance <= 1 && quantity > 0 )
 		{
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
 			return true;
@@ -464,6 +477,9 @@ void GameMgr::play_one_turn()
 		//clear_map();
 	}
 	clear_map();
+
+	static int turn_counter = 0;
+	std::cout << " Turn " << ++turn_counter << " ended " << std::endl << std::endl;
 }
 
 void GameMgr::clear_map()

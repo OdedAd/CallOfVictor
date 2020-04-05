@@ -4,8 +4,10 @@
 #include "Team.h"
 #include "Node.h"
 #include "PickupObject.h"
-#include "Player.h"
 #include "Grenade.h"
+
+#include "Player.h"
+#include "Sniper.h"
 
 #include "LogicBullet.h"
 
@@ -33,10 +35,11 @@ public:
 	vector<Bullet*>& get_bullets();
 	vector<Grenade*>& get_grenades();
 
-	Point2D& find_nearest_pickup(Point2D& location, PickupType type);
+	void find_nearest_pickup(Point2D& location, Point2D& target, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target, Team* callers_team = nullptr);
 	bool shoot(Player* calling_player, Point2D& target);
+	bool stab(Player* calling_player, Point2D& target);
 	void hit_player(Point2D& target, const int damage);
 	bool pickup(Player* calling_player, Point2D& target);
 	void generate_map();

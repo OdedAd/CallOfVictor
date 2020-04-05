@@ -201,7 +201,7 @@ void idle()
 		GameMgr::get_instance().clear_all_resources();
 		exit(0);
 	}
-	
+
 	glutPostRedisplay();// calls indirectly to display
 }
 
@@ -234,23 +234,36 @@ void menu(const int choice)
 	case 3:
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
+			{
 				cur_player->set_hp(1);
+				cur_player->set_ammo(0);
+				cur_player->set_is_moving(true);
+			}
+		move_on = true;
+
 		break;
 
 	case 4:
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
 			{
-				cur_player->set_hp(10);
+				cur_player->set_hp(cur_player->get_max_hp());
 				cur_player->set_ammo(0);
+				cur_player->set_is_moving(true);
 			}
+		move_on = true;
 		break;
 
 	case 5:
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
+			{
 				cur_player->set_hp(4);
+				cur_player->set_is_moving(true);
+			}
+		move_on = true;
 		break;
+
 	}
 }
 

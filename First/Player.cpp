@@ -1,9 +1,5 @@
 #include "Player.h"
 
-#include <iostream>
-
-#include "GLUT.H"
-
 #include "GameMgr.h"
 
 
@@ -98,27 +94,34 @@ void Player::heal()
 	//std::cout << "in heal function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
-	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
+	Point2D target = Point2D(-1, -1);
+	m_mgr_->find_nearest_pickup(m_location_->get_point(), target, PickupType::med_kit);
 
 	//std::cout << "in heal function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
 
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 
-	bool is_successful = false;
-	is_successful = m_mgr_->pickup(this, target);
+	if (target.get_col() != -1) //a target was found, procced to pickup.
+	{
+		bool is_successful = false;
+		is_successful = m_mgr_->pickup(this, target);
 
-	if (is_successful) //picked up the medkit successfully, heal up.
-	{
-		m_cur_hp_ = m_max_hp_;
-		m_is_moving_ = false;
-		m_is_running_for_hp_cond_ = false;
+		if (is_successful) //picked up the medkit successfully, heal up.
+		{
+			m_cur_hp_ = m_max_hp_;
+			m_is_moving_ = false;
+			m_is_running_for_hp_cond_ = false;
+			std::cout << "Player " << m_ID_ << " Healed up " << std::endl;
+		}
+		else //couldn't pick up the medkit, need to move closer.
+		{
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
+			m_is_moving_ = true;
+		}
 	}
-	else //couldn't pick up the medkit, need to move closer.
-	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
-		m_is_moving_ = true;
-	}
+	else //no medkit available, going down in the blaze of glory
+		fight();
 }
 
 ///<summary>
@@ -129,7 +132,8 @@ void Player::reload()
 	//std::cout << "in reload function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
-	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
+	Point2D target = Point2D(-1, -1);
+	m_mgr_->find_nearest_pickup(m_location_->get_point(), target, PickupType::ammo);
 
 	//std::cout << "in reload function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
@@ -144,6 +148,7 @@ void Player::reload()
 			m_ammo_ = m_max_ammo_;
 			m_is_moving_ = false;
 			m_is_running_for_hp_cond_ = false;
+			std::cout << "Player " << m_ID_ << " Reloaded " << std::endl;
 		}
 		else //couldn't pick up the ammo, need to move closer.
 		{
@@ -152,9 +157,8 @@ void Player::reload()
 		}
 	}
 	else //no ammo available, abandon all hope like a headless chicken
-	{
 		run_away();
-	}
+
 
 }
 
@@ -179,7 +183,20 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (m_ammo_ >= m_grenade_cost && distance_from_target > 4 && distance_from_target < 10)
+
+		if (distance_from_target <= 1)
+		{
+			is_successful = m_mgr_->stab(this, target_location);
+
+			if (is_successful)
+			{
+				m_ammo_ = 0;
+				m_is_moving_ = false;
+				std::cout << "Player " << m_ID_ << " Stabed someone " << std::endl;
+			}
+
+		}
+		else if (m_ammo_ >= m_grenade_cost && distance_from_target > 4 && distance_from_target < 10)
 		{
 			is_successful = m_mgr_->throw_grenade(this, target_location);
 
@@ -187,6 +204,7 @@ void Player::fight()
 			{
 				m_ammo_ -= m_grenade_cost;
 				m_is_moving_ = false;
+				std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
 			}
 
 		}
@@ -198,6 +216,7 @@ void Player::fight()
 			{
 				--m_ammo_;
 				m_is_moving_ = false;
+				std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
 			}
 
 		}
@@ -233,7 +252,8 @@ void Player::choose_direction()
 	}
 	else if (m_ammo_ >= 5)
 	{
-		run_away();
+		//run_away();
+		heal();
 	}
 	else if (m_ammo_ < 5 )
 	{
