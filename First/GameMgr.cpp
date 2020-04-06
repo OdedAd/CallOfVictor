@@ -62,7 +62,7 @@ void GameMgr::generate_teams()
 {
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
-	const auto max_num_of_players = 2;
+	const auto max_num_of_players_per_type = 1;
 	int playerMaxAmmo = 10;
 	int playerMaxHP = 1000;
 
@@ -80,7 +80,7 @@ void GameMgr::generate_teams()
 		const auto team_room_right_bottom_row = team_room.get_right_bottom().get_row();
 		const auto team_room_right_bottom_col = team_room.get_right_bottom().get_col();
 
-		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
+		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players_per_type; cur_num_of_players++)
 		{
 
 			do
@@ -104,6 +104,40 @@ void GameMgr::generate_teams()
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
 			team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
 		}
 		this->add_team(team);
 	}
@@ -269,7 +303,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 		//	cost = 0.1;
 		else if (cur_node_value == PLAYER) // player
 			if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
-				cost = 500;
+				cost = 5000;
 			else
 				cost = 5;
 

@@ -1,1 +1,1 @@
-#include "medic.h"
+#include "Medic.h"

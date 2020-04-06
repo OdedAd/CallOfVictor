@@ -40,6 +40,9 @@ Sniper::Sniper(GameMgr* mgr, int id, Team* team, Node* location, int max_ammo, i
 		m_melee_dmg = maxHP / 2;
 	else
 		m_melee_dmg = melee_dmg;
+
+	m_throw_dis_min = 5;
+	m_throw_dis_max = 8;
 }
 
 void Sniper::show_me() const
@@ -67,6 +70,7 @@ void Sniper::show_me() const
 
 }
 
+/*
 ///<summary>
 /// Find a target and attack if in range.
 ///</summary>
@@ -86,7 +90,7 @@ void Sniper::fight()
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
 		if (m_ammo_ > 0)
 		{
-			if (distance_from_target <= 1)
+			if (distance_from_target <= m_stab_dis_max)
 			{
 				is_successful = m_mgr_->stab(this, target_location);
 
@@ -94,11 +98,11 @@ void Sniper::fight()
 				{
 					m_ammo_ -= m_melee_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Stabed someone " << std::endl;
+					std::cout << "Player " << m_ID_ << " Stabbed someone " << std::endl;
 				}
 
 			}
-			if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > 6 && distance_from_target < 8)
+			if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > m_throw_dis_min && distance_from_target < m_throw_dis_max)
 			{
 				is_successful = m_mgr_->throw_grenade(this, target_location);
 
@@ -122,6 +126,8 @@ void Sniper::fight()
 				}
 
 			}
+			else //no enough ammo
+				reload();
 
 			if (is_successful == false)
 			{
@@ -133,7 +139,7 @@ void Sniper::fight()
 			reload();
 	}
 }
-
+*/
 
 void Sniper::choose_direction()
 {

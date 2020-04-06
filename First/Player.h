@@ -34,6 +34,10 @@ protected:
 	int m_shooting_dmg;
 	int m_melee_dmg;
 
+	int m_throw_dis_min;
+	int m_throw_dis_max;
+	int m_stab_dis_max;
+
 	int m_old_value = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;

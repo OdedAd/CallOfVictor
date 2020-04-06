@@ -52,6 +52,10 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	else
 		m_melee_dmg = melee_dmg;
 
+	m_throw_dis_min = 4;
+	m_throw_dis_max = 11;
+	m_stab_dis_max = 1;
+
 	m_idle_counter = 0;
 }
 
@@ -214,7 +218,7 @@ void Player::fight()
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
 		if (m_ammo_ > 0)
 		{
-			if (distance_from_target <= 1)
+			if (distance_from_target <= m_stab_dis_max)
 			{
 				is_successful = m_mgr_->stab(this, target_location);
 
@@ -222,11 +226,11 @@ void Player::fight()
 				{
 					m_ammo_ -= m_melee_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Stabed someone " << std::endl;
+					std::cout << "Player " << m_ID_ << " Stabbed someone " << std::endl;
 				}
 
 			}
-			else if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > 4 && distance_from_target < 11)
+			else if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > m_throw_dis_min && distance_from_target < m_throw_dis_max)
 			{
 				is_successful = m_mgr_->throw_grenade(this, target_location);
 
@@ -238,7 +242,7 @@ void Player::fight()
 				}
 
 			}
-			else
+			else if (m_ammo_ >= m_shooting_ammo_cost)
 			{
 				is_successful = m_mgr_->shoot(this, target_location);
 
@@ -251,6 +255,9 @@ void Player::fight()
 				}
 
 			}
+			else //no enough ammo
+				reload();
+
 
 			if (is_successful == false)
 			{

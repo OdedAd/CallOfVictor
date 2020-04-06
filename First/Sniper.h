@@ -17,7 +17,7 @@ public:
 
 private:
 
-	void fight();
+	//void fight();
 
 	///<summary>
 	/// The brain of the player, will decide what kind of target to look for
