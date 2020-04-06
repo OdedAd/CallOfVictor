@@ -3,7 +3,9 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP, int grenade_cost) :
+Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP,
+			int grenade_cost, int shooting_ammo_cost, int melee_ammo_cost,
+			int grenade_dmg, int shooting_dmg, int melee_dmg) :
 	m_mgr_(mgr), m_ID_(id), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(maxHP), m_max_hp_(maxHP)
@@ -18,10 +20,37 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 
 	m_cur_target_node_ = nullptr;
 
+
 	if (grenade_cost < 0)
-		m_grenade_cost = max_ammo / 2;
+		m_grenade_ammo_cost = max_ammo / 2;
 	else
-		m_grenade_cost = grenade_cost;
+		m_grenade_ammo_cost = grenade_cost;
+
+	if (shooting_ammo_cost < 0)
+		m_shooting_ammo_cost = 1;
+	else
+		m_shooting_ammo_cost = shooting_ammo_cost;
+
+	if (melee_ammo_cost < 0)
+		m_melee_ammo_cost = max_ammo;
+	else
+		m_melee_ammo_cost = melee_ammo_cost;
+
+
+	if (grenade_dmg < 0)
+		m_grenade_dmg = maxHP / 5;
+	else
+		m_grenade_dmg = grenade_dmg;
+
+	if (shooting_dmg < 0)
+		m_shooting_dmg = maxHP / 3;
+	else
+		m_shooting_dmg = shooting_dmg;
+
+	if (melee_dmg < 0)
+		m_melee_dmg = maxHP / 2;
+	else
+		m_melee_dmg = melee_dmg;
 
 	m_idle_counter = 0;
 }
@@ -31,9 +60,9 @@ void Player::show_me() const
 	double y = m_location_->get_point().get_row();
 	double x = m_location_->get_point().get_col();
 
-	int R = m_team_->get_color()[0];
-	int G = m_team_->get_color()[1];
-	int B = m_team_->get_color()[2];
+	double R = m_team_->get_color()[0];
+	double G = m_team_->get_color()[1];
+	double B = m_team_->get_color()[2];
 
 	glColor3d(R, G, B);
 
@@ -183,51 +212,54 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-
-		if (distance_from_target <= 1)
+		if (m_ammo_ > 0)
 		{
-			is_successful = m_mgr_->stab(this, target_location);
-
-			if (is_successful)
+			if (distance_from_target <= 1)
 			{
-				m_ammo_ = 0;
-				m_is_moving_ = false;
-				std::cout << "Player " << m_ID_ << " Stabed someone " << std::endl;
+				is_successful = m_mgr_->stab(this, target_location);
+
+				if (is_successful)
+				{
+					m_ammo_ -= m_melee_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Stabed someone " << std::endl;
+				}
+
+			}
+			else if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > 4 && distance_from_target < 11)
+			{
+				is_successful = m_mgr_->throw_grenade(this, target_location);
+
+				if (is_successful)
+				{
+					m_ammo_ -= m_grenade_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
+				}
+
+			}
+			else
+			{
+				is_successful = m_mgr_->shoot(this, target_location);
+
+				if (is_successful)
+				{
+					//--m_ammo_;
+					m_ammo_ -= m_shooting_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
+				}
+
 			}
 
-		}
-		else if (m_ammo_ >= m_grenade_cost && distance_from_target > 4 && distance_from_target < 10)
-		{
-			is_successful = m_mgr_->throw_grenade(this, target_location);
-
-			if (is_successful)
+			if (is_successful == false)
 			{
-				m_ammo_ -= m_grenade_cost;
-				m_is_moving_ = false;
-				std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
+				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location, m_team_);
+				m_is_moving_ = true;
 			}
-
-		}
-		else if(m_ammo_ > 0)
-		{
-			is_successful = m_mgr_->shoot(this, target_location);
-
-			if (is_successful)
-			{
-				--m_ammo_;
-				m_is_moving_ = false;
-				std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
-			}
-
 		}
 		else //no ammo
 			reload();
-
-		if (is_successful == false)
-		{
-			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location, m_team_);
-			m_is_moving_ = true;
-		}
 	}
 }
 

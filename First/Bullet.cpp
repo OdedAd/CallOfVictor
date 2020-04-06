@@ -109,16 +109,20 @@ void Bullet::set_dir(double angle)
 
 void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 {
-	int i = maze_size * (y_ + 1) / 2;
-	int j = maze_size * (x_ + 1) / 2;
-
-	while(maze.get_at_pos(i,j).get_value() != WALL)
+	try
 	{
-		map[i][j] += delta;
-		x_ += 0.001*dirx_;
-		y_ += 0.001*diry_;
-		i = maze_size * (y_ + 1) / 2;
-		j = maze_size * (x_ + 1) / 2;
+		int i = maze_size * (y_ + 1) / 2;
+		int j = maze_size * (x_ + 1) / 2;
+
+		while (maze.get_at_pos(i, j).get_value() != WALL)
+		{
+			map[i][j] += delta;
+			x_ += 0.001 * dirx_;
+			y_ += 0.001 * diry_;
+			i = maze_size * (y_ + 1) / 2;
+			j = maze_size * (x_ + 1) / 2;
+		}
 	}
+	catch (...){}
 
 }

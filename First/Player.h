@@ -22,12 +22,19 @@ protected:
 
 	const int m_ID_;
 	int m_ammo_;
-	int m_grenade_cost;
 	const int m_max_ammo_;
 	int m_cur_hp_;
 	const int m_max_hp_;
-	int m_old_value = 0;
 
+	int m_grenade_ammo_cost;
+	int m_shooting_ammo_cost;
+	int m_melee_ammo_cost;
+
+	int m_grenade_dmg;
+	int m_shooting_dmg;
+	int m_melee_dmg;
+
+	int m_old_value = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 
@@ -39,12 +46,6 @@ protected:
 
 	void fill_path_stack();
 
-
-public:
-
-	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int maxHP = 10, int grenade_cost = -1);
-	virtual ~Player() = default;
-	virtual void show_me() const;
 
 	///<summary>
 	/// Run away to a safer place.
@@ -73,6 +74,14 @@ public:
 	///</summary>
 	virtual void choose_direction();
 
+public:
+
+	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int maxHP = 100,
+		int grenade_cost = -1, int shooting_ammo_cost = -1, int melee_ammo_cost = -1,
+		int grenade_dmg = -1, int shooting_dmg = -1, int melee_dmg = -1);
+	virtual ~Player() = default;
+	virtual void show_me() const;
+
 	///<summary>
 	/// Reaction to getting hit.
 	///</summary>
@@ -95,7 +104,65 @@ public:
 	int get_ammo() const;
 	int get_old_value() const;
 
+	
+	int get_grenade_ammo_cost() const
+	{
+		return m_grenade_ammo_cost;
+	}
 
+	void set_grenade_ammo_cost(const int grenade_ammo_cost)
+	{
+		m_grenade_ammo_cost = grenade_ammo_cost;
+	}
 
+	int get_shooting_ammo_cost() const
+	{
+		return m_shooting_ammo_cost;
+	}
+
+	void set_shooting_ammo_cost(const int shooting_ammo_cost)
+	{
+		m_shooting_ammo_cost = shooting_ammo_cost;
+	}
+
+	int get_melee_ammo_cost() const
+	{
+		return m_melee_ammo_cost;
+	}
+
+	void set_melee_ammo_cost(const int melee_ammo_cost)
+	{
+		m_melee_ammo_cost = melee_ammo_cost;
+	}
+
+	int get_grenade_dmg() const
+	{
+		return m_grenade_dmg;
+	}
+
+	void set_grenade_dmg(const int grenade_dmg)
+	{
+		m_grenade_dmg = grenade_dmg;
+	}
+
+	int get_shooting_dmg() const
+	{
+		return m_shooting_dmg;
+	}
+
+	void set_shooting_dmg(const int shooting_dmg)
+	{
+		m_shooting_dmg = shooting_dmg;
+	}
+
+	int get_melee_dmg() const
+	{
+		return m_melee_dmg;
+	}
+
+	void set_melee_dmg(const int melee_dmg)
+	{
+		m_melee_dmg = melee_dmg;
+	}
 };
 

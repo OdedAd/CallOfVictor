@@ -82,7 +82,6 @@ void Grenade::simulate_explosion(double map[maze_size][maze_size], Maze& maze)
 		bullets_[i]->set_is_moving(true);
 		bullets_[i]->simulate_motion(map, maze);
 	}
-
 }
 
 bool Grenade::get_is_exploded()
