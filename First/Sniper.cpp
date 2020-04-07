@@ -70,7 +70,6 @@ void Sniper::show_me() const
 
 }
 
-/*
 ///<summary>
 /// Find a target and attack if in range.
 ///</summary>
@@ -88,7 +87,12 @@ void Sniper::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (m_ammo_ > 0)
+
+		if (distance_from_target > m_stab_dis_max && distance_from_target < 4)
+		{
+			run_away();
+		}
+		else if (m_ammo_ > 0)
 		{
 			if (distance_from_target <= m_stab_dis_max)
 			{
@@ -139,28 +143,23 @@ void Sniper::fight()
 			reload();
 	}
 }
-*/
 
-void Sniper::choose_direction()
+
+void Sniper::choose_action()
 {
 	int scared_hp = (int)(m_max_hp_ * 3.0 / 4.0);
-	if ((m_cur_hp_ >= scared_hp && m_ammo_ >= 2)
+	if (m_ammo_ <= m_shooting_ammo_cost)
+	{
+		reload();
+	}
+	else if ((m_cur_hp_ >= scared_hp)
 		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
 		|| m_idle_counter > 2) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}
-	else if (m_cur_hp_ < m_max_hp_ / 2)
+	else if (m_cur_hp_ < scared_hp)
 	{
-		heal();
-	}
-	else if (m_ammo_ <= 2)
-	{
-		reload();
-	}
-	else if (m_ammo_ >= 5)
-	{
-		//run_away();
 		heal();
 	}
 	else

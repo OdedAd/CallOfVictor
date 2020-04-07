@@ -199,6 +199,7 @@ void idle()
 	{
 		cout << "Game Over!" << endl;
 		GameMgr::get_instance().clear_all_resources();
+		system("pause");
 		exit(0);
 	}
 

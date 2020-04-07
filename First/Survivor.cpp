@@ -70,3 +70,29 @@ void Survivor::show_me() const
 	glEnd();
 
 }
+
+
+void Survivor::choose_action()
+{
+	int scared_hp = (int)(m_max_hp_ * 3.0 / 5.0);
+
+	if (m_cur_hp_ < scared_hp)
+	{
+		heal();
+	}
+	else if (m_ammo_ <= m_shooting_ammo_cost)
+	{
+		reload();
+	}
+	else if ((m_cur_hp_ >= scared_hp)
+		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter > 2) // if the player is sitting in place for too long, go fight someone.
+	{
+		fight();
+	}
+	else
+		heal();
+
+	if (m_is_moving_)
+		fill_path_stack();
+}

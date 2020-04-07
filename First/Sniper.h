@@ -17,12 +17,12 @@ public:
 
 private:
 
-	//void fight();
+	void fight();
 
 	///<summary>
 	/// The brain of the player, will decide what kind of target to look for
 	/// according to the player status(HP and ammo).
 	///</summary>
-	virtual void choose_direction();
+	virtual void choose_action();
 };
 

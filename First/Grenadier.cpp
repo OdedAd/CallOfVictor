@@ -51,8 +51,8 @@ void Grenadier::show_me() const
 	double x = m_location_->get_point().get_col();
 
 	double R = m_team_->get_color()[0];
-	double G = m_team_->get_color()[1] - 0.5;
-	double B = m_team_->get_color()[2] - 0.5;
+	double G = m_team_->get_color()[1] + 0.25;
+	double B = m_team_->get_color()[2] - 0.25;
 
 	glColor3d(R, G, B);
 

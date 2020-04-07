@@ -41,6 +41,7 @@ protected:
 	int m_old_value = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
+	int m_step_counter;
 
 	bool m_is_running_for_hp_cond_;
 	bool m_collision;
@@ -76,7 +77,7 @@ protected:
 	/// The brain of the player, will decide what kind of target to look for
 	/// according to the player status(HP and ammo).
 	///</summary>
-	virtual void choose_direction();
+	virtual void choose_action();
 
 public:
 

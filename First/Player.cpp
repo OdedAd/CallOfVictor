@@ -15,6 +15,7 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
+	m_step_counter = 0;
 	m_is_running_for_hp_cond_ = false;
 	m_collision = false;
 
@@ -189,8 +190,8 @@ void Player::reload()
 			m_is_moving_ = true;
 		}
 	}
-	else //no ammo available, abandon all hope like a headless chicken
-		run_away();
+	//else //no ammo available, abandon all hope like a headless chicken
+	//	run_away();
 
 
 }
@@ -275,11 +276,12 @@ void Player::fight()
 /// The brain of the player, will decide what kind of target to look for 
 /// according to the player status(HP and ammo).
 ///</summary>
-void Player::choose_direction()
+void Player::choose_action()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if ((m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0)
+	int scared_hp = (int)(m_max_hp_ * 1.0 / 2.0);
+	if ((m_cur_hp_ >= scared_hp)
 		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
 		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
 	{
@@ -294,7 +296,7 @@ void Player::choose_direction()
 		//run_away();
 		heal();
 	}
-	else if (m_ammo_ < 5 )
+	else if (m_ammo_ < m_shooting_ammo_cost * 2)
 	{
 		reload();
 	}
@@ -357,15 +359,14 @@ void Player::move(Maze& maze)
 {
 	//maybe this two variables can be class members and not static.
 	//static int old_value = 0; // the last value of the node.
-	static int step_counter = 0;
 
-	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || m_step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();
-		step_counter = 0;
+		m_step_counter = 0;
 
-		choose_direction();
+		choose_action();
 	}
 
 	if (m_is_moving_ && m_cur_path_to_target_.empty() == false)
@@ -405,7 +406,7 @@ void Player::move(Maze& maze)
 	else
 		++m_idle_counter;
 
-	++step_counter;
+	++m_step_counter;
 
 }
 

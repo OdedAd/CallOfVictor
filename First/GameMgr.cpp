@@ -421,12 +421,14 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		if (distance <= 1 && quantity > 0 )
 		{
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
+			if (targetPickupObject->get_quantity() <= 0)
+				maze_.get_at_pos(target).set_value(0);
 			return true;
 		}
 		else
 			return false;
 	}
-	else if (target_value == PLAYER)
+	else if (target_value == PLAYER || target_value == SPACE)
 		return false;
 	else
 		throw("at GameMgr::pickup , the given target point is not a pickup object");
