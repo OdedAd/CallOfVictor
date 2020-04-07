@@ -9,7 +9,6 @@
 #include "Player.h"
 #include "Berserker.h"
 #include "Grenadier.h"
-#include "Medic.h"
 #include "Sniper.h"
 #include "Survivor.h"
 
