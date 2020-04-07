@@ -3,10 +3,10 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP,
+Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int max_hp,
 			int grenade_cost, int shooting_ammo_cost, int melee_ammo_cost,
 			int grenade_dmg, int shooting_dmg, int melee_dmg) :
-	m_mgr_(mgr), m_ID_(id), m_team_(team), m_location_(location),
+	m_mgr_(mgr), m_id_(id), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(max_hp), m_max_hp_(max_hp)
 {
@@ -39,17 +39,17 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 
 
 	if (grenade_dmg < 0)
-		m_grenade_dmg = maxHP / 5;
+		m_grenade_dmg = max_hp / 5;
 	else
 		m_grenade_dmg = grenade_dmg;
 
 	if (shooting_dmg < 0)
-		m_shooting_dmg = maxHP / 3;
+		m_shooting_dmg = max_hp / 3;
 	else
 		m_shooting_dmg = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg = maxHP / 2;
+		m_melee_dmg = max_hp / 2;
 	else
 		m_melee_dmg = melee_dmg;
 
@@ -152,7 +152,7 @@ void Player::heal()
 			m_cur_hp_ = m_max_hp_;
 			m_is_moving_ = false;
 			m_is_running_for_hp_cond_ = false;
-			std::cout << "Player " << m_ID_ << " Healed up " << std::endl;
+			std::cout << "Player " << m_id_ << " Healed up " << std::endl;
 		}
 		else //couldn't pick up the medkit, need to move closer.
 		{
@@ -188,7 +188,7 @@ void Player::reload()
 			m_ammo_ = m_max_ammo_;
 			m_is_moving_ = false;
 			m_is_running_for_hp_cond_ = false;
-			std::cout << "Player " << m_ID_ << " Reloaded " << std::endl;
+			std::cout << "Player " << m_id_ << " Reloaded " << std::endl;
 		}
 		else //couldn't pick up the ammo, need to move closer.
 		{
@@ -233,7 +233,7 @@ void Player::fight()
 				{
 					m_ammo_ -= m_melee_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Stabbed someone " << std::endl;
+					std::cout << "Player " << m_id_ << " Stabbed someone " << std::endl;
 				}
 
 			}
@@ -245,7 +245,7 @@ void Player::fight()
 				{
 					m_ammo_ -= m_grenade_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
+					std::cout << "Player " << m_id_ << " Throw a grenade " << std::endl;
 				}
 
 			}
@@ -258,7 +258,7 @@ void Player::fight()
 					//--m_ammo_;
 					m_ammo_ -= m_shooting_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
+					std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
 				}
 
 			}
@@ -287,8 +287,8 @@ void Player::choose_action()
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
 	int scared_hp = (int)(m_max_hp_ * 1.0 / 2.0);
 	if ((m_cur_hp_ >= scared_hp)
-		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
+		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter_ > 3) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}

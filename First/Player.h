@@ -38,7 +38,7 @@ protected:
 	int m_throw_dis_max;
 	int m_stab_dis_max;
 
-	int m_old_value = 0;
+	int m_old_value_ = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
 	int m_step_counter;
@@ -81,7 +81,7 @@ protected:
 
 public:
 
-	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int maxHP = 100,
+	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int max_hp = 100,
 		int grenade_cost = -1, int shooting_ammo_cost = -1, int melee_ammo_cost = -1,
 		int grenade_dmg = -1, int shooting_dmg = -1, int melee_dmg = -1);
 	virtual ~Player() = default;
@@ -99,7 +99,7 @@ public:
 	void simulate_motion(double map[maze_size][maze_size], Maze maze) const;
 
 	Team* get_team() const;
-	int get_ID() const;
+	int get_id() const;
 	void set_is_moving(bool move);
 	bool get_is_moving() const;
 	void set_hp(int value);

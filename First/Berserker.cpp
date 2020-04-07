@@ -37,7 +37,7 @@ Berserker::Berserker(GameMgr* mgr, int id, Team* team, Node* location, int max_a
 		m_shooting_dmg = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg = maxHP / 2;
+		m_melee_dmg = maxHP / 3;
 	else
 		m_melee_dmg = melee_dmg;
 
@@ -76,8 +76,8 @@ void Berserker::choose_action()
 {
 	int scared_hp = (int)(m_max_hp_ * 1.0 / 4.0);
 	if ((m_cur_hp_ >= scared_hp)
-		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter > 2) // if the player is sitting in place for too long, go fight someone.
+		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter_ > 2) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}

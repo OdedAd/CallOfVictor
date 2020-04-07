@@ -85,8 +85,8 @@ void Survivor::choose_action()
 		reload();
 	}
 	else if ((m_cur_hp_ >= scared_hp)
-		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter > 2) // if the player is sitting in place for too long, go fight someone.
+		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter_ > 2) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}

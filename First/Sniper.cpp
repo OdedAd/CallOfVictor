@@ -102,7 +102,7 @@ void Sniper::fight()
 				{
 					m_ammo_ -= m_melee_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Stabbed someone " << std::endl;
+					std::cout << "Player " << m_id_ << " Stabbed someone " << std::endl;
 				}
 
 			}
@@ -114,7 +114,7 @@ void Sniper::fight()
 				{
 					m_ammo_ -= m_grenade_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
+					std::cout << "Player " << m_id_ << " Throw a grenade " << std::endl;
 				}
 
 			}
@@ -126,7 +126,7 @@ void Sniper::fight()
 				{
 					m_ammo_ -= m_shooting_ammo_cost;
 					m_is_moving_ = false;
-					std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
+					std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
 				}
 
 			}
@@ -153,8 +153,8 @@ void Sniper::choose_action()
 		reload();
 	}
 	else if ((m_cur_hp_ >= scared_hp)
-		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter > 2) // if the player is sitting in place for too long, go fight someone.
+		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter_ > 2) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}

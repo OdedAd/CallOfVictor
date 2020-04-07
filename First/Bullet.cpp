@@ -23,7 +23,7 @@ Bullet::Bullet(const double x, const double y, const int stopping_power)
 
 Bullet::Bullet(const int i, const int j, const Point2D& target_location, const int stopping_power)
 {
-	m_stopping_power = stopping_power;
+	m_stopping_power_ = stopping_power;
 
 	set_dir(Point2D(i,j).get_angle_between_two_points(target_location));
 	//int nextJ = (j + (int)round(dirx_));
@@ -81,7 +81,7 @@ void Bullet::move(Maze& maze)
 			//const auto distance = sqrt(pow(x_ - start_x, 2)
 			//	+ pow(y_ - start_y, 2)); // this is distance in the wierd ass graphical coordinates
 										// and it is unusable like this without some magic math.
-			int damage = m_stopping_power - (int)(travelDistance/10);
+			int damage = m_stopping_power_ - (int)(travelDistance/10);
 			if (damage < 0) damage = 0;
 			GameMgr::get_instance().hit_player(Point2D(i, j), damage);
 
