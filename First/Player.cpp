@@ -7,10 +7,10 @@
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP, int grenade_cost) :
-	m_mgr_(mgr), m_ID_(id), m_team_(team), m_location_(location),
+Player::Player(GameMgr* mgr, const int id, Team* team, Node* location, const int max_ammo, const int max_hp, const int grenade_cost) :
+	m_mgr_(mgr), m_id_(id), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
-	m_cur_hp_(maxHP), m_max_hp_(maxHP)
+	m_cur_hp_(max_hp), m_max_hp_(max_hp)
 {
 	//random starting direction, later when we add the brain of the player
 	//the direction will be chosen somewhat intelligently before each move.
@@ -18,16 +18,16 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
 	m_is_running_for_hp_cond_ = false;
-	m_collision = false;
+	m_collision_ = false;
 
 	m_cur_target_node_ = nullptr;
 
 	if (grenade_cost < 0)
-		m_grenade_cost = max_ammo / 2;
+		m_grenade_cost_ = max_ammo / 2;
 	else
-		m_grenade_cost = grenade_cost;
+		m_grenade_cost_ = grenade_cost;
 
-	m_idle_counter = 0;
+	m_idle_counter_ = 0;
 }
 
 void Player::show_me() const
@@ -60,21 +60,27 @@ void Player::show_me() const
 ///</summary>
 void Player::run_away()
 {
-	//get the room where the player is now
-	//auto current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
-
-	//get heat map in room -NOT YET
+	Point2D target;
+	try
+	{
+		Room current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
+		//get heat map in room and get cover (find minimum in that matrix)
+		target = Utils::find_minimum_in_room(GameMgr::get_instance().get_maze(), current_room);
+	}
+	catch (runtime_error&)
+	{ //player is in path or some other exception in finding the the player position
+		target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
+	}
 
 	//std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
-	//get cover (find minimum in that matrix)
 	if (m_is_running_for_hp_cond_)
 	{
 		heal();
 	}
 	else
 	{
-		Point2D target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
+		//Point2D target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
 		if (target == m_location_->get_point())
 		{
 			m_is_running_for_hp_cond_ = true;
@@ -105,8 +111,7 @@ void Player::heal()
 
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 
-	bool is_successful = false;
-	is_successful = m_mgr_->pickup(this, target);
+	const auto is_successful = m_mgr_->pickup(this, target);
 
 	if (is_successful) //picked up the medkit successfully, heal up.
 	{
@@ -159,15 +164,15 @@ void Player::reload()
 }
 
 ///<summary>
-/// Find a target and attack if in range.
+///Find a target and attack if in range.
 ///</summary>
 void Player::fight()
 {
 	bool is_shootable;
 	//std::cout << "in fight function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
-	Point2D target_location;
-	target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
+
+	Point2D target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
 	if (target_location.get_col() == -1 && target_location.get_row() == -1)
 	{
 		m_is_moving_ = false;
@@ -179,18 +184,18 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (distance_from_target < 7 && m_ammo_ >= m_grenade_cost)
+		if (distance_from_target < 7 && m_ammo_ >= m_grenade_cost_)
 		{
 			is_successful = m_mgr_->throw_grenade(this, target_location);
 
 			if (is_successful)
 			{
-				m_ammo_ -= m_grenade_cost;
+				m_ammo_ -= m_grenade_cost_;
 				m_is_moving_ = false;
 			}
 
 		}
-		else if(m_ammo_ > 0)
+		else if (m_ammo_ > 0)
 		{
 			is_successful = m_mgr_->shoot(this, target_location);
 
@@ -212,7 +217,6 @@ void Player::fight()
 	}
 }
 
-
 ///<summary>
 /// The brain of the player, will decide what kind of target to look for 
 /// according to the player status(HP and ammo).
@@ -221,9 +225,9 @@ void Player::choose_direction()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if ((m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_> 0)
-		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
+	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_ > 0
+		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter_ > 3) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}
@@ -235,7 +239,7 @@ void Player::choose_direction()
 	{
 		run_away();
 	}
-	else if (m_ammo_ < 5 )
+	else if (m_ammo_ < 5)
 	{
 		reload();
 	}
@@ -245,7 +249,6 @@ void Player::choose_direction()
 	if (m_is_moving_)
 		fill_path_stack();
 }
-
 
 void Player::fill_path_stack()
 {
@@ -262,18 +265,18 @@ void Player::fill_path_stack()
 		}
 		m_cur_path_to_target_.push(new Point2D(next_node->get_point().get_row(), next_node->get_point().get_col()));// possible waste of memory
 
-		delete next_node;
+		//delete next_node;
 	}
 }
 
 void Player::get_hit(const int damage)
 {
 	m_cur_hp_ -= damage;
-	std::cout << "Player " << m_ID_ << " Recived : " << damage << " damage " << std::endl;
+	std::cout << "Player " << m_id_ << " Received : " << damage << " damage " << std::endl;
 
 	if (m_cur_hp_ <= 0)
 	{
-		std::cout << "Player " << m_ID_ << " died" << std::endl;
+		std::cout << "Player " << m_id_ << " died" << std::endl;
 		GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
 		get_team()->reduce_players_alive(1);
 	}
@@ -311,8 +314,8 @@ void Player::move(Maze& maze)
 
 	if (m_is_moving_ && m_cur_path_to_target_.empty() == false)
 	{
-		m_idle_counter = 0;
-		int cur_old_value = m_old_value;
+		m_idle_counter_ = 0;
+		int cur_old_value = m_old_value_;
 
 		Point2D* nextPoint = m_cur_path_to_target_.top();
 		m_cur_path_to_target_.pop(); //remove the top point from the stack
@@ -331,20 +334,20 @@ void Player::move(Maze& maze)
 		{
 			m_location_->set_point(*nextPoint);
 
-			m_old_value = maze.get_at_pos(next_x, next_y).get_value();
+			m_old_value_ = maze.get_at_pos(next_x, next_y).get_value();
 			maze.get_at_pos(next_x, next_y).set_value(PLAYER); //upadte the new location
 			maze.get_at_pos(cur_x, cur_y).set_value(cur_old_value); //upadte the old location
 
 			//std::cout << "x = " << cur_x << " y = " << cur_y << std::endl;
 			//std::cout << "next_x = " << next_x << " next_y = " << next_y << std::endl;
 
-			m_collision = false;
+			m_collision_ = false;
 		}
 		else if (next_value == PLAYER)
-			m_collision = true;
+			m_collision_ = true;
 	}
 	else
-		++m_idle_counter;
+		++m_idle_counter_;
 
 	++step_counter;
 
@@ -352,7 +355,7 @@ void Player::move(Maze& maze)
 
 //deprecated
 //Changes = Rounded here
-void Player::set_dir(double angle)
+void Player::set_dir(const double angle)
 {
 	m_dirx_ = (int)round(cos(angle));
 	m_diry_ = (int)round(sin(angle));
@@ -401,7 +404,7 @@ int Player::get_ammo() const
 
 int Player::get_old_value() const
 {
-	return m_old_value;
+	return m_old_value_;
 }
 
 Team* Player::get_team() const
@@ -409,7 +412,19 @@ Team* Player::get_team() const
 	return this->m_team_;
 }
 
-int Player::get_ID() const
+int Player::get_id() const
 {
-	return m_ID_;
+	return m_id_;
+}
+
+bool Player::is_in_room() const
+{
+	bool retval = false;
+	try
+	{
+		GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
+		retval = true;
+	}catch(...){}
+	
+	return retval;
 }

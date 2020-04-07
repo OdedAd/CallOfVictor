@@ -55,7 +55,6 @@ void Team::reduce_players_alive(const int count)
 
 int Team::get_players_alive() const
 {
-	std::cout << "players of team = " << get_team_name() << players_alive_ << std::endl;
 	return this->players_alive_;
 }
 

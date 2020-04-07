@@ -40,6 +40,8 @@ public:
 	void hit_player(Point2D& target, const int damage);
 	bool pickup(Player* calling_player, Point2D& target);
 	void generate_map();
+	void clear_room_map(Room& room);
+	void generate_map_for_room(Room& room);
 	double** get_heat_map();
 	void play_one_turn();
 	void clear_map();

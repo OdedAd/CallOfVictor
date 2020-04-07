@@ -1,7 +1,6 @@
 #include "Maze.h"
 #include <iostream>
 
-
 /**
  * \brief get a sub matrix
  * \param top_left the top left point of room
@@ -10,9 +9,9 @@
  */
 Node** Maze::get_sub_matrix(const Point2D top_left, const Point2D bottom_right)
 {
-	const auto rows = bottom_right.get_row() - top_left.get_row(); 
+	const auto rows = bottom_right.get_row() - top_left.get_row();
 	const auto cols = bottom_right.get_col() - top_left.get_col();
-	auto sub_maze = new Node*[rows];
+	auto sub_maze = new Node * [rows];
 	for (auto i = 0; i < rows; ++i)
 	{
 		sub_maze[i] = new Node[cols];
@@ -22,15 +21,19 @@ Node** Maze::get_sub_matrix(const Point2D top_left, const Point2D bottom_right)
 	{
 		for (int j = top_left.get_col(); j < bottom_right.get_col(); ++j)
 		{
-			sub_maze[i-top_left.get_row()][j - top_left.get_col()] = maze_[i][j];
+			sub_maze[i - top_left.get_row()][j - top_left.get_col()] = maze_[i][j];
 		}
 	}
-	
+
 	return sub_maze;
 }
 
 Node& Maze::get_at_pos(const int i, const int j)
 {
+	if (i >= maze_size || i < 0 || j >= maze_size || j < 0)
+	{
+		throw std::runtime_error("Invalid coordinates");
+	}
 	return this->maze_[i][j];
 }
 
@@ -48,7 +51,7 @@ void Maze::setup_maze()
 		for (j = 0; j < maze_size; j++)
 		{
 			maze_[i][j].set_value(WALL);
-			maze_[i][j].set_point(Point2D(i , j));
+			maze_[i][j].set_point(Point2D(i, j));
 		}
 	}
 	for (num_existing_rooms_ = 0; num_existing_rooms_ < num_of_rooms; num_existing_rooms_++)
@@ -56,7 +59,7 @@ void Maze::setup_maze()
 		rooms_[num_existing_rooms_] = generate_room();
 	}
 
-	for (auto k = 0; k < 30; k++)
+	for (auto k = 0; k < 80; k++)
 	{
 		i = rand() % maze_size;
 		j = rand() % maze_size;
@@ -78,27 +81,27 @@ Room& Maze::get_room_at(const unsigned short index)
 Room& Maze::get_room_at(const Point2D& point)
 {
 	int target_room_index = 0;
-	bool isFound = false;
+	bool is_found = false;
 
 	if (point.get_row() >= maze_size || point.get_col() >= maze_size)
 	{
-		throw "get_room_at: Point out of bounds!";
+		throw std::invalid_argument("get_room_at: Point out of bounds!");
 	}
 
-	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (isFound == false); ++cur_room_index)
+	for (int cur_room_index = 0; (cur_room_index < num_existing_rooms_) && (is_found == false); ++cur_room_index)
 	{
 		if ((rooms_[cur_room_index].get_left_top().get_row() - 1 <= point.get_row() && point.get_row() <= rooms_[cur_room_index].get_right_bottom().get_row() + 1)
 			&& (rooms_[cur_room_index].get_left_top().get_col() - 1 <= point.get_col() && point.get_col() <= rooms_[cur_room_index].get_right_bottom().get_col() + 1))
 		{
 			target_room_index = cur_room_index;
-			isFound = true;
+			is_found = true;
 		}
 	}
 
-	if(isFound)
+	if (is_found)
 		return rooms_[target_room_index];
-	else
-		throw "get_room_at: Point not in room!";
+	
+	throw std::runtime_error("get_room_at: Point not in room!");
 }
 
 Room& Maze::generate_room()
@@ -160,7 +163,7 @@ void Maze::generate_path(Point2D start, Point2D target)
 	{
 		pn = pq.top();
 		pq.pop();
-		
+
 		if (pn->get_point() == target) // the path has been found
 		{
 			// restore path to dig tunnels
@@ -187,25 +190,25 @@ void Maze::generate_path(Point2D start, Point2D target)
 	}
 }
 
-void Maze::add_neighbors(Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
-                   std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq)
+void Maze::add_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq) const
 {
 	// try down
-	if(pn->get_point().get_row()<maze_size-1)
+	if (pn->get_point().get_row() < maze_size - 1)
 		add_node(pn->get_point().get_row() + 1, pn->get_point().get_col(), pn, gray, black, pq);
 	// try up
-	if (pn->get_point().get_row() >0)
+	if (pn->get_point().get_row() > 0)
 		add_node(pn->get_point().get_row() - 1, pn->get_point().get_col(), pn, gray, black, pq);
 	// try left
 	if (pn->get_point().get_col() > 0)
-		add_node(pn->get_point().get_row() , pn->get_point().get_col()- 1, pn, gray, black, pq);
+		add_node(pn->get_point().get_row(), pn->get_point().get_col() - 1, pn, gray, black, pq);
 	// try right
-	if (pn->get_point().get_col() <maze_size-1)
+	if (pn->get_point().get_col() < maze_size - 1)
 		add_node(pn->get_point().get_row(), pn->get_point().get_col() + 1, pn, gray, black, pq);
 }
 
-void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &gray, std::vector<Node> &black,
-             std::priority_queue <Node*, std::vector<Node*>, CompareNodes> &pq)
+void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
+	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq) const
 {
 	Point2D pt;
 	double cost;
@@ -223,7 +226,7 @@ void Maze::add_node(const int row, const int col, Node* pn, std::vector<Node> &g
 
 	const auto black_it = find(black.begin(), black.end(), *pn1);
 	const auto gray_it = find(gray.begin(), gray.end(), *pn1);
-	if (black_it == black.end() && gray_it==gray.end()) // it is not black and not gray!
+	if (black_it == black.end() && gray_it == gray.end()) // it is not black and not gray!
 	{// i.e. it is white
 		pq.push(pn1);
 		gray.push_back(*pn1);
