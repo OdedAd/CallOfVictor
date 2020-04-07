@@ -51,9 +51,9 @@ void Survivor::show_me() const
 	double y = m_location_->get_point().get_row();
 	double x = m_location_->get_point().get_col();
 
-	double R = m_team_->get_color()[0];
-	double G = m_team_->get_color()[1] + 0.5;
-	double B = m_team_->get_color()[2] - 0.5;
+	double R = m_team_->get_color()[0] + 0.35;;
+	double G = m_team_->get_color()[1] - 0.35;
+	double B = m_team_->get_color()[2] + 0.35;
 
 	glColor3d(R, G, B);
 

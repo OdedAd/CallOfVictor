@@ -329,12 +329,14 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
+	double distance = calling_player_point.get_distance(target);
 	int start_i = calling_player_point.get_row();
 	int start_j = calling_player_point.get_col();
 
 	//int max_damage = targetPlayer->get_max_hp() / 5;
 
-	if (calling_player_point.get_distance(target) < 5)
+	if (distance < calling_player->get_throw_dis_max() &&
+		distance > calling_player->get_throw_dis_min())
 	{
 		//grenades_.push_back(new Grenade(start_i, start_j, max_damage));
 		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg()));
@@ -388,7 +390,7 @@ bool GameMgr::stab(Player* calling_player, Point2D& target)
 
 	//int max_damage = targetPlayer->get_max_hp() / 2;
 
-	if (calling_player_point.get_distance(target) <= 2)
+	if (targetPlayer->get_hp() > 0 && calling_player_point.get_distance(target) <= calling_player->get_stab_dis())
 	{
 		hit_player(target, calling_player->get_melee_dmg());
 		return true;

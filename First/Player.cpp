@@ -225,7 +225,7 @@ void Player::fight()
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
 		if (m_ammo_ > 0)
 		{
-			if (distance_from_target <= m_stab_dis_max_)
+			if (distance_from_target <= m_stab_dis_max_ + 2.0)
 			{
 				is_successful = m_mgr_->stab(this, target_location);
 
@@ -237,7 +237,7 @@ void Player::fight()
 				}
 
 			}
-			else if (m_ammo_ >= m_grenade_ammo_cost_ && distance_from_target > m_throw_dis_min_ && distance_from_target < m_throw_dis_max_)
+			else if (m_ammo_ >= m_grenade_ammo_cost_ && distance_from_target > m_throw_dis_min_ - 2.0 && distance_from_target < m_throw_dis_max_ + 2.0)
 			{
 				is_successful = m_mgr_->throw_grenade(this, target_location);
 
@@ -333,14 +333,17 @@ void Player::fill_path_stack()
 
 void Player::get_hit(const int damage)
 {
-	m_cur_hp_ -= damage;
-	std::cout << "Player " << m_id_ << " Received : " << damage << " damage " << std::endl;
-
-	if (m_cur_hp_ <= 0)
+	if (m_cur_hp_ > 0)
 	{
-		std::cout << "Player " << m_id_ << " died" << std::endl;
-		GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
-		get_team()->reduce_players_alive(1);
+		m_cur_hp_ -= damage;
+		std::cout << "Player " << m_id_ << " Received : " << damage << " damage " << std::endl;
+
+		if (m_cur_hp_ <= 0)
+		{
+			std::cout << "Player " << m_id_ << " died" << std::endl;
+			GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
+			get_team()->reduce_players_alive(1);
+		}
 	}
 }
 

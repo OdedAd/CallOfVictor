@@ -169,5 +169,20 @@ public:
 	{
 		m_melee_dmg_ = melee_dmg;
 	}
+
+	int get_throw_dis_min() const
+	{
+		return m_throw_dis_min_;
+	}
+
+	int get_throw_dis_max() const
+	{
+		return m_throw_dis_max_;
+	}
+
+	int get_stab_dis() const
+	{
+		return m_stab_dis_max_;
+	}
 };
 

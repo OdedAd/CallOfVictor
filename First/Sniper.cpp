@@ -50,9 +50,9 @@ void Sniper::show_me() const
 	double y = m_location_->get_point().get_row();
 	double x = m_location_->get_point().get_col();
 
-	double R = m_team_->get_color()[0];
-	double G = m_team_->get_color()[1] + 0.5;
-	double B = m_team_->get_color()[2] + 0.5;
+	double R = m_team_->get_color()[0] + 0.35;;
+	double G = m_team_->get_color()[1] + 0.35;
+	double B = m_team_->get_color()[2] + 0.35;
 
 	glColor3d(R, G, B);
 
@@ -88,13 +88,13 @@ void Sniper::fight()
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
 
-		if (distance_from_target > m_stab_dis_max_ && distance_from_target < 4)
+		if (distance_from_target > m_stab_dis_max_ && distance_from_target < 4.0)
 		{
 			run_away();
 		}
 		else if (m_ammo_ > 0)
 		{
-			if (distance_from_target <= m_stab_dis_max_)
+			if (distance_from_target <= m_stab_dis_max_ + 1.0)
 			{
 				is_successful = m_mgr_->stab(this, target_location);
 
@@ -106,7 +106,7 @@ void Sniper::fight()
 				}
 
 			}
-			if (m_ammo_ >= m_grenade_ammo_cost_ && distance_from_target > m_throw_dis_min_ && distance_from_target < m_throw_dis_max_)
+			if (m_ammo_ >= m_grenade_ammo_cost_ && distance_from_target > m_throw_dis_min_ - 1.0 && distance_from_target < m_throw_dis_max_ + 1.0)
 			{
 				is_successful = m_mgr_->throw_grenade(this, target_location);
 
