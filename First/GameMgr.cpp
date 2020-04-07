@@ -10,8 +10,9 @@ void GameMgr::init_game()
 	is_game_over_ = false;
 	generate_maze();
 	generate_map();
-	generate_teams();
 	generate_pickups();
+	generate_teams();
+
 }
 
 GameMgr& GameMgr::get_instance()
@@ -61,6 +62,10 @@ void GameMgr::generate_teams()
 {
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
+	const auto max_num_of_players_per_type = 1;
+	int playerMaxAmmo = 10;
+	int playerMaxHP = 1000;
+
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
 		int color[3] = { i % 2,0,(i + 1) % 2 };
@@ -68,23 +73,71 @@ void GameMgr::generate_teams()
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
-		const auto max_num_of_players = 5;
+		int curValue;
 
-		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
+		const auto team_room_left_top_row = team_room.get_left_top().get_row();
+		const auto team_room_left_top_col = team_room.get_left_top().get_col();
+		const auto team_room_right_bottom_row = team_room.get_right_bottom().get_row();
+		const auto team_room_right_bottom_col = team_room.get_right_bottom().get_col();
+
+		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players_per_type; cur_num_of_players++)
 		{
-			const auto team_room_left_top_row = team_room.get_left_top().get_row();
-			const auto team_room_left_top_col = team_room.get_left_top().get_col();
-			const auto team_room_right_bottom_row = team_room.get_right_bottom().get_row();
-			const auto team_room_right_bottom_col = team_room.get_right_bottom().get_col();
 
 			do
 			{
 				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
 				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-			} while (maze_.get_at_pos(k, j).get_value() == PLAYER); //collision prevention
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), 10, 100));
+			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
+			do
+			{
+				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
+				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
+				curValue = maze_.get_at_pos(k, j).get_value();
+
+			} while (curValue != SPACE); //collision prevention
+
+			maze_.get_at_pos(k, j).set_value(PLAYER);
+			team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+
 		}
 		this->add_team(team);
 	}
@@ -114,11 +167,10 @@ vector<Grenade*>& GameMgr::get_grenades()
 ///<summary>
 /// Find the nearest pickup of the given type
 ///  relative to the given location using heuristic distance.
-/// If there is no such PickupObject , nullptr is returned.
+/// If there is no such PickupObject , target doesn't change.
 ///</summary>
-Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
+void GameMgr::find_nearest_pickup(Point2D& location, Point2D& target, const PickupType type)
 {
-	Point2D p = Point2D(-1,-1);
 	Node temp_node;
 	temp_node.set_point(location);
 	double min_distance = -1;
@@ -132,12 +184,10 @@ Point2D& GameMgr::find_nearest_pickup(Point2D& location, const PickupType type)
 			if (min_distance == -1 || cur_distance < min_distance)
 			{
 				min_distance = cur_distance;
-				p = *cur_pickup.get_position();
+				target = *cur_pickup.get_position();
 			}
 		}
 	}
-
-	return p;
 }
 
 ///<summary>
@@ -251,7 +301,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 		//	cost = 0.1;
 		else if (cur_node_value == PLAYER) // player
 			if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
-				cost = 500;
+				cost = 5000;
 			else
 				cost = 5;
 
@@ -282,12 +332,12 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 	int start_i = calling_player_point.get_row();
 	int start_j = calling_player_point.get_col();
 
-	int max_damage = targetPlayer->get_max_hp() / 5;
+	//int max_damage = targetPlayer->get_max_hp() / 5;
 
 	if (calling_player_point.get_distance(target) < 5)
 	{
-		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
-		grenades_.push_back(new Grenade(start_i, start_j, max_damage));
+		//grenades_.push_back(new Grenade(start_i, start_j, max_damage));
+		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg()));
 		return true;
 	}
 	else
@@ -298,17 +348,17 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
+
 	int start_i = calling_player_point.get_row();
 	int start_j = calling_player_point.get_col();
+	double angle = Point2D(start_i, start_j).get_angle_between_two_points(target);
+	start_i += (int)round(cos(angle));
+	start_j += (int)round(sin(angle));
 
-	int max_damage = targetPlayer->get_max_hp() / 2;
-	//int damage = max_damage - (int)calling_player->get_location()->get_point().get_distance(target);
-	//if (damage < 0) damage = 0;
-
-	if (calling_player_point.get_distance(target) < 2)
+	if (calling_player_point.get_distance(target) <= 1)
 	{
-		//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, max_damage));
-		bullets_.push_back(new Bullet(start_i, start_j, target, max_damage));
+		//bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
+		bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 		return true;
 	}
 
@@ -318,8 +368,8 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		Room& player_room = maze_.get_room_at(calling_player_point);
 		if (player_room == targets_room)
 		{
-			//bullets_.push_back(new LogicBullet(calling_player->get_location()->get_point(), target, 2));
-			bullets_.push_back(new Bullet(start_i, start_j, target, 2));
+			//bullets_.push_back(new Bullet(start_i, start_j, target, 10));
+			bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 			return true;
 		}
 	}
@@ -327,6 +377,22 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 					// and because the points are the location of a player and he can only be
 					// on a space or a path it means that he is in a PATH and we don't shoot
 					// in PATH so he will need to keep going.
+
+	return false;
+}
+
+bool GameMgr::stab(Player* calling_player, Point2D& target)
+{
+	Player* targetPlayer = get_player_at_pos(target);
+	Point2D calling_player_point = calling_player->get_location()->get_point();
+
+	//int max_damage = targetPlayer->get_max_hp() / 2;
+
+	if (calling_player_point.get_distance(target) <= 2)
+	{
+		hit_player(target, calling_player->get_melee_dmg());
+		return true;
+	}
 
 	return false;
 }
@@ -349,15 +415,17 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		PickupObject* targetPickupObject = get_pickup_at_pos(target);
 		int quantity = targetPickupObject->get_quantity();
 
-		if (quantity > 0)
+		if (distance <= 1 && quantity > 0 )
 		{
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
+			if (targetPickupObject->get_quantity() <= 0)
+				maze_.get_at_pos(target).set_value(0);
 			return true;
 		}
 		else
 			return false;
 	}
-	else if (target_value == PLAYER)
+	else if (target_value == PLAYER || target_value == SPACE)
 		return false;
 	else
 		throw("at GameMgr::pickup , the given target point is not a pickup object");
@@ -484,9 +552,10 @@ void GameMgr::play_one_turn()
 			//bullets_.erase(itr);
 
 
-		//clear_map();
 	}
-	//clear_map();
+
+	static int turn_counter = 0;
+	std::cout << " Turn " << ++turn_counter << " ended " << std::endl << std::endl;
 }
 
 void GameMgr::clear_map()

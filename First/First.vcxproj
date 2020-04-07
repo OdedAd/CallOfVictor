@@ -147,35 +147,45 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Berserker.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="CompareNodes.cpp" />
     <ClCompile Include="GameMgr.cpp" />
     <ClCompile Include="Grenade.cpp" />
+    <ClCompile Include="Grenadier.cpp" />
     <ClCompile Include="LogicBullet.cpp" />
     <ClCompile Include="LogicGrenade.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maze.cpp" />
+    <ClCompile Include="Medic.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PickupObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point2D.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Sniper.cpp" />
+    <ClCompile Include="Survivor.cpp" />
     <ClCompile Include="Team.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Berserker.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="CompareNodes.h" />
     <ClInclude Include="GameMgr.h" />
     <ClInclude Include="Grenade.h" />
+    <ClInclude Include="Grenadier.h" />
     <ClInclude Include="LogicBullet.h" />
     <ClInclude Include="LogicGrenade.h" />
     <ClInclude Include="Maze.h" />
+    <ClInclude Include="Medic.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PickupObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="Sniper.h" />
+    <ClInclude Include="Survivor.h" />
     <ClInclude Include="Team.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

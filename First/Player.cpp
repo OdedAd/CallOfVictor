@@ -1,14 +1,12 @@
 #include "Player.h"
 
-#include <iostream>
-
-#include "GLUT.H"
-
 #include "GameMgr.h"
 
 
-Player::Player(GameMgr* mgr, const int id, Team* team, Node* location, const int max_ammo, const int max_hp, const int grenade_cost) :
-	m_mgr_(mgr), m_id_(id), m_team_(team), m_location_(location),
+Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_ammo, const int maxHP,
+			int grenade_cost, int shooting_ammo_cost, int melee_ammo_cost,
+			int grenade_dmg, int shooting_dmg, int melee_dmg) :
+	m_mgr_(mgr), m_ID_(id), m_team_(team), m_location_(location),
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(max_hp), m_max_hp_(max_hp)
 {
@@ -17,15 +15,47 @@ Player::Player(GameMgr* mgr, const int id, Team* team, Node* location, const int
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
+	m_step_counter = 0;
 	m_is_running_for_hp_cond_ = false;
 	m_collision_ = false;
 
 	m_cur_target_node_ = nullptr;
 
+
 	if (grenade_cost < 0)
-		m_grenade_cost_ = max_ammo / 2;
+		m_grenade_ammo_cost = max_ammo / 2;
 	else
-		m_grenade_cost_ = grenade_cost;
+		m_grenade_ammo_cost = grenade_cost;
+
+	if (shooting_ammo_cost < 0)
+		m_shooting_ammo_cost = 1;
+	else
+		m_shooting_ammo_cost = shooting_ammo_cost;
+
+	if (melee_ammo_cost < 0)
+		m_melee_ammo_cost = max_ammo;
+	else
+		m_melee_ammo_cost = melee_ammo_cost;
+
+
+	if (grenade_dmg < 0)
+		m_grenade_dmg = maxHP / 5;
+	else
+		m_grenade_dmg = grenade_dmg;
+
+	if (shooting_dmg < 0)
+		m_shooting_dmg = maxHP / 3;
+	else
+		m_shooting_dmg = shooting_dmg;
+
+	if (melee_dmg < 0)
+		m_melee_dmg = maxHP / 2;
+	else
+		m_melee_dmg = melee_dmg;
+
+	m_throw_dis_min = 4;
+	m_throw_dis_max = 11;
+	m_stab_dis_max = 1;
 
 	m_idle_counter_ = 0;
 }
@@ -35,9 +65,9 @@ void Player::show_me() const
 	double y = m_location_->get_point().get_row();
 	double x = m_location_->get_point().get_col();
 
-	int R = m_team_->get_color()[0];
-	int G = m_team_->get_color()[1];
-	int B = m_team_->get_color()[2];
+	double R = m_team_->get_color()[0];
+	double G = m_team_->get_color()[1];
+	double B = m_team_->get_color()[2];
 
 	glColor3d(R, G, B);
 
@@ -104,26 +134,34 @@ void Player::heal()
 	//std::cout << "in heal function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
-	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::med_kit);
+	Point2D target = Point2D(-1, -1);
+	m_mgr_->find_nearest_pickup(m_location_->get_point(), target, PickupType::med_kit);
 
 	//std::cout << "in heal function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
 
 	m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 
-	const auto is_successful = m_mgr_->pickup(this, target);
+	if (target.get_col() != -1) //a target was found, procced to pickup.
+	{
+		bool is_successful = false;
+		is_successful = m_mgr_->pickup(this, target);
 
-	if (is_successful) //picked up the medkit successfully, heal up.
-	{
-		m_cur_hp_ = m_max_hp_;
-		m_is_moving_ = false;
-		m_is_running_for_hp_cond_ = false;
+		if (is_successful) //picked up the medkit successfully, heal up.
+		{
+			m_cur_hp_ = m_max_hp_;
+			m_is_moving_ = false;
+			m_is_running_for_hp_cond_ = false;
+			std::cout << "Player " << m_ID_ << " Healed up " << std::endl;
+		}
+		else //couldn't pick up the medkit, need to move closer.
+		{
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
+			m_is_moving_ = true;
+		}
 	}
-	else //couldn't pick up the medkit, need to move closer.
-	{
-		m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
-		m_is_moving_ = true;
-	}
+	else //no medkit available, going down in the blaze of glory
+		fight();
 }
 
 ///<summary>
@@ -134,7 +172,8 @@ void Player::reload()
 	//std::cout << "in reload function: my location row = " << m_location_->get_point().get_row()
 		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
-	Point2D target = m_mgr_->find_nearest_pickup(m_location_->get_point(), PickupType::ammo);
+	Point2D target = Point2D(-1, -1);
+	m_mgr_->find_nearest_pickup(m_location_->get_point(), target, PickupType::ammo);
 
 	//std::cout << "in reload function: target_location row = " << target.get_row()
 		//<< " col = " << target.get_col() << std::endl;
@@ -149,6 +188,7 @@ void Player::reload()
 			m_ammo_ = m_max_ammo_;
 			m_is_moving_ = false;
 			m_is_running_for_hp_cond_ = false;
+			std::cout << "Player " << m_ID_ << " Reloaded " << std::endl;
 		}
 		else //couldn't pick up the ammo, need to move closer.
 		{
@@ -156,10 +196,9 @@ void Player::reload()
 			m_is_moving_ = true;
 		}
 	}
-	else //no ammo available, abandon all hope like a headless chicken
-	{
-		run_away();
-	}
+	//else //no ammo available, abandon all hope like a headless chicken
+	//	run_away();
+
 
 }
 
@@ -184,36 +223,57 @@ void Player::fight()
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
-		if (distance_from_target < 7 && m_ammo_ >= m_grenade_cost_)
+		if (m_ammo_ > 0)
 		{
-			is_successful = m_mgr_->throw_grenade(this, target_location);
-
-			if (is_successful)
+			if (distance_from_target <= m_stab_dis_max)
 			{
-				m_ammo_ -= m_grenade_cost_;
-				m_is_moving_ = false;
+				is_successful = m_mgr_->stab(this, target_location);
+
+				if (is_successful)
+				{
+					m_ammo_ -= m_melee_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Stabbed someone " << std::endl;
+				}
+
 			}
-
-		}
-		else if (m_ammo_ > 0)
-		{
-			is_successful = m_mgr_->shoot(this, target_location);
-
-			if (is_successful)
+			else if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > m_throw_dis_min && distance_from_target < m_throw_dis_max)
 			{
-				--m_ammo_;
-				m_is_moving_ = false;
-			}
+				is_successful = m_mgr_->throw_grenade(this, target_location);
 
+				if (is_successful)
+				{
+					m_ammo_ -= m_grenade_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Throw a grenade " << std::endl;
+				}
+
+			}
+			else if (m_ammo_ >= m_shooting_ammo_cost)
+			{
+				is_successful = m_mgr_->shoot(this, target_location);
+
+				if (is_successful)
+				{
+					//--m_ammo_;
+					m_ammo_ -= m_shooting_ammo_cost;
+					m_is_moving_ = false;
+					std::cout << "Player " << m_ID_ << " Is shooting " << std::endl;
+				}
+
+			}
+			else //no enough ammo
+				reload();
+
+
+			if (is_successful == false)
+			{
+				m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location, m_team_);
+				m_is_moving_ = true;
+			}
 		}
 		else //no ammo
 			reload();
-
-		if (is_successful == false)
-		{
-			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target_location, m_team_);
-			m_is_moving_ = true;
-		}
 	}
 }
 
@@ -221,13 +281,14 @@ void Player::fight()
 /// The brain of the player, will decide what kind of target to look for 
 /// according to the player status(HP and ammo).
 ///</summary>
-void Player::choose_direction()
+void Player::choose_action()
 {
 	//Very very problematic
 	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
-	if (m_cur_hp_ >= m_max_hp_ / 2 && m_ammo_ > 0
-		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.
-		|| m_idle_counter_ > 3) // if the player is sitting in place for too long, go fight someone.
+	int scared_hp = (int)(m_max_hp_ * 1.0 / 2.0);
+	if ((m_cur_hp_ >= scared_hp)
+		|| m_collision == true  //the collision flag is to get rid of two player stuck in  a corridor.
+		|| m_idle_counter > 3) // if the player is sitting in place for too long, go fight someone.
 	{
 		fight();
 	}
@@ -237,9 +298,10 @@ void Player::choose_direction()
 	}
 	else if (m_ammo_ >= 5)
 	{
-		run_away();
+		//run_away();
+		heal();
 	}
-	else if (m_ammo_ < 5)
+	else if (m_ammo_ < m_shooting_ammo_cost * 2)
 	{
 		reload();
 	}
@@ -301,15 +363,14 @@ void Player::move(Maze& maze)
 {
 	//maybe this two variables can be class members and not static.
 	//static int old_value = 0; // the last value of the node.
-	static int step_counter = 0;
 
-	if (m_cur_path_to_target_.empty() || step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || m_step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();
-		step_counter = 0;
+		m_step_counter = 0;
 
-		choose_direction();
+		choose_action();
 	}
 
 	if (m_is_moving_ && m_cur_path_to_target_.empty() == false)
@@ -349,7 +410,7 @@ void Player::move(Maze& maze)
 	else
 		++m_idle_counter_;
 
-	++step_counter;
+	++m_step_counter;
 
 }
 

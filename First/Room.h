@@ -6,7 +6,7 @@ class Room
 {
 public:
 	Room() = default;
-	~Room()= default;
+	~Room() = default;
 	double get_height() const;
 	double get_width() const;
 	Room(int ci, int cj, int w, int h);

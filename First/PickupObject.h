@@ -12,7 +12,7 @@ class PickupObject
 
 public:
 
-	PickupObject(Point2D* position , PickupType type, int quantity = 10);
+	PickupObject(Point2D* position , PickupType type, int quantity = 20);
 	void pickup();
 
 	Point2D* get_position() const;

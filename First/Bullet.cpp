@@ -23,12 +23,14 @@ Bullet::Bullet(const double x, const double y, const int stopping_power)
 
 Bullet::Bullet(const int i, const int j, const Point2D& target_location, const int stopping_power)
 {
+	m_stopping_power = stopping_power;
+
+	set_dir(Point2D(i,j).get_angle_between_two_points(target_location));
+	//int nextJ = (j + (int)round(dirx_));
+	//int nextI = (i + (int)round(diry_) * -1);
 	this->x_ = (j * 2.0) / (double)maze_size - 1;
 	this->y_ = (i * 2.0) / (double)maze_size - 1;
 
-	m_stopping_power_ = stopping_power;
-
-	set_dir(Point2D(i, j).get_angle_between_two_points(target_location));
 	is_moving_ = true;
 }
 
@@ -61,6 +63,7 @@ void Bullet::move(Maze& maze)
 	int cur_value;
 	double start_x = x_;
 	double start_y = y_;
+	int travelDistance = 0;
 
 	while (is_moving_)
 	{
@@ -71,12 +74,14 @@ void Bullet::move(Maze& maze)
 		{
 			x_ += 0.001 * dirx_;
 			y_ += 0.001 * diry_;
+			++travelDistance;
 		}
 		else if (cur_value == PLAYER)
 		{
-			const auto distance = sqrt(pow(x_ - start_x, 2)
-				+ pow(y_ - start_y, 2));
-			int damage = m_stopping_power_ - distance;
+			//const auto distance = sqrt(pow(x_ - start_x, 2)
+			//	+ pow(y_ - start_y, 2)); // this is distance in the wierd ass graphical coordinates
+										// and it is unusable like this without some magic math.
+			int damage = m_stopping_power - (int)(travelDistance/10);
 			if (damage < 0) damage = 0;
 			GameMgr::get_instance().hit_player(Point2D(i, j), damage);
 
@@ -123,5 +128,6 @@ void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 	{//if i and j get fucked up do nothing with this
 		std::cout << "ex = " << re.what() << std::endl;
 	}
+	catch (...){}
 
 }
