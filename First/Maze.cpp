@@ -30,7 +30,7 @@ Node** Maze::get_sub_matrix(const Point2D top_left, const Point2D bottom_right)
 
 Node& Maze::get_at_pos(const int i, const int j)
 {
-	if (i >= maze_size || i < 0 || j >= maze_size || j < 0)
+	if (i > maze_size - 1 || i < 0 || j > maze_size - 1 || j < 0)
 	{
 		throw std::runtime_error("Invalid coordinates");
 	}
