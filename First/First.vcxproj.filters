@@ -75,9 +75,6 @@
     <ClCompile Include="Berserker.cpp">
       <Filter>Players</Filter>
     </ClCompile>
-    <ClCompile Include="Medic.cpp">
-      <Filter>Players</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node.h">
@@ -132,9 +129,6 @@
       <Filter>Players</Filter>
     </ClInclude>
     <ClInclude Include="Berserker.h">
-      <Filter>Players</Filter>
-    </ClInclude>
-    <ClInclude Include="Medic.h">
       <Filter>Players</Filter>
     </ClInclude>
   </ItemGroup>

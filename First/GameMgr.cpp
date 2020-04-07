@@ -587,6 +587,16 @@ void GameMgr::clear_all_resources()
 	delete_team_related_allocations();
 }
 
+Point2D GameMgr::get_safest_point_in_room(Room& room)
+{
+	return Utils::find_minimum_in_room(maze_, room);
+}
+
+Point2D GameMgr::get_safest_point_in_maze()
+{
+	return Utils::find_minimum_in_matrix(maze_);
+}
+
 Player* GameMgr::get_player_at_pos(Point2D& position)
 {
 	for (auto curTeam : teams_)

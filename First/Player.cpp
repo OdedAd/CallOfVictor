@@ -15,7 +15,7 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
 	m_diry_ = 0;//(int)(rand() % 3) - 1;
 	m_is_moving_ = false;
-	m_step_counter = 0;
+	m_step_counter_ = 0;
 	m_is_running_for_hp_cond_ = false;
 	m_collision_ = false;
 
@@ -23,39 +23,39 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 
 
 	if (grenade_cost < 0)
-		m_grenade_ammo_cost = max_ammo / 2;
+		m_grenade_ammo_cost_ = max_ammo / 2;
 	else
-		m_grenade_ammo_cost = grenade_cost;
+		m_grenade_ammo_cost_ = grenade_cost;
 
 	if (shooting_ammo_cost < 0)
-		m_shooting_ammo_cost = 1;
+		m_shooting_ammo_cost_ = 1;
 	else
-		m_shooting_ammo_cost = shooting_ammo_cost;
+		m_shooting_ammo_cost_ = shooting_ammo_cost;
 
 	if (melee_ammo_cost < 0)
-		m_melee_ammo_cost = max_ammo;
+		m_melee_ammo_cost_ = max_ammo;
 	else
-		m_melee_ammo_cost = melee_ammo_cost;
+		m_melee_ammo_cost_ = melee_ammo_cost;
 
 
 	if (grenade_dmg < 0)
-		m_grenade_dmg = max_hp / 5;
+		m_grenade_dmg_ = max_hp / 5;
 	else
-		m_grenade_dmg = grenade_dmg;
+		m_grenade_dmg_ = grenade_dmg;
 
 	if (shooting_dmg < 0)
-		m_shooting_dmg = max_hp / 3;
+		m_shooting_dmg_ = max_hp / 3;
 	else
-		m_shooting_dmg = shooting_dmg;
+		m_shooting_dmg_ = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg = max_hp / 2;
+		m_melee_dmg_ = max_hp / 2;
 	else
-		m_melee_dmg = melee_dmg;
+		m_melee_dmg_ = melee_dmg;
 
-	m_throw_dis_min = 4;
-	m_throw_dis_max = 11;
-	m_stab_dis_max = 1;
+	m_throw_dis_min_ = 4;
+	m_throw_dis_max_ = 11;
+	m_stab_dis_max_ = 1;
 
 	m_idle_counter_ = 0;
 }
@@ -95,11 +95,11 @@ void Player::run_away()
 	{
 		Room current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
 		//get heat map in room and get cover (find minimum in that matrix)
-		target = Utils::find_minimum_in_room(GameMgr::get_instance().get_maze(), current_room);
+		target = m_mgr_->get_safest_point_in_room(current_room);
 	}
 	catch (runtime_error&)
 	{ //player is in path or some other exception in finding the the player position
-		target = Utils::find_minimum_in_matrix(GameMgr::get_instance().get_maze());
+		target = m_mgr_->get_safest_point_in_maze();
 	}
 
 	//std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
@@ -225,38 +225,38 @@ void Player::fight()
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
 		if (m_ammo_ > 0)
 		{
-			if (distance_from_target <= m_stab_dis_max)
+			if (distance_from_target <= m_stab_dis_max_)
 			{
 				is_successful = m_mgr_->stab(this, target_location);
 
 				if (is_successful)
 				{
-					m_ammo_ -= m_melee_ammo_cost;
+					m_ammo_ -= m_melee_ammo_cost_;
 					m_is_moving_ = false;
 					std::cout << "Player " << m_id_ << " Stabbed someone " << std::endl;
 				}
 
 			}
-			else if (m_ammo_ >= m_grenade_ammo_cost && distance_from_target > m_throw_dis_min && distance_from_target < m_throw_dis_max)
+			else if (m_ammo_ >= m_grenade_ammo_cost_ && distance_from_target > m_throw_dis_min_ && distance_from_target < m_throw_dis_max_)
 			{
 				is_successful = m_mgr_->throw_grenade(this, target_location);
 
 				if (is_successful)
 				{
-					m_ammo_ -= m_grenade_ammo_cost;
+					m_ammo_ -= m_grenade_ammo_cost_;
 					m_is_moving_ = false;
 					std::cout << "Player " << m_id_ << " Throw a grenade " << std::endl;
 				}
 
 			}
-			else if (m_ammo_ >= m_shooting_ammo_cost)
+			else if (m_ammo_ >= m_shooting_ammo_cost_)
 			{
 				is_successful = m_mgr_->shoot(this, target_location);
 
 				if (is_successful)
 				{
 					//--m_ammo_;
-					m_ammo_ -= m_shooting_ammo_cost;
+					m_ammo_ -= m_shooting_ammo_cost_;
 					m_is_moving_ = false;
 					std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
 				}
@@ -301,7 +301,7 @@ void Player::choose_action()
 		//run_away();
 		heal();
 	}
-	else if (m_ammo_ < m_shooting_ammo_cost * 2)
+	else if (m_ammo_ < m_shooting_ammo_cost_ * 2)
 	{
 		reload();
 	}
@@ -364,11 +364,11 @@ void Player::move(Maze& maze)
 	//maybe this two variables can be class members and not static.
 	//static int old_value = 0; // the last value of the node.
 
-	if (m_cur_path_to_target_.empty() || m_step_counter > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || m_step_counter_ > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
 			m_cur_path_to_target_.pop();
-		m_step_counter = 0;
+		m_step_counter_ = 0;
 
 		choose_action();
 	}
@@ -410,7 +410,7 @@ void Player::move(Maze& maze)
 	else
 		++m_idle_counter_;
 
-	++m_step_counter;
+	++m_step_counter_;
 
 }
 

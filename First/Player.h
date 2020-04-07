@@ -2,7 +2,6 @@
 
 #include <stack>
 #include <iostream>
-
 #include "Maze.h"
 #include "Node.h"
 #include "GLUT.H"
@@ -26,22 +25,22 @@ protected:
 	int m_cur_hp_;
 	const int m_max_hp_;
 
-	int m_grenade_ammo_cost;
-	int m_shooting_ammo_cost;
-	int m_melee_ammo_cost;
+	int m_grenade_ammo_cost_;
+	int m_shooting_ammo_cost_;
+	int m_melee_ammo_cost_;
 
-	int m_grenade_dmg;
-	int m_shooting_dmg;
-	int m_melee_dmg;
+	int m_grenade_dmg_;
+	int m_shooting_dmg_;
+	int m_melee_dmg_;
 
-	int m_throw_dis_min;
-	int m_throw_dis_max;
-	int m_stab_dis_max;
+	int m_throw_dis_min_;
+	int m_throw_dis_max_;
+	int m_stab_dis_max_;
 
 	int m_old_value_ = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
-	int m_step_counter;
+	int m_step_counter_;
 
 	bool m_is_running_for_hp_cond_;
 	bool m_collision_;
@@ -113,62 +112,62 @@ public:
 	
 	int get_grenade_ammo_cost() const
 	{
-		return m_grenade_ammo_cost;
+		return m_grenade_ammo_cost_;
 	}
 
 	void set_grenade_ammo_cost(const int grenade_ammo_cost)
 	{
-		m_grenade_ammo_cost = grenade_ammo_cost;
+		m_grenade_ammo_cost_ = grenade_ammo_cost;
 	}
 
 	int get_shooting_ammo_cost() const
 	{
-		return m_shooting_ammo_cost;
+		return m_shooting_ammo_cost_;
 	}
 
 	void set_shooting_ammo_cost(const int shooting_ammo_cost)
 	{
-		m_shooting_ammo_cost = shooting_ammo_cost;
+		m_shooting_ammo_cost_ = shooting_ammo_cost;
 	}
 
 	int get_melee_ammo_cost() const
 	{
-		return m_melee_ammo_cost;
+		return m_melee_ammo_cost_;
 	}
 
 	void set_melee_ammo_cost(const int melee_ammo_cost)
 	{
-		m_melee_ammo_cost = melee_ammo_cost;
+		m_melee_ammo_cost_ = melee_ammo_cost;
 	}
 
 	int get_grenade_dmg() const
 	{
-		return m_grenade_dmg;
+		return m_grenade_dmg_;
 	}
 
 	void set_grenade_dmg(const int grenade_dmg)
 	{
-		m_grenade_dmg = grenade_dmg;
+		m_grenade_dmg_ = grenade_dmg;
 	}
 
 	int get_shooting_dmg() const
 	{
-		return m_shooting_dmg;
+		return m_shooting_dmg_;
 	}
 
 	void set_shooting_dmg(const int shooting_dmg)
 	{
-		m_shooting_dmg = shooting_dmg;
+		m_shooting_dmg_ = shooting_dmg;
 	}
 
 	int get_melee_dmg() const
 	{
-		return m_melee_dmg;
+		return m_melee_dmg_;
 	}
 
 	void set_melee_dmg(const int melee_dmg)
 	{
-		m_melee_dmg = melee_dmg;
+		m_melee_dmg_ = melee_dmg;
 	}
 };
 

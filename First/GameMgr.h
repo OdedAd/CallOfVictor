@@ -55,6 +55,8 @@ public:
 	void clear_map();
 	bool is_game_over() const;
 	void clear_all_resources();
+	Point2D get_safest_point_in_room(Room& room);
+	Point2D get_safest_point_in_maze();
 
 	GameMgr(GameMgr const&) = delete;
 	GameMgr(GameMgr const &&) = delete;

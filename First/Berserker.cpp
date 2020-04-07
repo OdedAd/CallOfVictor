@@ -11,39 +11,39 @@ Berserker::Berserker(GameMgr* mgr, int id, Team* team, Node* location, int max_a
 {
 
 	if (grenade_cost < 0)
-		m_grenade_ammo_cost = max_ammo;
+		m_grenade_ammo_cost_ = max_ammo;
 	else
-		m_grenade_ammo_cost = grenade_cost;
+		m_grenade_ammo_cost_ = grenade_cost;
 
 	if (shooting_ammo_cost < 0)
-		m_shooting_ammo_cost = max_ammo;
+		m_shooting_ammo_cost_ = max_ammo;
 	else
-		m_shooting_ammo_cost = shooting_ammo_cost;
+		m_shooting_ammo_cost_ = shooting_ammo_cost;
 
 	if (melee_ammo_cost < 0)
-		m_melee_ammo_cost = max_ammo/2;
+		m_melee_ammo_cost_ = max_ammo/2;
 	else
-		m_melee_ammo_cost = melee_ammo_cost;
+		m_melee_ammo_cost_ = melee_ammo_cost;
 
 
 	if (grenade_dmg < 0)
-		m_grenade_dmg = maxHP / 3;
+		m_grenade_dmg_ = maxHP / 3;
 	else
-		m_grenade_dmg = grenade_dmg;
+		m_grenade_dmg_ = grenade_dmg;
 
 	if (shooting_dmg < 0)
-		m_shooting_dmg = (int)(maxHP * (1.0 / 3.0));
+		m_shooting_dmg_ = (int)(maxHP * (1.0 / 3.0));
 	else
-		m_shooting_dmg = shooting_dmg;
+		m_shooting_dmg_ = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg = maxHP / 3;
+		m_melee_dmg_ = maxHP / 3;
 	else
-		m_melee_dmg = melee_dmg;
+		m_melee_dmg_ = melee_dmg;
 
-	m_throw_dis_min = 2;
-	m_throw_dis_max = 4;
-	m_stab_dis_max = 3;
+	m_throw_dis_min_ = 2;
+	m_throw_dis_max_ = 4;
+	m_stab_dis_max_ = 3;
 }
 
 void Berserker::show_me() const
@@ -85,7 +85,7 @@ void Berserker::choose_action()
 	{
 		heal();
 	}
-	else if (m_ammo_ <= m_shooting_ammo_cost)
+	else if (m_ammo_ <= m_shooting_ammo_cost_)
 	{
 		reload();
 	}
