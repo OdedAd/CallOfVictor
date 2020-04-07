@@ -62,6 +62,7 @@ void Grenade::explode(Maze& maze)
 
 		tic_counter = 0;
 		isExploded = true;
+
 	}
 }
 

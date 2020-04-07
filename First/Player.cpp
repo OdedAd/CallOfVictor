@@ -18,6 +18,7 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	m_step_counter_ = 0;
 	m_is_running_for_hp_cond_ = false;
 	m_collision_ = false;
+	m_is_in_position_ = false;
 
 	m_cur_target_node_ = nullptr;
 
@@ -102,8 +103,6 @@ void Player::run_away()
 		target = m_mgr_->get_safest_point_in_maze();
 	}
 
-	//std::cout << "in run function: my location row = " << m_location_->get_point().get_row()
-		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 	if (m_is_running_for_hp_cond_)
 	{
 		heal();
@@ -117,11 +116,10 @@ void Player::run_away()
 		}
 		else
 		{
-			//std::cout << "in run function: target_location row = " << target.get_row()
-				//<< " col = " << target.get_col() << std::endl;
 			//move to the minimum target
 			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 			m_is_moving_ = true;
+			std::cout << "Player " << m_id_ << " Is running away " << std::endl;
 		}
 	}
 }
@@ -196,11 +194,39 @@ void Player::reload()
 			m_is_moving_ = true;
 		}
 	}
-	//else //no ammo available, abandon all hope like a headless chicken
-	//	run_away();
+	else //no ammo available, abandon all hope like a headless chicken
+		run_away();
 
 
 }
+
+
+bool Player::get_into_position()
+{
+	if (is_in_room() == true)
+	{
+		m_is_in_position_ = false;
+
+		//get heat map in room and get cover (find minimum in that matrix)
+		Point2D target = m_mgr_->get_safest_point_in_room(GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point()));
+		if (target == m_location_->get_point())
+		{
+			m_is_in_position_ = true;
+		}
+		else
+		{
+			//move to the minimum target
+			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
+			m_is_moving_ = true;
+			std::cout << "Player " << m_id_ << " Is getting into position " << std::endl;
+		}
+	}
+	else
+		m_is_in_position_ = true;
+
+	return m_is_in_position_;
+}
+
 
 ///<summary>
 ///Find a target and attack if in range.
@@ -208,8 +234,6 @@ void Player::reload()
 void Player::fight()
 {
 	bool is_shootable;
-	//std::cout << "in fight function: my location row = " << m_location_->get_point().get_row()
-		//<< " col = " << m_location_->get_point().get_col() << std::endl;
 
 	Point2D target_location = m_mgr_->find_nearest_enemy(m_location_->get_point(), *m_team_, is_shootable);
 	if (target_location.get_col() == -1 && target_location.get_row() == -1)
@@ -218,8 +242,6 @@ void Player::fight()
 	}
 	else
 	{
-		//std::cout << "in fight function: target_location row = " << target_location.get_row()
-			//<< " col = " << target_location.get_col() << std::endl;
 
 		bool is_successful = false;
 		double distance_from_target = m_location_->get_point().get_distance(target_location);
@@ -255,11 +277,12 @@ void Player::fight()
 
 				if (is_successful)
 				{
-					//--m_ammo_;
 					m_ammo_ -= m_shooting_ammo_cost_;
 					m_is_moving_ = false;
 					std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
 				}
+				//else if (m_is_in_position_ == false)
+				//	return;
 
 			}
 			else //no enough ammo
@@ -275,6 +298,7 @@ void Player::fight()
 		else //no ammo
 			reload();
 	}
+
 }
 
 ///<summary>
@@ -292,13 +316,12 @@ void Player::choose_action()
 	{
 		fight();
 	}
-	else if (m_cur_hp_ < m_max_hp_ / 4)
+	else if (m_cur_hp_ < scared_hp)
 	{
-		heal();
+		run_away();
 	}
 	else if (m_ammo_ >= 5)
 	{
-		//run_away();
 		heal();
 	}
 	else if (m_ammo_ < m_shooting_ammo_cost_ * 2)
@@ -343,6 +366,7 @@ void Player::get_hit(const int damage)
 			std::cout << "Player " << m_id_ << " died" << std::endl;
 			GameMgr::get_instance().get_maze().get_at_pos(m_location_->get_point()).set_value(SPACE);
 			get_team()->reduce_players_alive(1);
+			PlaySound(TEXT("Sounds/Dying.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		}
 	}
 }
@@ -489,6 +513,6 @@ bool Player::is_in_room() const
 		GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
 		retval = true;
 	}catch(...){}
-	
+
 	return retval;
 }

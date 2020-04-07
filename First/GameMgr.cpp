@@ -12,6 +12,7 @@ void GameMgr::init_game()
 	generate_map();
 	generate_pickups();
 	generate_teams();
+	PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME );
 
 }
 
@@ -339,6 +340,7 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 		distance > calling_player->get_throw_dis_min())
 	{
 		//grenades_.push_back(new Grenade(start_i, start_j, max_damage));
+		PlaySound(TEXT("Sounds/PinDrop.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg()));
 		return true;
 	}
@@ -360,6 +362,7 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	if (calling_player_point.get_distance(target) <= 1)
 	{
 		//bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
+		PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 		return true;
 	}
@@ -370,9 +373,12 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		Room& player_room = maze_.get_room_at(calling_player_point);
 		if (player_room == targets_room)
 		{
-			//bullets_.push_back(new Bullet(start_i, start_j, target, 10));
-			bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
-			return true;
+			//if (calling_player->get_into_position() == true)
+			//{
+				bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
+				PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
+				return true;
+			//}
 		}
 	}
 	catch (...) {}; //if we get to the catch it means one of the points was not in a room
@@ -393,6 +399,7 @@ bool GameMgr::stab(Player* calling_player, Point2D& target)
 	if (targetPlayer->get_hp() > 0 && calling_player_point.get_distance(target) <= calling_player->get_stab_dis())
 	{
 		hit_player(target, calling_player->get_melee_dmg());
+		PlaySound(TEXT("Sounds/Stab.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		return true;
 	}
 
@@ -422,6 +429,12 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
 			if (targetPickupObject->get_quantity() <= 0)
 				maze_.get_at_pos(target).set_value(0);
+
+			if(target_value == PICKUP_AMMO)
+				PlaySound(TEXT("Sounds/Reload.wav"), NULL, SND_ASYNC | SND_FILENAME);
+			else if(target_value == PICKUP_MED)
+				PlaySound(TEXT("Sounds/Heal.wav"), NULL, SND_ASYNC | SND_FILENAME);
+
 			return true;
 		}
 		else
@@ -535,6 +548,11 @@ void GameMgr::play_one_turn()
 			}
 		}
 
+		//very inefficient, but we never have too many grenades on the field at the same time so the runtime impact is negligible.
+		for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
+			if ((*itr)->get_is_exploded() == true)
+				PlaySound(TEXT("Sounds/Explosion.wav"), NULL, SND_ASYNC | SND_FILENAME);
+
 		grenades_.erase(std::remove_if(grenades_.begin(), grenades_.end(),
 			[](const auto g) { return g->get_is_exploded() == true; }),
 			grenades_.end());
@@ -542,6 +560,7 @@ void GameMgr::play_one_turn()
 		for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
 			if ((*itr)->get_is_exploded() == false)
 				(*itr)->explode(maze_);
+
 
 		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
 			[](const auto b) { return b->get_is_moving() == false; }),
@@ -573,6 +592,9 @@ void GameMgr::clear_map()
 
 bool GameMgr::is_game_over() const
 {
+	if(is_game_over_ == true)
+		PlaySound(TEXT("Sounds/Win.wav"), NULL, SND_ASYNC | SND_FILENAME);
+
 	return this->is_game_over_;
 }
 

@@ -40,6 +40,7 @@ protected:
 	int m_old_value_ = 0;
 	int m_dirx_, m_diry_; //deprecated
 	bool m_is_moving_;
+	bool m_is_in_position_;
 	int m_step_counter_;
 
 	bool m_is_running_for_hp_cond_;
@@ -66,6 +67,7 @@ protected:
 	///</summary>
 	virtual void reload();
 
+
 	///<summary>
 	/// Find a target and attack if in range.
 	///</summary>
@@ -85,6 +87,8 @@ public:
 		int grenade_dmg = -1, int shooting_dmg = -1, int melee_dmg = -1);
 	virtual ~Player() = default;
 	virtual void show_me() const;
+
+	bool get_into_position();
 
 	///<summary>
 	/// Reaction to getting hit.

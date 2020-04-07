@@ -61,6 +61,9 @@ public:
 	GameMgr(GameMgr const &&) = delete;
 	void operator=(GameMgr const&) = delete;
 
+	Player* get_player_at_pos(Point2D& position);
+
+
 private:
 	void delete_team_related_allocations();
 	void check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
@@ -79,7 +82,6 @@ private:
 
 	bool is_game_over_;
 
-	Player* get_player_at_pos(Point2D& position);
 	Player& get_player_at_pos_ref(Point2D& position);
 	PickupObject* get_pickup_at_pos(Point2D& position);
 	double map_[maze_size][maze_size];
