@@ -6,6 +6,10 @@
 #include "Node.h"
 #include "GLUT.H"
 
+static const int SNIPER_TYPE = 0;
+static const int BERSERKER_TYPE = 1;
+static const int GRENADIER_TYPE = 2;
+static const int SURVIVOR_TYPE = 3;
 
 class GameMgr;
 class Team;

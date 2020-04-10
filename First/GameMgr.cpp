@@ -63,7 +63,7 @@ void GameMgr::generate_teams()
 {
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
-	const auto max_num_of_players_per_type = 1;
+	const auto max_num_of_players = 5;
 	int playerMaxAmmo = 10;
 	int playerMaxHP = 1000;
 
@@ -75,13 +75,14 @@ void GameMgr::generate_teams()
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
 		int curValue;
+		int player_type;
 
 		const auto team_room_left_top_row = team_room.get_left_top().get_row();
 		const auto team_room_left_top_col = team_room.get_left_top().get_col();
 		const auto team_room_right_bottom_row = team_room.get_right_bottom().get_row();
 		const auto team_room_right_bottom_col = team_room.get_right_bottom().get_col();
 
-		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players_per_type; cur_num_of_players++)
+		for (auto cur_num_of_players = 0; cur_num_of_players < max_num_of_players; cur_num_of_players++)
 		{
 
 			do
@@ -93,51 +94,38 @@ void GameMgr::generate_teams()
 			} while (curValue != SPACE); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
 
-			do
+			//player_type = cur_num_of_players;
+			player_type = rand()%4;
+
+			switch (player_type)
 			{
-				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
-				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-				curValue = maze_.get_at_pos(k, j).get_value();
-
-			} while (curValue != SPACE); //collision prevention
-
-			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-
-			do
-			{
-				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
-				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-				curValue = maze_.get_at_pos(k, j).get_value();
-
-			} while (curValue != SPACE); //collision prevention
-
-			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-
-			do
-			{
-				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
-				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-				curValue = maze_.get_at_pos(k, j).get_value();
-
-			} while (curValue != SPACE); //collision prevention
-
-			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-
-			do
-			{
-				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
-				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-				curValue = maze_.get_at_pos(k, j).get_value();
-
-			} while (curValue != SPACE); //collision prevention
-
-			maze_.get_at_pos(k, j).set_value(PLAYER);
-			team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				case SNIPER_TYPE:
+				{
+					team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+					break;
+				}
+				case BERSERKER_TYPE:
+				{
+					team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+					break;
+				}
+				case GRENADIER_TYPE:
+				{
+					team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+					break;
+				}
+				case SURVIVOR_TYPE:
+				{
+					team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+					break;
+				}
+				default:
+				{
+					team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+					break;
+				}
+			}
 
 		}
 		this->add_team(team);
@@ -371,9 +359,10 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	{
 		Room& targets_room = maze_.get_room_at(target);
 		Room& player_room = maze_.get_room_at(calling_player_point);
+		//bool isInPosition = calling_player->get_into_position();
 		if (player_room == targets_room)
 		{
-			//if (calling_player->get_into_position() == true)
+			//if (isInPosition == true)
 			//{
 				bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 				PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);

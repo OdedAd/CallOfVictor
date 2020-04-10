@@ -130,7 +130,7 @@ void Sniper::fight()
 				}
 
 			}
-			else //no enough ammo
+			else //not enough ammo
 				reload();
 
 			if (is_successful == false)

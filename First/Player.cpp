@@ -203,6 +203,7 @@ void Player::reload()
 
 bool Player::get_into_position()
 {
+
 	if (is_in_room() == true)
 	{
 		m_is_in_position_ = false;
@@ -219,6 +220,7 @@ bool Player::get_into_position()
 			m_cur_target_node_ = m_mgr_->a_star(m_location_->get_point(), target, m_team_);
 			m_is_moving_ = true;
 			std::cout << "Player " << m_id_ << " Is getting into position " << std::endl;
+			m_is_in_position_ = false;
 		}
 	}
 	else
@@ -273,19 +275,22 @@ void Player::fight()
 			}
 			else if (m_ammo_ >= m_shooting_ammo_cost_)
 			{
-				is_successful = m_mgr_->shoot(this, target_location);
+				//if (get_into_position() == true)
+				//{
+					is_successful = m_mgr_->shoot(this, target_location);
 
-				if (is_successful)
-				{
-					m_ammo_ -= m_shooting_ammo_cost_;
-					m_is_moving_ = false;
-					std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
-				}
-				//else if (m_is_in_position_ == false)
+					if (is_successful)
+					{
+						m_ammo_ -= m_shooting_ammo_cost_;
+						m_is_moving_ = false;
+						std::cout << "Player " << m_id_ << " Is shooting " << std::endl;
+					}
+				//}
+				//else if(m_is_in_position_ == false)
 				//	return;
 
 			}
-			else //no enough ammo
+			else //not enough ammo
 				reload();
 
 
