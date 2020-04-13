@@ -8,15 +8,15 @@
 
 using namespace std;
 
-Room::Room(int ci, int cj, int w, int h) {
+Room::Room(int ci, int cj, int width, int height) {
 	center_.set_col(cj);
 	center_.set_row(ci);
-	left_top_.set_col(cj - w / 2);
-	left_top_.set_row(ci - h / 2);
-	right_bottom_.set_col(cj + w / 2);
-	right_bottom_.set_row(ci + h / 2);
-	width_ = w;
-	height_ = h;
+	left_top_.set_col(cj - width / 2);
+	left_top_.set_row(ci - height / 2);
+	right_bottom_.set_col(cj + width / 2);
+	right_bottom_.set_row(ci + height / 2);
+	width_ = width;
+	height_ = height;
 
 }
 

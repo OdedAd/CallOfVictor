@@ -1,6 +1,5 @@
 #pragma once
 #include "Node.h"
-#include "Point2D.h"
 
 class Room
 {
@@ -9,7 +8,7 @@ public:
 	~Room() = default;
 	double get_height() const;
 	double get_width() const;
-	Room(int ci, int cj, int w, int h);
+	Room(int ci, int cj, int width, int height);
 	Point2D get_left_top()const;
 	Point2D get_right_bottom()const;
 	bool check_overlapping(Room * pother) const;
@@ -27,6 +26,5 @@ public:
 private:
 	Point2D left_top_, right_bottom_, center_;
 	int width_, height_;
-	//double** map_;
 };
 

@@ -96,7 +96,7 @@ void Player::run_away()
 	{
 		Room current_room = GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point());
 		//get heat map in room and get cover (find minimum in that matrix)
-		target = m_mgr_->get_safest_point_in_room(current_room);
+		target = m_mgr_->get_safest_point_in_room(current_room,m_team_);
 	}
 	catch (runtime_error&)
 	{ //player is in path or some other exception in finding the the player position
@@ -209,7 +209,7 @@ bool Player::get_into_position()
 		m_is_in_position_ = false;
 
 		//get heat map in room and get cover (find minimum in that matrix)
-		Point2D target = m_mgr_->get_safest_point_in_room(GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point()));
+		Point2D target = m_mgr_->get_safest_point_in_room(GameMgr::get_instance().get_maze().get_room_at(m_location_->get_point()),m_team_);
 		if (target == m_location_->get_point())
 		{
 			m_is_in_position_ = true;

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <time.h>
-#include <vector>
 #include "GLUT.h"
 #include <windows.h> 
 #include "GameMgr.h"
@@ -76,7 +75,7 @@ void draw_maze()
 void draw_map()
 {
 	double sz = sz = 2.0 / maze_size, xx, yy;
-	double** map = GameMgr::get_instance().get_heat_map();
+	double** map = GameMgr::get_instance().get_teams()[0]->get_map();
 	auto maze = GameMgr::get_instance().get_maze();
 
 	for (auto i = 0; i < maze_size; i++)
@@ -100,7 +99,7 @@ void draw_map()
 				glEnd();
 			}
 		}
-	Utils::clear_temporary_map(map,maze_size);
+	//Utils::clear_temporary_map(map,maze_size);
 }
 //void generate_map()
 //{

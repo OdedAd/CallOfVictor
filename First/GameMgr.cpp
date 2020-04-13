@@ -9,11 +9,11 @@ void GameMgr::init_game()
 {
 	is_game_over_ = false;
 	generate_maze();
-	generate_map();
 	generate_pickups();
 	generate_teams();
-	PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME );
-
+	generate_map();
+	std::cout << (Utils::compare_maps(teams_[0]->get_map(), teams_[1]->get_map()) ? "Maps are different" : "Maps are the same") << std::endl;
+	//PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME);
 }
 
 GameMgr& GameMgr::get_instance()
@@ -31,7 +31,9 @@ GameMgr& GameMgr::get_instance()
 ///
 void GameMgr::generate_maze()
 {
+	std::cout << "-----Generating maze-----" << std::endl;
 	this->maze_.setup_maze();
+	std::cout << "-----Finished generating maze-----\n" << std::endl;
 }
 
 ///
@@ -39,11 +41,13 @@ void GameMgr::generate_maze()
 ///
 void GameMgr::generate_pickups()
 {
+	std::cout << "-----Generating Pickups-----" << std::endl;
 	for (int i = 0; i < num_of_pickups; i++)
 	{
 		init_pickup(PickupType::ammo, PICKUP_AMMO);
 		init_pickup(PickupType::med_kit, PICKUP_MED);
 	}
+	std::cout << "-----Finished generating Pickups-----\n" << std::endl;
 }
 
 void GameMgr::init_pickup(const PickupType type, const int color_type)
@@ -55,12 +59,12 @@ void GameMgr::init_pickup(const PickupType type, const int color_type)
 	maze_.get_at_pos(location->get_row(), location->get_col()).set_value(color_type);
 }
 
-
 ///
 ///Initialize the teams.
 ///
 void GameMgr::generate_teams()
 {
+	std::cout << "-----Generating teams and players-----" << std::endl;
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
 	const auto max_num_of_players = 5;
@@ -96,40 +100,41 @@ void GameMgr::generate_teams()
 			maze_.get_at_pos(k, j).set_value(PLAYER);
 
 			//player_type = cur_num_of_players;
-			player_type = rand()%4;
+			player_type = rand() % 4;
 
 			switch (player_type)
 			{
-				case SNIPER_TYPE:
-				{
-					team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-					break;
-				}
-				case BERSERKER_TYPE:
-				{
-					team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-					break;
-				}
-				case GRENADIER_TYPE:
-				{
-					team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-					break;
-				}
-				case SURVIVOR_TYPE:
-				{
-					team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-					break;
-				}
-				default:
-				{
-					team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
-					break;
-				}
+			case SNIPER_TYPE:
+			{
+				team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				break;
+			}
+			case BERSERKER_TYPE:
+			{
+				team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				break;
+			}
+			case GRENADIER_TYPE:
+			{
+				team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				break;
+			}
+			case SURVIVOR_TYPE:
+			{
+				team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				break;
+			}
+			default:
+			{
+				team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				break;
+			}
 			}
 
 		}
 		this->add_team(team);
 	}
+	std::cout << "-----Finished generating teams and players-----\n" << std::endl;
 }
 
 Maze& GameMgr::get_maze()
@@ -142,7 +147,6 @@ std::vector<Team*>& GameMgr::get_teams()
 	return this->teams_;
 }
 
-//vector<LogicBullet*>& GameMgr::get_bullets()
 vector<Bullet*>& GameMgr::get_bullets()
 {
 	return this->bullets_;
@@ -288,12 +292,15 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 			cost = 0.5; // space or path cost
 		//else if (curNodeValue == PICKUP) // pickup 
 		//	cost = 0.1;
-		else if (cur_node_value == PLAYER) // player
+		else if (cur_node_value == PLAYER)
+		{ // player
 			if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
 				cost = 5000;
 			else
 				cost = 5;
+		}
 
+		cost += callers_team->get_map()[row][col];
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
 		const auto black_it = find(black.begin(), black.end(), *pn1);
@@ -364,9 +371,9 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 		{
 			//if (isInPosition == true)
 			//{
-				bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
-				PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
-				return true;
+			bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
+			PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
+			return true;
 			//}
 		}
 	}
@@ -413,15 +420,15 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		PickupObject* targetPickupObject = get_pickup_at_pos(target);
 		int quantity = targetPickupObject->get_quantity();
 
-		if (distance <= 1 && quantity > 0 )
+		if (distance <= 1 && quantity > 0)
 		{
 			targetPickupObject->pickup(); //pickup successful , update the PickupObject.
 			if (targetPickupObject->get_quantity() <= 0)
 				maze_.get_at_pos(target).set_value(0);
 
-			if(target_value == PICKUP_AMMO)
+			if (target_value == PICKUP_AMMO)
 				PlaySound(TEXT("Sounds/Reload.wav"), NULL, SND_ASYNC | SND_FILENAME);
-			else if(target_value == PICKUP_MED)
+			else if (target_value == PICKUP_MED)
 				PlaySound(TEXT("Sounds/Heal.wav"), NULL, SND_ASYNC | SND_FILENAME);
 
 			return true;
@@ -437,24 +444,30 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 
 void GameMgr::generate_map()
 {
-	const int num_tries = 3000;
-	int col, row;
-	double x, y;
-	const auto size_factor = 2.0 / maze_size;
-
-	for (auto i = 0; i < num_tries; i++)
+	std::cout << "Generating heat maps:" << std::endl;
+	for (auto team : teams_)
 	{
-		do
-		{
-			col = rand() % maze_size;
-			row = rand() % maze_size;
-		} while (maze_.get_at_pos(row, col).get_value() != SPACE);
+		std::cout << "Generating map for team " << team->get_team_name() << std::endl;
+		const int num_tries = 2000;
 
-		x = col * size_factor - 1;
-		y = row * size_factor - 1;
-		Grenade* pg = new Grenade(x, y);
-		pg->simulate_explosion(map_, maze_);
-		delete pg;
+		int col, row;
+		const auto size_factor = 2.0 / maze_size;
+
+		for (auto i = 0; i < num_tries; i++)
+		{
+			do
+			{
+				col = rand() % maze_size;
+				row = rand() % maze_size;
+			} while (maze_.get_at_pos(row, col).get_value() != SPACE);
+
+			double x = col * size_factor - 1;
+			double y = row * size_factor - 1;
+			Grenade* pg = new Grenade(x, y);
+			pg->simulate_explosion(team->get_map(), maze_);
+			delete pg;
+		}
+		std::cout << "Finished generating map for team " << team->get_team_name() << std::endl;
 	}
 }
 
@@ -464,39 +477,29 @@ void GameMgr::clear_room_map(Room& room)
 	{
 		for (auto j = room.get_left_top().get_col(); j < room.get_right_bottom().get_col(); j++)
 		{
-			map_[i][j] = 0;
+			for (auto team : teams_)
+			{
+				team->get_map()[i][j] = 0;
+				//map_[i][j] = 0;
+			}
 		}
 	}
 }
 
-void GameMgr::generate_map_for_room(Room& room)
-{
-	const auto num_tries = room.get_height() * room.get_width();
-	clear_room_map(room);
-
-	for (auto i = 0; i < num_tries; i++)
-	{
-		const auto pt = room.get_random_point_in_room();
-
-		auto pg = new Grenade(pt->get_row(), pt->get_col());
-		pg->simulate_explosion(map_, maze_);
-		delete pg;
-	}
-}
-
-double** GameMgr::get_heat_map()
-{
-	double** returnedMap = new double* [maze_size];
-	for (int i = 0; i < maze_size; i++)
-	{
-		returnedMap[i] = new double[maze_size];
-		for (int j = 0; j < maze_size; j++)
-		{
-			returnedMap[i][j] = map_[i][j];
-		}
-	}
-	return returnedMap;
-}
+//void GameMgr::generate_map_for_room(Room& room)
+//{
+//	const auto num_tries = room.get_height() * room.get_width();
+//	clear_room_map(room);
+//
+//	for (auto i = 0; i < num_tries; i++)
+//	{
+//		const auto pt = room.get_random_point_in_room();
+//
+//		auto pg = new Grenade(pt->get_row(), pt->get_col());
+//		pg->simulate_explosion(map_, maze_);
+//		delete pg;
+//	}
+//}
 
 void GameMgr::play_one_turn()
 {
@@ -521,12 +524,12 @@ void GameMgr::play_one_turn()
 				{
 					if (cur_player->is_in_room())
 					{
-						//need to be changed so if all players are in different room it won't calculate a lot of things
-						if (current_room.get_left_top() != maze_.get_room_at(cur_player->get_location()->get_point()).get_left_top())
-						{
-							current_room = maze_.get_room_at(cur_player->get_location()->get_point());
-							generate_map_for_room(current_room);
-						}
+						//TODO:need to be changed so if all players are in different room it won't calculate a lot of things
+						//if (current_room.get_left_top() != maze_.get_room_at(cur_player->get_location()->get_point()).get_left_top())
+						//{
+							//current_room = maze_.get_room_at(cur_player->get_location()->get_point());
+							//generate_map_for_room(current_room);
+						//}
 					}
 					cur_player->move(maze_);
 				}
@@ -568,20 +571,9 @@ void GameMgr::play_one_turn()
 	std::cout << " Turn " << ++turn_counter << " ended " << std::endl << std::endl;
 }
 
-void GameMgr::clear_map()
-{
-	for (int i = 0; i < maze_size; ++i)
-	{
-		for (int j = 0; j < maze_size; ++j)
-		{
-			map_[i][j] = 0;
-		}
-	}
-}
-
 bool GameMgr::is_game_over() const
 {
-	if(is_game_over_ == true)
+	if (is_game_over_ == true)
 		PlaySound(TEXT("Sounds/Win.wav"), NULL, SND_ASYNC | SND_FILENAME);
 
 	return this->is_game_over_;
@@ -600,14 +592,15 @@ void GameMgr::clear_all_resources()
 	delete_team_related_allocations();
 }
 
-Point2D GameMgr::get_safest_point_in_room(Room& room)
+Point2D GameMgr::get_safest_point_in_room(Room& room, Team* team)
 {
-	return Utils::find_minimum_in_room(maze_, room);
+	return Utils::find_minimum_in_room(maze_, room, team);
 }
 
 Point2D GameMgr::get_safest_point_in_maze()
 {
-	return Utils::find_minimum_in_matrix(maze_);
+	//TODO: FIX CORRECT TEAM
+	return Utils::find_minimum_in_matrix(maze_, new Team());
 }
 
 Player* GameMgr::get_player_at_pos(Point2D& position)

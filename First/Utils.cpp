@@ -38,43 +38,45 @@ void Utils::clear_temporary_maze(Node** matrix, const int size)
 	delete[] matrix;
 }
 
-void Utils::clear_temporary_map(double** map, const int size)
-{
-	for (auto i = 0; i < size; ++i)
-	{
-		delete[] map[i];
-	}
-	delete[] map;
-}
-
-void Utils::print_map(double map[maze_size][maze_size])
+bool Utils::compare_maps(double** team_one_map, double** team_two_map)
 {
 	for (int i = 0; i < maze_size; ++i)
 	{
 		for (int j = 0; j < maze_size; ++j)
 		{
-			std::cout << "row = " << i << ", col = " << j << ", value = " << map[i][j] << std::endl;
+			if(team_one_map[i][j] != team_two_map[i][j])
+				return true;
 		}
+	}
+	return false;
+}
+
+void Utils::print_map(double** map)
+{
+	cout.precision(3);
+	for (int i = 0; i < maze_size; ++i)
+	{
+		for (int j = 0; j < maze_size; ++j)
+		{
+			std::cout << map[i][j] << " ,";
+		}
+		std::cout << "\b" << std::endl;
 	}
 }
 
-Point2D& Utils::find_minimum_in_matrix(Maze& maze)
+Point2D& Utils::find_minimum_in_matrix(Maze& maze, Team* team)
 {
 	Point2D* min_value_location = new Point2D();
-	double** map = GameMgr::get_instance().get_heat_map();
-
-	//print_map(map);
+	double** map = team->get_map();
 
 	min_value_location->set_row(0);
 	min_value_location->set_col(0);
-	//double min_value = maze.get_at_pos(0, 0).get_value();
 	double min_value = 100;
 
 	for (int row_index = 0; row_index < maze_size; row_index++)
 	{
 		for (int col_index = 0; col_index < maze_size; col_index++)
 		{
-			//double cur_value = maze.get_at_pos(row_index, col_index).get_value();
 			double cur_value = map[row_index][col_index];
 			if (min_value > cur_value && (maze.get_at_pos(row_index, col_index).get_value() == SPACE ||
 				maze.get_at_pos(row_index, col_index).get_value() == PLAYER)
@@ -86,17 +88,13 @@ Point2D& Utils::find_minimum_in_matrix(Maze& maze)
 			}
 		}
 	}
-
-	clear_temporary_map(map, maze_size);
-	//std::cout << GameMgr::get_instance().get_maze().get_at_pos(*min_value_location).get_value()<<std::endl;
-
 	return *min_value_location;
 }
 
-Point2D& Utils::find_minimum_in_room(Maze& maze, Room& room)
+Point2D& Utils::find_minimum_in_room(Maze& maze, Room& room, Team* team)
 {
 	Point2D* min_value_location = new Point2D();
-	double** map = GameMgr::get_instance().get_heat_map();
+	double** map = team->get_map();
 	
 	min_value_location->set_row(room.get_left_top().get_row());
 	min_value_location->set_col(room.get_left_top().get_col());
@@ -117,8 +115,6 @@ Point2D& Utils::find_minimum_in_room(Maze& maze, Room& room)
 			}
 		}
 	}
-
-	clear_temporary_map(map, maze_size);
-
+	
 	return *min_value_location;
 }

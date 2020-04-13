@@ -131,3 +131,27 @@ void Bullet::simulate_motion(double map[maze_size][maze_size], Maze& maze)
 	catch (...){}
 
 }
+
+void Bullet::simulate_motion(double** map, Maze& maze)
+{
+	int i = maze_size * (y_ + 1) / 2;
+	int j = maze_size * (x_ + 1) / 2;
+
+	try
+	{
+		while (maze.get_at_pos(i, j).get_value() != WALL)
+		{
+			map[i][j] += delta;
+			x_ += 0.001 * dirx_;
+			y_ += 0.001 * diry_;
+			i = maze_size * (y_ + 1) / 2;
+			j = maze_size * (x_ + 1) / 2;
+		}
+	}
+	catch (const std::runtime_error&)
+	{//if i and j get fucked up do nothing with this
+		//std::cout << "ex = " << re.what() << std::endl;
+	}
+	catch (...){}
+
+}

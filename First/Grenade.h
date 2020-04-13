@@ -24,6 +24,7 @@ public:
 	void show_me() const;
 	void move_bullets( Maze& maze);
 	void simulate_explosion(double map[maze_size][maze_size], Maze& maze);
+	void simulate_explosion(double** map, Maze& maze);
 	bool get_is_exploded() const;
 private:
 	double x_, y_;

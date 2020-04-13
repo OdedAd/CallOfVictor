@@ -1,5 +1,8 @@
 #pragma once
-#include "Maze.h"
+#include "Utils.h"
+class Maze;
+class Point2D;
+//#include "Maze.h"
 const double delta = 0.0001;
 
 class Bullet
@@ -18,6 +21,7 @@ public:
 	double get_y() const;
 	void set_dir(double angle);
 	void simulate_motion(double map[maze_size][maze_size], Maze& maze);
+	void simulate_motion(double** map, Maze& maze);
 
 private:
 	double x_, y_;
