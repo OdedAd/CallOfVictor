@@ -200,7 +200,6 @@ void Player::reload()
 
 }
 
-
 bool Player::get_into_position()
 {
 
@@ -228,7 +227,6 @@ bool Player::get_into_position()
 
 	return m_is_in_position_;
 }
-
 
 ///<summary>
 ///Find a target and attack if in range.
@@ -312,8 +310,6 @@ void Player::fight()
 ///</summary>
 void Player::choose_action()
 {
-	//Very very problematic
-	//for example if AMMO = 0 and HP is bigger then 5 he will go and fight
 	int scared_hp = (int)(m_max_hp_ * 1.0 / 2.0);
 	if ((m_cur_hp_ >= scared_hp)
 		|| m_collision_ == true  //the collision flag is to get rid of two player stuck in  a corridor.

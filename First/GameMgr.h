@@ -42,7 +42,7 @@ public:
 	bool pickup(Player* calling_player, Point2D& target);
 	void generate_map();
 	void clear_room_map(Room& room);
-	//void generate_map_for_room(Room& room);
+	void generate_map_for_room(Room& room, Team* my_team);
 	void play_one_turn();
 	bool is_game_over() const;
 	void clear_all_resources();

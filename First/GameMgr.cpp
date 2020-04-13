@@ -486,20 +486,28 @@ void GameMgr::clear_room_map(Room& room)
 	}
 }
 
-//void GameMgr::generate_map_for_room(Room& room)
-//{
-//	const auto num_tries = room.get_height() * room.get_width();
-//	clear_room_map(room);
-//
-//	for (auto i = 0; i < num_tries; i++)
-//	{
-//		const auto pt = room.get_random_point_in_room();
-//
-//		auto pg = new Grenade(pt->get_row(), pt->get_col());
-//		pg->simulate_explosion(map_, maze_);
-//		delete pg;
-//	}
-//}
+void GameMgr::generate_map_for_room(Room& room, Team* my_team)
+{
+	//const auto num_tries = room.get_height() * room.get_width();
+	const auto num_tries = 3;
+	auto other_team = my_team!=teams_[0]?teams_[0]:teams_[1];
+	//clear_room_map(room);
+
+	for (auto i = 0; i < num_tries; i++)
+	{
+		//const auto pt = room.get_random_point_in_room();
+		for (auto player : my_team->get_teammates())
+		{
+			if (room.get_left_top() == maze_.get_room_at(player->get_location()->get_point()).get_left_top())
+			{
+				const auto pt = player->get_location()->get_point();
+				auto pg = new Grenade(pt.get_row(), pt.get_col());
+				pg->simulate_explosion(other_team->get_map(), maze_);
+				delete pg;
+			}
+		}
+	}
+}
 
 void GameMgr::play_one_turn()
 {
