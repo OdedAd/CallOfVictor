@@ -9,10 +9,6 @@ using namespace std;
 const int width = 600; // window width
 const int height = 600; // window height
 
-//double map[maze_size][maze_size] = { 0 };
-//double** map;
-
-//Bullet* pb = nullptr;
 Grenade* pg;
 bool move_on = false;
 
@@ -29,7 +25,7 @@ void init()
 
 void draw_maze()
 {
-	double sz, x, y;
+	const auto size_factor = 2.0 / maze_size;
 
 	for (auto i = 0; i < maze_size; i++)
 		for (auto j = 0; j < maze_size; j++)
@@ -55,18 +51,19 @@ void draw_maze()
 			case PICKUP_MED:
 				glColor3d(0.64, 0, 1); // orange
 				break;
+			default: break;
 			}
 
 			// draw rectangle
-			sz = 2.0 / maze_size;
-			x = j * sz - 1;
-			y = i * sz - 1;
+			
+			const auto x = j * size_factor - 1;
+			const auto y = i * size_factor - 1;
 
 			glBegin(GL_POLYGON);
 			glVertex2d(x, y);
-			glVertex2d(x + sz, y);
-			glVertex2d(x + sz, y + sz);
-			glVertex2d(x, y + sz);
+			glVertex2d(x + size_factor, y);
+			glVertex2d(x + size_factor, y + size_factor);
+			glVertex2d(x, y + size_factor);
 
 			glEnd();
 		}
@@ -101,31 +98,7 @@ void draw_map()
 				glEnd();
 			}
 		}
-	//Utils::clear_temporary_map(map,maze_size);
 }
-//void generate_map()
-//{
-//	const int num_tries = 1000;
-//	int col, row;
-//	double x, y, sz;
-//	Grenade* pg = nullptr;
-//
-//	for (auto i = 0; i < num_tries; i++)
-//	{
-//		do
-//		{
-//			col = rand() % maze_size;
-//			row = rand() % maze_size;
-//		} while (GameMgr::get_instance().get_maze().get_at_pos(row, col).get_value() != SPACE);
-//		sz = 2.0 / maze_size;
-//		x = col * sz - 1;
-//		y = row * sz - 1;
-//		pg = new Grenade(x, y);
-//		pg->simulate_explosion(map, GameMgr::get_instance().get_maze());
-//		delete pg;
-//	}
-//}
-
 
 void display()
 {
@@ -296,6 +269,7 @@ void mouse(const int button, const int state, const int x, const int y)
 		//		move_on = true;
 	}
 }
+
 void main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);

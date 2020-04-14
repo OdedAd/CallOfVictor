@@ -21,7 +21,7 @@ public:
 	void setup_maze();
 	Room& get_room_at(unsigned short index);
 	Room& get_room_at(const Point2D& point);
-	Room& generate_room();
+	Room& generate_room(int id);
 	void dig_tunnels();
 	void generate_path(Point2D start,Point2D target);
 	void add_neighbors(Node* pn, std::vector<Node> &gray, std::vector<Node> &black,

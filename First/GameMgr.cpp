@@ -8,12 +8,13 @@
 void GameMgr::init_game()
 {
 	is_game_over_ = false;
+	fighting_rooms_ = new vector<int>();
 	generate_maze();
 	generate_pickups();
 	generate_teams();
 	generate_map();
 	std::cout << (Utils::compare_maps(teams_[0]->get_map(), teams_[1]->get_map()) ? "Maps are different" : "Maps are the same") << std::endl;
-	//PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME);
+	PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME);
 }
 
 GameMgr& GameMgr::get_instance()
@@ -490,7 +491,7 @@ void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 {
 	//const auto num_tries = room.get_height() * room.get_width();
 	const auto num_tries = 3;
-	auto other_team = my_team!=teams_[0]?teams_[0]:teams_[1];
+	auto other_team = my_team != teams_[0] ? teams_[0] : teams_[1];
 	//clear_room_map(room);
 
 	for (auto i = 0; i < num_tries; i++)
@@ -509,9 +510,33 @@ void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 	}
 }
 
-void GameMgr::play_one_turn()
+void GameMgr::find_rooms_with_fight()
 {
-	//generate_map();
+	vector<vector<int>*> team_rooms;
+	int i = 0;
+	for (auto team : teams_)
+	{
+		team_rooms.push_back(new vector<int>());
+		for (auto player : team->get_teammates())
+		{
+			if (player->get_hp() > 0 && player->is_in_room())
+			{
+				team_rooms[i]->push_back(maze_.get_room_at(player->get_location()->get_point()).get_id());
+			}
+		}
+		std::sort(team_rooms[i]->begin(), team_rooms[i]->end());
+		i++;
+	}
+
+	std::set_intersection(team_rooms[0]->begin(), team_rooms[0]->end(),
+		team_rooms[1]->begin(), team_rooms[1]->end(), fighting_rooms_->begin());
+	
+	delete team_rooms[0];
+	delete team_rooms[1];
+}
+
+void GameMgr::check_if_teams_alive()
+{
 	for (auto game_team : teams_)
 	{
 		if (game_team->get_players_alive() <= 0)
@@ -520,25 +545,26 @@ void GameMgr::play_one_turn()
 			is_game_over_ = true;
 		}
 	}
+}
+
+void GameMgr::play_one_turn()
+{
+	check_if_teams_alive();
 
 	if (is_game_over_ == false)
 	{
-		Room current_room = maze_.get_room_at(0);
+		find_rooms_with_fight();
 		for (auto cur_team : teams_)
 		{
+			for (auto fighting_room : *fighting_rooms_)
+			{
+				clear_room_map(maze_.get_room_at(fighting_room));
+				generate_map_for_room(maze_.get_room_at(fighting_room), teams_[0] != cur_team ? cur_team : teams_[1]);
+			}
 			for (Player* cur_player : cur_team->get_teammates())
 			{
 				if (cur_player->get_hp() > 0)
 				{
-					if (cur_player->is_in_room())
-					{
-						//TODO:need to be changed so if all players are in different room it won't calculate a lot of things
-						//if (current_room.get_left_top() != maze_.get_room_at(cur_player->get_location()->get_point()).get_left_top())
-						//{
-							//current_room = maze_.get_room_at(cur_player->get_location()->get_point());
-							//generate_map_for_room(current_room);
-						//}
-					}
 					cur_player->move(maze_);
 				}
 				else
@@ -598,6 +624,7 @@ void GameMgr::delete_team_related_allocations()
 void GameMgr::clear_all_resources()
 {
 	delete_team_related_allocations();
+	delete fighting_rooms_;
 }
 
 Point2D GameMgr::get_safest_point_in_room(Room& room, Team* team)

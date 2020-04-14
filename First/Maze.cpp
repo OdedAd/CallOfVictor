@@ -56,7 +56,7 @@ void Maze::setup_maze()
 	}
 	for (num_existing_rooms_ = 0; num_existing_rooms_ < num_of_rooms; num_existing_rooms_++)
 	{
-		rooms_[num_existing_rooms_] = generate_room();
+		rooms_[num_existing_rooms_] = generate_room(num_existing_rooms_);
 	}
 
 	for (auto k = 0; k < 80; k++)
@@ -104,7 +104,7 @@ Room& Maze::get_room_at(const Point2D& point)
 	throw std::runtime_error("get_room_at: Point not in room!");
 }
 
-Room& Maze::generate_room()
+Room& Maze::generate_room(const int id)
 {
 	Room* pr = nullptr;
 	bool is_overlapping;
@@ -118,12 +118,11 @@ Room& Maze::generate_room()
 		const auto center_i = height / 2 + rand() % (maze_size - height);
 		const auto center_j = width / 2 + rand() % (maze_size - width);
 
-		pr = new Room(center_i, center_j, width, height);
+		pr = new Room(center_i, center_j, width, height,id);
 		for (auto i = 0; i < num_existing_rooms_ && !is_overlapping; i++)
 		{
 			if (rooms_[i].check_overlapping(pr))
 				is_overlapping = true;
-
 		}
 	} while (is_overlapping);
 	// pr is not overlapping with other rooms

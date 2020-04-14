@@ -43,6 +43,8 @@ public:
 	void generate_map();
 	void clear_room_map(Room& room);
 	void generate_map_for_room(Room& room, Team* my_team);
+	void find_rooms_with_fight();
+	void check_if_teams_alive();
 	void play_one_turn();
 	bool is_game_over() const;
 	void clear_all_resources();
@@ -70,6 +72,7 @@ private:
 	std::vector<PickupObject> pickup_objects_;
 	vector<Bullet*> bullets_;
 	vector<Grenade*> grenades_;
+	vector<int>* fighting_rooms_;
 
 	bool is_game_over_;
 

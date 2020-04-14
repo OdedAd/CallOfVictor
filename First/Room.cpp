@@ -1,14 +1,10 @@
 #include "Room.h"
-#include <math.h>
 #include <iostream>
-
-
 #include "GameMgr.h"
-#include "Grenade.h"
 
 using namespace std;
 
-Room::Room(int ci, int cj, int width, int height) {
+Room::Room(const int ci, const int cj, const int width, const int height, const short id) {
 	center_.set_col(cj);
 	center_.set_row(ci);
 	left_top_.set_col(cj - width / 2);
@@ -17,7 +13,7 @@ Room::Room(int ci, int cj, int width, int height) {
 	right_bottom_.set_row(ci + height / 2);
 	width_ = width;
 	height_ = height;
-
+	id_ = id;
 }
 
 double Room::get_height() const
@@ -80,35 +76,13 @@ Point2D* Room::get_point_in_room() const
 	return new Point2D(row,col);
 }
 
-//void Room::generate_map()
-//{
-//	const int num_tries = 5;
-//	double x, y;
-//	Grenade* pg = nullptr;
-//
-//	map_ = new double*[width_];
-//	for (int i = 0; i < width_; i++)
-//	{
-//		map_[i] = new double[this->height_];
-//		for (int j = 0; j < height_; j++)
-//		{
-//			map_[i][j] = 0;
-//		}
-//	}
-//
-//	for (auto i = 0; i < num_tries; i++)
-//	{
-//		Point2D* pt = get_point_in_room();
-//		pg = new Grenade(pt->get_row(), pt->get_col());
-//		pg->simulate_explosion(this->map_, *this);
-//		//pg->simulate_explosion(map_,GameMgr::get_instance().get_maze());
-//		delete pg;
-//		delete pt;
-//	}
-//}
-
 Node** Room::get_room_maze() const
 {
 	return GameMgr::get_instance().get_maze().get_sub_matrix(left_top_,right_bottom_);
+}
+
+short Room::get_id() const
+{
+	return this->id_;
 }
 
