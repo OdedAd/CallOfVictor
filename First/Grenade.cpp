@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Grenade::Grenade(const double x, const double y, int megatons, int fuze)
+Grenade::Grenade(const double x, const double y, const int megatons, const int fuze)
 {
 	int i;
 	this->x_ = x;
@@ -19,9 +19,9 @@ Grenade::Grenade(const double x, const double y, int megatons, int fuze)
 	isExploded = false;
 }
 
-Grenade::Grenade(const int i, const int j, int megatons, int fuze)
+Grenade::Grenade(const int i, const int j, const int megatons, const int fuze)
 {
-	int indx;
+	int index;
 	this->x_ = (j * 2.0) / (double)maze_size - 1;
 	this->y_ = (i * 2.0) / (double)maze_size - 1;
 
@@ -30,10 +30,10 @@ Grenade::Grenade(const int i, const int j, int megatons, int fuze)
 	isExploded = false;
 
 	double alpha, delta = 2 * PI / NUM_BULLETS;
-	for (indx = 0, alpha = 0; indx < NUM_BULLETS; indx++, alpha += delta)
+	for (index = 0, alpha = 0; index < NUM_BULLETS; index++, alpha += delta)
 	{
-		bullets_[indx] = new Bullet(x_, y_, m_megatons);
-		bullets_[indx]->set_dir(alpha);
+		bullets_[index] = new Bullet(x_, y_, m_megatons);
+		bullets_[index]->set_dir(alpha);
 	}
 
 }
@@ -62,7 +62,6 @@ void Grenade::explode(Maze& maze)
 
 		tic_counter = 0;
 		isExploded = true;
-
 	}
 }
 
@@ -99,4 +98,14 @@ void Grenade::simulate_explosion(double** map, Maze& maze)
 bool Grenade::get_is_exploded() const
 {
 	return isExploded;
+}
+
+double Grenade::get_row() const
+{
+	return this->y_;
+}
+
+double Grenade::get_col() const
+{
+	return this->x_;
 }

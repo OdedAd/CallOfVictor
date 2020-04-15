@@ -153,8 +153,6 @@
     <ClCompile Include="GameMgr.cpp" />
     <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="Grenadier.cpp" />
-    <ClCompile Include="LogicBullet.cpp" />
-    <ClCompile Include="LogicGrenade.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -174,8 +172,6 @@
     <ClInclude Include="GameMgr.h" />
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="Grenadier.h" />
-    <ClInclude Include="LogicBullet.h" />
-    <ClInclude Include="LogicGrenade.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PickupObject.h" />

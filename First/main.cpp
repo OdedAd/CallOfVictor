@@ -4,10 +4,15 @@
 #include <windows.h> 
 #include "GameMgr.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 using namespace std;
 
 const int width = 600; // window width
 const int height = 600; // window height
+bool is_show_room_map_calculated = false;
 
 Grenade* pg;
 bool move_on = false;
@@ -46,16 +51,16 @@ void draw_maze()
 				glColor3d(1, 0, 0); // red
 				break;
 			case PICKUP_AMMO:
-				glColor3d(1, 0.64, 0); // orange
+				glColor3d(0.2, 0.2, 0.2); // orange
 				break;
 			case PICKUP_MED:
-				glColor3d(0.64, 0, 1); // orange
+				glColor3d(0, 1, 0); // green
 				break;
 			default: break;
 			}
 
 			// draw rectangle
-			
+
 			const auto x = j * size_factor - 1;
 			const auto y = i * size_factor - 1;
 
@@ -71,9 +76,14 @@ void draw_maze()
 
 void draw_map()
 {
+
 	double sz = sz = 2.0 / maze_size, xx, yy;
-	GameMgr::get_instance().generate_map_for_room(GameMgr::get_instance().get_maze().get_room_at(0),
-		GameMgr::get_instance().get_teams()[0]);
+	if (!is_show_room_map_calculated)
+	{
+		is_show_room_map_calculated = true;
+		GameMgr::get_instance().generate_map_for_room(GameMgr::get_instance().get_maze().get_room_at(0),
+			GameMgr::get_instance().get_teams()[0]);
+	}
 	double** map = GameMgr::get_instance().get_teams()[1]->get_map();
 	auto maze = GameMgr::get_instance().get_maze();
 
@@ -173,6 +183,7 @@ void idle()
 	{
 		cout << "Game Over!" << endl;
 		GameMgr::get_instance().clear_all_resources();
+		_CrtDumpMemoryLeaks();
 		system("pause");
 		exit(0);
 	}

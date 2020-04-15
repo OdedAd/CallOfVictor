@@ -32,7 +32,6 @@ public:
 	std::vector<Team*>& get_teams();
 	vector<Bullet*>& get_bullets();
 	vector<Grenade*>& get_grenades();
-
 	void find_nearest_pickup(Point2D& location, Point2D& target, PickupType type);
 	Point2D& find_nearest_enemy(Point2D& location, Team& my_team,bool& is_shootable);
 	Node* a_star(Point2D& start, Point2D& target, Team* callers_team = nullptr);
@@ -45,6 +44,8 @@ public:
 	void generate_map_for_room(Room& room, Team* my_team);
 	void find_rooms_with_fight();
 	void check_if_teams_alive();
+	void explode_grenades();
+	void shoot_bullets();
 	void play_one_turn();
 	bool is_game_over() const;
 	void clear_all_resources();

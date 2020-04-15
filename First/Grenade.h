@@ -26,6 +26,8 @@ public:
 	void simulate_explosion(double map[maze_size][maze_size], Maze& maze);
 	void simulate_explosion(double** map, Maze& maze);
 	bool get_is_exploded() const;
+	double get_row() const;
+	double get_col() const ;
 private:
 	double x_, y_;
 	Bullet* bullets_[NUM_BULLETS];

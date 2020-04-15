@@ -8,7 +8,7 @@
 void GameMgr::init_game()
 {
 	is_game_over_ = false;
-	fighting_rooms_ = new vector<int>();
+	fighting_rooms_ = new vector<int>(10);
 	generate_maze();
 	generate_pickups();
 	generate_teams();
@@ -68,9 +68,9 @@ void GameMgr::generate_teams()
 	std::cout << "-----Generating teams and players-----" << std::endl;
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
-	const auto max_num_of_players = 5;
-	int playerMaxAmmo = 10;
-	int playerMaxHP = 1000;
+	const auto max_num_of_players = 4;
+	int player_max_ammo = 10;
+	int player_max_hp = 1000;
 
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
@@ -79,8 +79,7 @@ void GameMgr::generate_teams()
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
 		int k, j;
-		int curValue;
-		int player_type;
+		int cur_value;
 
 		const auto team_room_left_top_row = team_room.get_left_top().get_row();
 		const auto team_room_left_top_col = team_room.get_left_top().get_col();
@@ -94,14 +93,14 @@ void GameMgr::generate_teams()
 			{
 				k = rand() % (team_room_right_bottom_row - team_room_left_top_row) + team_room_left_top_row;
 				j = rand() % (team_room_right_bottom_col - team_room_left_top_col) + team_room_left_top_col;
-				curValue = maze_.get_at_pos(k, j).get_value();
+				cur_value = maze_.get_at_pos(k, j).get_value();
 
-			} while (curValue != SPACE); //collision prevention
+			} while (cur_value != SPACE); //collision prevention
 
 			maze_.get_at_pos(k, j).set_value(PLAYER);
 
-			//player_type = cur_num_of_players;
-			player_type = rand() % 4;
+			int player_type = cur_num_of_players;
+			//player_type = rand() % 4;
 
 			switch (player_type)
 			{
@@ -255,6 +254,11 @@ Node* GameMgr::a_star(Point2D& start, Point2D& target, Team* callers_team)
 		}
 	}
 
+	//while(!black.empty())
+	//{
+	//	
+	//}
+
 	return nullptr;
 }
 
@@ -301,7 +305,7 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 				cost = 5;
 		}
 
-		cost += callers_team->get_map()[row][col];
+		cost += callers_team->get_map()[row][col] * 10;
 		const auto pn1 = new Node(pt, pn->get_target(), maze_.get_at_pos(pt.get_row(), pt.get_col()).get_value(), pn->get_g() + cost, pn);
 
 		const auto black_it = find(black.begin(), black.end(), *pn1);
@@ -449,7 +453,7 @@ void GameMgr::generate_map()
 	for (auto team : teams_)
 	{
 		std::cout << "Generating map for team " << team->get_team_name() << std::endl;
-		const int num_tries = 2000;
+		const int num_tries = 1500;
 
 		int col, row;
 		const auto size_factor = 2.0 / maze_size;
@@ -490,7 +494,7 @@ void GameMgr::clear_room_map(Room& room)
 void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 {
 	//const auto num_tries = room.get_height() * room.get_width();
-	const auto num_tries = 3;
+	const auto num_tries = 15;
 	auto other_team = my_team != teams_[0] ? teams_[0] : teams_[1];
 	//clear_room_map(room);
 
@@ -499,12 +503,17 @@ void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 		//const auto pt = room.get_random_point_in_room();
 		for (auto player : my_team->get_teammates())
 		{
-			if (room.get_left_top() == maze_.get_room_at(player->get_location()->get_point()).get_left_top())
+			if (player->is_in_room())
 			{
-				const auto pt = player->get_location()->get_point();
-				auto pg = new Grenade(pt.get_row(), pt.get_col());
-				pg->simulate_explosion(other_team->get_map(), maze_);
-				delete pg;
+				auto player_room = maze_.get_room_at(player->get_location()->get_point());
+				if (room.get_left_top() == player_room.get_left_top())
+				{
+					const auto pt = player->get_location()->get_point();
+					auto pg = new Grenade(pt.get_row(), pt.get_col());
+					pg->simulate_explosion(other_team->get_map(), maze_);
+					delete pg;
+				}
+
 			}
 		}
 	}
@@ -514,6 +523,7 @@ void GameMgr::find_rooms_with_fight()
 {
 	vector<vector<int>*> team_rooms;
 	int i = 0;
+	while (!fighting_rooms_->empty()) { fighting_rooms_->pop_back(); }
 	for (auto team : teams_)
 	{
 		team_rooms.push_back(new vector<int>());
@@ -529,8 +539,8 @@ void GameMgr::find_rooms_with_fight()
 	}
 
 	std::set_intersection(team_rooms[0]->begin(), team_rooms[0]->end(),
-		team_rooms[1]->begin(), team_rooms[1]->end(), fighting_rooms_->begin());
-	
+		team_rooms[1]->begin(), team_rooms[1]->end(), std::back_inserter(*fighting_rooms_));
+
 	delete team_rooms[0];
 	delete team_rooms[1];
 }
@@ -543,6 +553,55 @@ void GameMgr::check_if_teams_alive()
 		{
 			std::cout << "Team " << game_team->get_team_name() << " lost!" << std::endl;
 			is_game_over_ = true;
+		}
+	}
+}
+
+void GameMgr::explode_grenades()
+{
+	for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
+		if ((*itr)->get_is_exploded() == true)
+			PlaySound(TEXT("Sounds/Explosion.wav"), NULL, SND_ASYNC | SND_FILENAME);
+
+	grenades_.erase(std::remove_if(grenades_.begin(), grenades_.end(),
+		[](const auto g) { return g->get_is_exploded() == true; }),
+		grenades_.end());
+
+	for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
+	{
+		if ((*itr)->get_is_exploded() == false)
+		{
+			for (auto team : teams_)
+			{
+				for (auto i = 0; i < 3; ++i)
+				{
+					auto pg = new Grenade((*itr)->get_row(), (*itr)->get_col());
+					pg->simulate_explosion(team->get_map(), maze_);
+					delete pg;
+				}
+			}
+			(*itr)->explode(maze_);
+		}
+	}
+}
+
+void GameMgr::shoot_bullets()
+{
+	bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
+		[](const auto b) { return b->get_is_moving() == false; }),
+		bullets_.end());
+
+	for (auto itr = bullets_.begin(); itr != bullets_.end(); ++itr)
+	{
+		if ((*itr)->get_is_moving() == true)
+		{
+			for (auto team : teams_)
+			{
+				Bullet* bull = new Bullet((*itr)->get_x(), (*itr)->get_y());
+				bull->simulate_motion(team->get_map(), maze_);
+				delete bull;
+			}
+			(*itr)->move(maze_);
 		}
 	}
 }
@@ -574,31 +633,8 @@ void GameMgr::play_one_turn()
 			}
 		}
 
-		//very inefficient, but we never have too many grenades on the field at the same time so the runtime impact is negligible.
-		for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
-			if ((*itr)->get_is_exploded() == true)
-				PlaySound(TEXT("Sounds/Explosion.wav"), NULL, SND_ASYNC | SND_FILENAME);
-
-		grenades_.erase(std::remove_if(grenades_.begin(), grenades_.end(),
-			[](const auto g) { return g->get_is_exploded() == true; }),
-			grenades_.end());
-
-		for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
-			if ((*itr)->get_is_exploded() == false)
-				(*itr)->explode(maze_);
-
-
-		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
-			[](const auto b) { return b->get_is_moving() == false; }),
-			bullets_.end());
-
-		for (auto itr = bullets_.begin(); itr != bullets_.end(); ++itr)
-			if ((*itr)->get_is_moving() == true)
-				(*itr)->move(maze_);
-		//else
-			//bullets_.erase(itr);
-
-
+		explode_grenades();
+		shoot_bullets();
 	}
 
 	static int turn_counter = 0;
