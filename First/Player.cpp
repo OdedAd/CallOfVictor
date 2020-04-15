@@ -100,7 +100,7 @@ void Player::run_away()
 	}
 	catch (runtime_error&)
 	{ //player is in path or some other exception in finding the the player position
-		target = m_mgr_->get_safest_point_in_maze();
+		target = m_mgr_->get_safest_point_in_maze(this->m_team_);
 	}
 
 	if (m_is_running_for_hp_cond_)

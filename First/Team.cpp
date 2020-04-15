@@ -3,8 +3,6 @@
 #include <iostream>
 
 
-//todo: check if vector is necessary
-//TODO: CLEAR ALLOCATIONS OF EACH MAP
 Team::Team(const int color[COLOR_LENGTH], const std::vector<Player*> players) :
 	m_players_(players),players_alive_(0)
 {

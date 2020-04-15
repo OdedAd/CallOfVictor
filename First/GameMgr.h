@@ -50,7 +50,7 @@ public:
 	bool is_game_over() const;
 	void clear_all_resources();
 	Point2D get_safest_point_in_room(Room& room, Team* team);
-	Point2D get_safest_point_in_maze();
+	Point2D get_safest_point_in_maze(Team* team);
 
 	GameMgr(GameMgr const&) = delete;
 	GameMgr(GameMgr const &&) = delete;

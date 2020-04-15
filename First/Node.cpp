@@ -1,4 +1,6 @@
 #include "Node.h"
+
+#include <iostream>
 #include <math.h>
 
 
@@ -10,6 +12,11 @@ Node::Node()
 	g_ = 0;
 }
 
+//
+//Node::Node(const Node& other)
+//{
+//	std::cout<<"In copy node"<<std::endl;
+//}
 
 Node::Node(Point2D &pt, Point2D* t, int v, double g, Node* pr) {
 	point_ = pt;

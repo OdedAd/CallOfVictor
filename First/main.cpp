@@ -4,10 +4,6 @@
 #include <windows.h> 
 #include "GameMgr.h"
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
 using namespace std;
 
 const int width = 600; // window width
@@ -183,7 +179,6 @@ void idle()
 	{
 		cout << "Game Over!" << endl;
 		GameMgr::get_instance().clear_all_resources();
-		_CrtDumpMemoryLeaks();
 		system("pause");
 		exit(0);
 	}

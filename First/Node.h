@@ -22,6 +22,8 @@ public:
 	Node();
 	~Node() = default;
 
+	//Node(const Node& other);
+
 	Node(Point2D & pt, Point2D * t, int v, double g, Node * pr);
 
 private:

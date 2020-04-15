@@ -254,11 +254,6 @@ Node* GameMgr::a_star(Point2D& start, Point2D& target, Team* callers_team)
 		}
 	}
 
-	//while(!black.empty())
-	//{
-	//	
-	//}
-
 	return nullptr;
 }
 
@@ -278,7 +273,6 @@ void GameMgr::check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Nod
 	if (pn->get_point().get_col() < maze_size - 1)
 		check_node(pn->get_point().get_row(), pn->get_point().get_col() + 1, pn, gray, black, pq, callers_team);
 
-	//TODO: add diagonal movement support
 }
 
 void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
@@ -668,10 +662,9 @@ Point2D GameMgr::get_safest_point_in_room(Room& room, Team* team)
 	return Utils::find_minimum_in_room(maze_, room, team);
 }
 
-Point2D GameMgr::get_safest_point_in_maze()
+Point2D GameMgr::get_safest_point_in_maze(Team* team)
 {
-	//TODO: FIX CORRECT TEAM
-	return Utils::find_minimum_in_matrix(maze_, new Team());
+	return Utils::find_minimum_in_matrix(maze_, team);
 }
 
 Player* GameMgr::get_player_at_pos(Point2D& position)
