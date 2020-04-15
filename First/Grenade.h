@@ -17,8 +17,8 @@ class Grenade
 {
 public:
 	//Grenade() = default;
-	Grenade(double x, double y, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE);  //openGL cord
-	Grenade(int i, int j, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE); // maze cord
+	Grenade(double x, double y, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE, const double color[COLOR_LENGTH] = DEFAULT_GRENADE_COLOR);  //openGL cord
+	Grenade(int i, int j, int megatons = DEFAULT_MAGATONS, int fuze = DEFAULT_FUZE, const double color[COLOR_LENGTH] = DEFAULT_GRENADE_COLOR); // maze cord
 	~Grenade();
 	void explode(Maze& maze);
 	void show_me() const;
@@ -35,5 +35,7 @@ private:
 	int m_megatons;
 	int m_fuze;
 	bool isExploded;
+	//color in RGB
+	double m_color_[COLOR_LENGTH];
 };
 

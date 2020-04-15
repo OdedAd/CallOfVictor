@@ -1,5 +1,11 @@
 #pragma once
 
+#define COLOR_LENGTH 3
+
+static double DEFAULT_TEAM_COLOR[] = { 0 , 0 , 1 }; //blue
+static double DEFAULT_BULLET_COLOR[] = { 0 , 0 , 0 }; //black
+static double DEFAULT_GRENADE_COLOR[] = { 0.75 , 0.75 , 0.75 }; //grey
+
 #include "Room.h"
 
 class Team;

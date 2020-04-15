@@ -74,7 +74,7 @@ void GameMgr::generate_teams()
 
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
-		int color[3] = { i % 2,0,(i + 1) % 2 };
+		double color[3] = { i % 2,0,(i + 1) % 2 };
 		auto team = new Team(color);
 		//add a player in a random location at room 0
 		auto team_room = maze_.get_room_at(rooms[i]);
@@ -325,8 +325,8 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
 	double distance = calling_player_point.get_distance(target);
-	int start_i = calling_player_point.get_row();
-	int start_j = calling_player_point.get_col();
+	int start_i = target.get_row();
+	int start_j = target.get_col();
 
 	//int max_damage = targetPlayer->get_max_hp() / 5;
 
@@ -335,7 +335,7 @@ bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 	{
 		//grenades_.push_back(new Grenade(start_i, start_j, max_damage));
 		PlaySound(TEXT("Sounds/PinDrop.wav"), NULL, SND_ASYNC | SND_FILENAME);
-		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg()));
+		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg(), DEFAULT_FUZE, calling_player->get_team()->get_color()));
 		return true;
 	}
 	else

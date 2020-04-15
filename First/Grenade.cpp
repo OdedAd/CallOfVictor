@@ -2,24 +2,29 @@
 
 #include <iostream>
 
-Grenade::Grenade(const double x, const double y, const int megatons, const int fuze)
+Grenade::Grenade(const double x, const double y, const int megatons, const int fuze, const double color[COLOR_LENGTH])
 {
 	int i;
 	this->x_ = x;
 	this->y_ = y;
 	double alpha, delta = 2 * PI / NUM_BULLETS;
+	m_megatons = megatons;
+
+	for (int i = 0; i < COLOR_LENGTH; i++)
+		m_color_[i] = color[i];
+
 	for (i = 0, alpha = 0; i < NUM_BULLETS; i++, alpha += delta)
 	{
-		bullets_[i] = new Bullet(x, y, megatons);
+		bullets_[i] = new Bullet(x, y, m_megatons, m_color_);
 		bullets_[i]->set_dir(alpha);
 	}
 
-	m_megatons = megatons;
 	m_fuze = fuze;
 	isExploded = false;
+
 }
 
-Grenade::Grenade(const int i, const int j, const int megatons, const int fuze)
+Grenade::Grenade(const int i, const int j, const int megatons, const int fuze, const double color[COLOR_LENGTH])
 {
 	int index;
 	this->x_ = (j * 2.0) / (double)maze_size - 1;
@@ -29,10 +34,13 @@ Grenade::Grenade(const int i, const int j, const int megatons, const int fuze)
 	m_fuze = fuze;
 	isExploded = false;
 
+	for (int i = 0; i < COLOR_LENGTH; i++)
+		m_color_[i] = color[i];
+
 	double alpha, delta = 2 * PI / NUM_BULLETS;
 	for (index = 0, alpha = 0; index < NUM_BULLETS; index++, alpha += delta)
 	{
-		bullets_[index] = new Bullet(x_, y_, m_megatons);
+		bullets_[index] = new Bullet(x_, y_, m_megatons, m_color_);
 		bullets_[index]->set_dir(alpha);
 	}
 

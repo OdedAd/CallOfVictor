@@ -5,14 +5,15 @@ class Point2D;
 //#include "Maze.h"
 const double delta = 0.0001;
 
+
 class Bullet
 {
 public:
 	Bullet() = default;
 	~Bullet() = default;
 
-	Bullet(double x, double y, int stopping_power = 10); //openGL cord
-	Bullet(int i, int j, const Point2D& target_location, int stopping_power = 10);// maze cord
+	Bullet(double x, double y, int stopping_power = 10, const double color[COLOR_LENGTH] = DEFAULT_BULLET_COLOR); //openGL cord
+	Bullet(int i, int j, const Point2D& target_location, int stopping_power = 10, const double color[COLOR_LENGTH] = DEFAULT_BULLET_COLOR);// maze cord
 	void show_me() const;
 	void set_is_moving(bool move);
 	bool get_is_moving() const;
@@ -28,5 +29,7 @@ private:
 	double dirx_, diry_;
 	bool is_moving_;
 	int m_stopping_power_;
+	//color in RGB
+	double m_color_[COLOR_LENGTH];
 };
 

@@ -7,7 +7,7 @@ namespace std {
 	class runtime_error;
 }
 
-Bullet::Bullet(const double x, const double y, const int stopping_power)
+Bullet::Bullet(const double x, const double y, const int stopping_power, const double color[COLOR_LENGTH])
 {
 	this->x_ = x;
 	this->y_ = y;
@@ -19,9 +19,12 @@ Bullet::Bullet(const double x, const double y, const int stopping_power)
 	is_moving_ = false;
 
 	m_stopping_power_ = stopping_power;
+
+	for (int i = 0; i < COLOR_LENGTH; i++)
+		m_color_[i] = color[i];
 }
 
-Bullet::Bullet(const int i, const int j, const Point2D& target_location, const int stopping_power)
+Bullet::Bullet(const int i, const int j, const Point2D& target_location, const int stopping_power, const double color[COLOR_LENGTH])
 {
 	m_stopping_power_ = stopping_power;
 
@@ -32,11 +35,14 @@ Bullet::Bullet(const int i, const int j, const Point2D& target_location, const i
 	this->y_ = (i * 2.0) / (double)maze_size - 1;
 
 	is_moving_ = true;
+
+	for (int i = 0; i < COLOR_LENGTH; i++)
+		m_color_[i] = color[i];
 }
 
 void Bullet::show_me() const
 {
-	glColor3d(0, 0, 0);
+	glColor3d(m_color_[0] , m_color_[1], m_color_[2]);
 	glBegin(GL_POLYGON);
 	glVertex2d(x_ - 0.01, y_);
 	glVertex2d(x_, y_ + 0.01);
@@ -69,26 +75,38 @@ void Bullet::move(Maze& maze)
 	{
 		i = maze_size * (y_ + 1) / 2;
 		j = maze_size * (x_ + 1) / 2;
-		cur_value = maze.get_at_pos(i, j).get_value();
-		if (cur_value == SPACE)
-		{
-			x_ += 0.001 * dirx_;
-			y_ += 0.001 * diry_;
-			++travelDistance;
-		}
-		else if (cur_value == PLAYER)
-		{
-			//const auto distance = sqrt(pow(x_ - start_x, 2)
-			//	+ pow(y_ - start_y, 2)); // this is distance in the wierd ass graphical coordinates
-										// and it is unusable like this without some magic math.
-			int damage = m_stopping_power_ - (int)(travelDistance/10);
-			if (damage < 0) damage = 0;
-			GameMgr::get_instance().hit_player(Point2D(i, j), damage);
-
+		if(i < 0 || j < 0)
 			is_moving_ = false;
-		}
 		else
-			is_moving_ = false;
+		{
+			try
+			{
+				cur_value = maze.get_at_pos(i, j).get_value();
+				if (cur_value == SPACE)
+				{
+					x_ += 0.001 * dirx_;
+					y_ += 0.001 * diry_;
+					++travelDistance;
+				}
+				else if (cur_value == PLAYER)
+				{
+					//const auto distance = sqrt(pow(x_ - start_x, 2)
+					//	+ pow(y_ - start_y, 2)); // this is distance in the wierd ass graphical coordinates
+												// and it is unusable like this without some magic math.
+					int damage = m_stopping_power_ - (int)(travelDistance / 10);
+					if (damage < 0) damage = 0;
+					GameMgr::get_instance().hit_player(Point2D(i, j), damage);
+
+					is_moving_ = false;
+				}
+				else
+					is_moving_ = false;
+			}
+			catch(runtime_error e)
+			{
+				is_moving_ = false;
+			}
+		}
 	}
 }
 

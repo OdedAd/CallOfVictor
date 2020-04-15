@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-Team::Team(const int color[COLOR_LENGTH], const std::vector<Player*> players) :
+Team::Team(const double color[COLOR_LENGTH], const std::vector<Player*> players) :
 	m_players_(players),players_alive_(0)
 {
 	for (int i = 0; i < 3; i++)
@@ -54,12 +54,12 @@ void Team::add_player(Player* player)
 	players_alive_++;
 }
 
-const int* Team::get_color() const
+const double* Team::get_color() const
 {
 	return m_color_;
 }
 
-bool Team::compare_color(const int* other_color)
+bool Team::compare_color(const double* other_color)
 {
 	for (int i = 0; i < COLOR_LENGTH; ++i)
 	{
