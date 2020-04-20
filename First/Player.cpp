@@ -349,7 +349,8 @@ void Player::fill_path_stack()
 			m_cur_path_to_target_.push(&next_node->get_point());
 			next_node = next_node->get_parent();
 		}
-		m_cur_path_to_target_.push(new Point2D(next_node->get_point().get_row(), next_node->get_point().get_col()));// possible waste of memory
+		//m_cur_path_to_target_.push(new Point2D(next_node->get_point().get_row(), next_node->get_point().get_col()));// possible waste of memory
+		m_cur_path_to_target_.push(&next_node->get_point());
 
 		//delete next_node;
 	}
@@ -392,12 +393,32 @@ void Player::move(Maze& maze)
 	//maybe this two variables can be class members and not static.
 	//static int old_value = 0; // the last value of the node.
 
-	if (m_cur_path_to_target_.empty() || m_step_counter_ > 2) //every 2 steps reset the m_cur_path_to_target_ and make new one.
+	if (m_cur_path_to_target_.empty() || m_step_counter_ > 1) //every 2 steps reset the m_cur_path_to_target_ and make new one.
 	{
 		while (m_cur_path_to_target_.empty() == false)
-			m_cur_path_to_target_.pop();
+		{
+			//Point2D* curPoint = m_cur_path_to_target_.top();
+			//delete curPoint;
+			//m_cur_path_to_target_.pop();
+			//m_cur_path_to_target_ = std::stack<Point2D*>();
+			m_cur_path_to_target_ = {};
+		}
 		m_step_counter_ = 0;
+		//delete m_cur_target_node_;
+		if (m_cur_target_node_ != nullptr)
+		{
+			/*
+			Point2D tempPoint = m_cur_target_node_->get_point();
+			Point2D* tempPointP = &m_cur_target_node_->get_point();
 
+			Point2D tempPoint2 = *m_cur_target_node_->get_target();
+			Point2D* tempPointP2 = m_cur_target_node_->get_target();
+
+			delete m_cur_target_node_;
+			*tempPointP = tempPoint;
+			*tempPointP2 = tempPoint2;
+			*/
+		}
 		choose_action();
 	}
 

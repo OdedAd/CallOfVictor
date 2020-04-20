@@ -1,6 +1,7 @@
 #include "GameMgr.h"
 
 #include <iostream>
+#include <omp.h>
 
 ///
 ///Initialize the game. call all relevant initialization function and generate the maze
@@ -614,8 +615,20 @@ void GameMgr::play_one_turn()
 				clear_room_map(maze_.get_room_at(fighting_room));
 				generate_map_for_room(maze_.get_room_at(fighting_room), teams_[0] != cur_team ? cur_team : teams_[1]);
 			}
-			for (Player* cur_player : cur_team->get_teammates())
+			//for (Player* cur_player : cur_team->get_teammates())
+			/*
+			vector<Player*> activePlayers;
+			for (Player* curPlayer : cur_team->get_teammates())
+				if (curPlayer->get_hp() > 0 == true)
+					activePlayers.push_back(curPlayer);
+				else
+					curPlayer->set_is_moving(false);
+			*/
+			int index;
+			#pragma omp parallel for private (index) schedule(dynamic,1)
+			for(index = 0; index < cur_team->get_teammates().size(); index++)
 			{
+				Player* cur_player = cur_team->get_teammates().at(index);
 				if (cur_player->get_hp() > 0)
 				{
 					cur_player->move(maze_);
@@ -629,11 +642,13 @@ void GameMgr::play_one_turn()
 
 		explode_grenades();
 		shoot_bullets();
+
 	}
 
 	static int turn_counter = 0;
 	std::cout << " Turn " << ++turn_counter << " ended " << std::endl << std::endl;
 }
+
 
 bool GameMgr::is_game_over() const
 {
