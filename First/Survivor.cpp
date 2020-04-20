@@ -11,7 +11,7 @@ Survivor::Survivor(GameMgr* mgr, int id, Team* team, Node* location, int max_amm
 {
 
 	if (grenade_cost < 0)
-		m_grenade_ammo_cost_ = max_ammo;
+		m_grenade_ammo_cost_ = m_max_ammo_;
 	else
 		m_grenade_ammo_cost_ = grenade_cost;
 
@@ -21,23 +21,23 @@ Survivor::Survivor(GameMgr* mgr, int id, Team* team, Node* location, int max_amm
 		m_shooting_ammo_cost_ = shooting_ammo_cost;
 
 	if (melee_ammo_cost < 0)
-		m_melee_ammo_cost_ = max_ammo;
+		m_melee_ammo_cost_ = m_max_ammo_;
 	else
 		m_melee_ammo_cost_ = melee_ammo_cost;
 
 
 	if (grenade_dmg < 0)
-		m_grenade_dmg_ = maxHP / 5;
+		m_grenade_dmg_ = m_max_hp_ / 5;
 	else
 		m_grenade_dmg_ = grenade_dmg;
 
 	if (shooting_dmg < 0)
-		m_shooting_dmg_ = (int)(maxHP * (1.0 / 5.0));
+		m_shooting_dmg_ = (int)(m_max_hp_ * (1.0 / 5.0));
 	else
 		m_shooting_dmg_ = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg_ = maxHP / 4;
+		m_melee_dmg_ = m_max_hp_ / 4;
 	else
 		m_melee_dmg_ = melee_dmg;
 

@@ -10,6 +10,10 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 	m_ammo_(max_ammo), m_max_ammo_(max_ammo),
 	m_cur_hp_(max_hp), m_max_hp_(max_hp)
 {
+
+	m_max_ammo_ = m_max_ammo_ + (int)(rand() % (int)(m_max_ammo_ * 0.5)) - (int)(m_max_ammo_ * 0.25);
+	m_max_hp_ = m_max_hp_ + (int)(rand() % (int)(m_max_hp_ * 0.5)) - (int)(m_max_hp_ * 0.25);
+	
 	//random starting direction, later when we add the brain of the player
 	//the direction will be chosen somewhat intelligently before each move.
 	m_dirx_ = 0;//(int)(rand() % 3) - 1;
@@ -24,7 +28,7 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 
 
 	if (grenade_cost < 0)
-		m_grenade_ammo_cost_ = max_ammo / 2;
+		m_grenade_ammo_cost_ = m_max_ammo_ / 2;
 	else
 		m_grenade_ammo_cost_ = grenade_cost;
 
@@ -34,23 +38,23 @@ Player::Player(GameMgr* mgr, int id, Team* team, Node* location, const int max_a
 		m_shooting_ammo_cost_ = shooting_ammo_cost;
 
 	if (melee_ammo_cost < 0)
-		m_melee_ammo_cost_ = max_ammo;
+		m_melee_ammo_cost_ = m_max_ammo_;
 	else
 		m_melee_ammo_cost_ = melee_ammo_cost;
 
 
 	if (grenade_dmg < 0)
-		m_grenade_dmg_ = max_hp / 5;
+		m_grenade_dmg_ = m_max_hp_ / 5;
 	else
 		m_grenade_dmg_ = grenade_dmg;
 
 	if (shooting_dmg < 0)
-		m_shooting_dmg_ = max_hp / 3;
+		m_shooting_dmg_ = m_max_hp_ / 3;
 	else
 		m_shooting_dmg_ = shooting_dmg;
 
 	if (melee_dmg < 0)
-		m_melee_dmg_ = max_hp / 2;
+		m_melee_dmg_ = m_max_hp_ / 2;
 	else
 		m_melee_dmg_ = melee_dmg;
 

@@ -25,9 +25,9 @@ protected:
 
 	const int m_id_;
 	int m_ammo_;
-	const int m_max_ammo_;
+	int m_max_ammo_;
 	int m_cur_hp_;
-	const int m_max_hp_;
+	int m_max_hp_;
 
 	int m_grenade_ammo_cost_;
 	int m_shooting_ammo_cost_;
