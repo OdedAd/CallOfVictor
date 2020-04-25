@@ -9,7 +9,8 @@ class Grenadier :
 	public Player
 {
 public:
-	Grenadier(GameMgr* mgr, int id, Team* team, Node* location, int max_ammo = 7, int maxHP = 75,
+	Grenadier(GameMgr* mgr, int id, Team* team, Node* location, int steps_to_rethink = DEFAULT_STEPS_TO_RETHINK,
+		int max_ammo = 7, int maxHP = 75,
 		int grenade_cost = -1, int shooting_ammo_cost = -1, int melee_ammo_cost = -1,
 		int grenade_dmg = -1, int shooting_dmg = -1, int melee_dmg = -1);
 

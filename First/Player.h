@@ -11,6 +11,9 @@ static const int BERSERKER_TYPE = 1;
 static const int GRENADIER_TYPE = 2;
 static const int SURVIVOR_TYPE = 3;
 
+static const int DEFAULT_STEPS_TO_RETHINK = 2;
+
+
 class GameMgr;
 class Team;
 
@@ -46,6 +49,7 @@ protected:
 	bool m_is_moving_;
 	bool m_is_in_position_;
 	int m_step_counter_;
+	const int m_steps_to_rethink_; // how many steps to move without calling choose_action().
 
 	bool m_is_running_for_hp_cond_;
 	bool m_collision_;
@@ -86,7 +90,8 @@ protected:
 
 public:
 
-	Player(GameMgr* mgr ,int id, Team* team, Node* location, int max_ammo = 10, int max_hp = 100,
+	Player(GameMgr* mgr ,int id, Team* team, Node* location, int steps_to_rethink = DEFAULT_STEPS_TO_RETHINK,
+		int max_ammo = 10, int max_hp = 100,
 		int grenade_cost = -1, int shooting_ammo_cost = -1, int melee_ammo_cost = -1,
 		int grenade_dmg = -1, int shooting_dmg = -1, int melee_dmg = -1);
 	virtual ~Player() = default;

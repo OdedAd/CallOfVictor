@@ -2,10 +2,11 @@
 
 #include "GameMgr.h"
 
-Berserker::Berserker(GameMgr* mgr, int id, Team* team, Node* location, int max_ammo, int maxHP,
+Berserker::Berserker(GameMgr* mgr, int id, Team* team, Node* location, int steps_to_rethink,
+	int max_ammo, int maxHP,
 	int grenade_cost, int shooting_ammo_cost, int melee_ammo_cost,
 	int grenade_dmg, int shooting_dmg, int melee_dmg) :
-	Player(mgr, id, team, location, max_ammo, maxHP,
+	Player(mgr, id, team, location, steps_to_rethink, max_ammo, maxHP,
 		grenade_cost, shooting_ammo_cost, melee_ammo_cost,
 		grenade_dmg, shooting_dmg, melee_dmg)
 {
