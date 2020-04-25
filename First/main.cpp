@@ -16,9 +16,7 @@ bool move_on = false;
 void init()
 {
 	srand(time(nullptr)); // pseudo randomization
-
 	glClearColor(0.7, 0.7, 0.7, 0);
-
 	glOrtho(-1, 1, -1, 1, -1, 1);
 
 	GameMgr::get_instance().init_game();
@@ -55,8 +53,6 @@ void draw_maze()
 			default: break;
 			}
 
-			// draw rectangle
-
 			const auto x = j * size_factor - 1;
 			const auto y = i * size_factor - 1;
 
@@ -72,7 +68,6 @@ void draw_maze()
 
 void draw_map()
 {
-
 	double sz = sz = 2.0 / maze_size, xx, yy;
 	if (!is_show_room_map_calculated)
 	{
@@ -109,15 +104,12 @@ void draw_map()
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // clean frame buffer
-
 	draw_maze();
 
 	if (pg != nullptr)
 	{
-		//	pb->showMe();
 		pg->show_me();
 	}
-
 
 	for (auto cur_team : GameMgr::get_instance().get_teams())
 	{
@@ -149,29 +141,11 @@ void display_map()
 	glutSwapBuffers();// show what was drawn in "frame buffer"
 }
 
-// checks if dx,dy is on SPACE in maze
-bool check_is_space(const double dx, const double dy)
-{
-	int i = maze_size * (dy + 1) / 2;
-	int j = maze_size * (dx + 1) / 2;
-	return  GameMgr::get_instance().get_maze().get_at_pos(i, j).get_value() == SPACE;
-}
-
 void idle()
 {
-
 	Sleep(50);
 	if (move_on && !GameMgr::get_instance().is_game_over())
 	{
-		//if (pg != nullptr)
-		//{
-			////		pb->SetIsMoving(CheckIsSpace(pb->getX(),pb->getY()));
-			////		pb->move();
-			//pg->move_bullets(GameMgr::get_instance().get_maze());
-
-			////		move_on = pg->GetIsMoving();
-		//}
-
 		GameMgr::get_instance().play_one_turn();
 	}
 
@@ -182,7 +156,6 @@ void idle()
 		system("pause");
 		exit(0);
 	}
-
 	glutPostRedisplay();// calls indirectly to display
 }
 
@@ -192,19 +165,11 @@ void menu(const int choice)
 	{
 	case 1:
 		move_on = false;
-		//generate_map();
-		//map = game_mgr.get_maze().get_room_at(0).get_room_maze();
 		GameMgr::get_instance().generate_map();
 		glutDisplayFunc(display_map);
 		break;
 	case 2:
 		glutDisplayFunc(display);
-		//		pb->SetIsMoving(true);
-		//if (pg != nullptr)
-		//{
-		//	pg->explode();
-		//}
-
 		for (auto cur_team : GameMgr::get_instance().get_teams())
 			for (Player* cur_player : cur_team->get_teammates())
 				cur_player->set_is_moving(true);
@@ -213,15 +178,14 @@ void menu(const int choice)
 		break;
 
 	case 3:
-		for (auto cur_team : GameMgr::get_instance().get_teams())
-			for (Player* cur_player : cur_team->get_teammates())
+		for (auto* cur_team : GameMgr::get_instance().get_teams())
+			for (auto* cur_player : cur_team->get_teammates())
 			{
 				cur_player->set_hp(1);
 				cur_player->set_ammo(0);
 				cur_player->set_is_moving(true);
 			}
 		move_on = true;
-
 		break;
 
 	case 4:
@@ -234,17 +198,6 @@ void menu(const int choice)
 			}
 		move_on = true;
 		break;
-
-	case 5:
-		for (auto cur_team : GameMgr::get_instance().get_teams())
-			for (Player* cur_player : cur_team->get_teammates())
-			{
-				cur_player->set_hp(4);
-				cur_player->set_is_moving(true);
-			}
-		move_on = true;
-		break;
-
 	}
 }
 
@@ -255,12 +208,6 @@ void mouse(const int button, const int state, const int x, const int y)
 	{
 		xx = 2 * (double)x / width - 1;
 		yy = 2 * ((double)height - y) / height - 1;
-
-		//		pb = new Bullet(xx,yy);
-		//pg = new Grenade(xx, yy);
-		//GameMgr::get_instance().get_grenades().push_back(new Grenade(xx, yy));
-
-		//cout<< GameMgr::get_instance().get_grenades().size()<<endl;
 
 		cout << "player moving" << endl;
 		GameMgr::get_instance().get_teams()[0]->get_teammates()[0]->set_is_moving(true);
@@ -282,7 +229,7 @@ void main(int argc, char* argv[])
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(200, 100);
-	glutCreateWindow("Dungeon ");
+	glutCreateWindow("Dungeon");
 
 	glutDisplayFunc(display); // refresh function
 	glutIdleFunc(idle); // idle: when nothing happens
@@ -293,7 +240,6 @@ void main(int argc, char* argv[])
 	glutAddMenuEntry("Start Game", 2);
 	glutAddMenuEntry("Check Heal", 3);
 	glutAddMenuEntry("Check Reload", 4);
-	glutAddMenuEntry("Check Runaway", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	init();
