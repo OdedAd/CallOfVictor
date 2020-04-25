@@ -18,6 +18,9 @@ void GameMgr::init_game()
 	PlaySound(TEXT("Sounds/AtDoomsGate.wav"), NULL, SND_ASYNC | SND_FILENAME);
 }
 
+///
+/// return an instance of game manager
+///
 GameMgr& GameMgr::get_instance()
 {
 	static GameMgr* instance;
@@ -44,7 +47,7 @@ void GameMgr::generate_maze()
 void GameMgr::generate_pickups()
 {
 	std::cout << "-----Generating Pickups-----" << std::endl;
-	for (int i = 0; i < num_of_pickups; i++)
+	for (auto i = 0; i < num_of_pickups; i++)
 	{
 		init_pickup(PickupType::ammo, PICKUP_AMMO);
 		init_pickup(PickupType::med_kit, PICKUP_MED);
@@ -52,10 +55,15 @@ void GameMgr::generate_pickups()
 	std::cout << "-----Finished generating Pickups-----\n" << std::endl;
 }
 
+/**
+ * \brief initialize a pickup based on it's type and color
+ * \param type the pickup type to initialize
+ * \param color_type the color of the pickup
+ */
 void GameMgr::init_pickup(const PickupType type, const int color_type)
 {
 	const auto room = maze_.get_room_at(rand() % num_of_rooms);
-	const auto location = room.get_random_point_in_room();
+	auto* const location = room.get_random_point_in_room();
 	const auto pickup_object = PickupObject(location, type);
 	pickup_objects_.push_back(pickup_object);
 	maze_.get_at_pos(location->get_row(), location->get_col()).set_value(color_type);
@@ -70,8 +78,6 @@ void GameMgr::generate_teams()
 	int running_id = 0;
 	int rooms[2] = { 0,maze_.get_num_existing_rooms() - 1 };
 	const auto max_num_of_players = 4;
-	int player_max_ammo = 10;
-	int player_max_hp = 1000;
 
 	for (auto i = 0; i < num_of_teams; ++i)
 	{
@@ -107,27 +113,27 @@ void GameMgr::generate_teams()
 			{
 			case SNIPER_TYPE:
 			{
-				team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				team->add_player(new Sniper(this, ++running_id, team, &maze_.get_at_pos(k, j), (i + 1) * 2));
 				break;
 			}
 			case BERSERKER_TYPE:
 			{
-				team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				team->add_player(new Berserker(this, ++running_id, team, &maze_.get_at_pos(k, j), (i + 1) * 2));
 				break;
 			}
 			case GRENADIER_TYPE:
 			{
-				team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				team->add_player(new Grenadier(this, ++running_id, team, &maze_.get_at_pos(k, j), (i + 1) * 2));
 				break;
 			}
 			case SURVIVOR_TYPE:
 			{
-				team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				team->add_player(new Survivor(this, ++running_id, team, &maze_.get_at_pos(k, j), (i + 1) * 2));
 				break;
 			}
 			default:
 			{
-				team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j)));
+				team->add_player(new Player(this, ++running_id, team, &maze_.get_at_pos(k, j), (i + 1) * 2));
 				break;
 			}
 			}
@@ -138,21 +144,37 @@ void GameMgr::generate_teams()
 	std::cout << "-----Finished generating teams and players-----\n" << std::endl;
 }
 
+/**
+ * \brief get the maze object
+ * \return a reference to the maze object
+ */
 Maze& GameMgr::get_maze()
 {
 	return this->maze_;
 }
 
+/**
+ * \brief get all teams playing
+ * \return vector with the teams playing
+ */
 std::vector<Team*>& GameMgr::get_teams()
 {
 	return this->teams_;
 }
 
+/**
+ * \brief get all bullets for drawing purpose
+ * \return a vector containing all bullets
+ */
 vector<Bullet*>& GameMgr::get_bullets()
 {
 	return this->bullets_;
 }
 
+/**
+ * \brief get all grenades for drawing purpose
+ * \return a vector containing all grenades
+ */
 vector<Grenade*>& GameMgr::get_grenades()
 {
 	return this->grenades_;
@@ -169,15 +191,15 @@ void GameMgr::find_nearest_pickup(Point2D& location, Point2D& target, const Pick
 	temp_node.set_point(location);
 	double min_distance = -1;
 
-	for (PickupObject cur_pickup : pickup_objects_)
+	for (auto cur_pickup : pickup_objects_)
 	{
 		if (cur_pickup.get_type() == type && cur_pickup.get_quantity() > 0)
 		{
 			temp_node.set_target(cur_pickup.get_position());
-			double cur_distance = temp_node.compute_h();
-			if (min_distance == -1 || cur_distance < min_distance)
+			const auto current_distance = temp_node.compute_h();
+			if (min_distance == -1 || current_distance < min_distance)
 			{
-				min_distance = cur_distance;
+				min_distance = current_distance;
 				target = *cur_pickup.get_position();
 			}
 		}
@@ -222,6 +244,13 @@ Point2D& GameMgr::find_nearest_enemy(Point2D& location, Team& my_team, bool& is_
 	return *p;
 }
 
+/**
+ * \brief Implementation of the A* algorithm
+ * \param start the starting point for the algorithm
+ * \param target the target to search for
+ * \param callers_team the calling team
+ * \return the target node with all parents
+ */
 Node* GameMgr::a_star(Point2D& start, Point2D& target, Team* callers_team)
 {
 	std::priority_queue <Node*, std::vector<Node*>, CompareNodes> pq;
@@ -258,6 +287,14 @@ Node* GameMgr::a_star(Point2D& start, Point2D& target, Team* callers_team)
 	return nullptr;
 }
 
+/**
+ * \brief help function to the A* that checks all positions to march to
+ * \param pn the current node we are in
+ * \param gray the gray vector reference
+ * \param black the black vector reference
+ * \param pq the priority queue reference
+ * \param callers_team the team which invoked the a*
+ */
 void GameMgr::check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
 	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team)
 {
@@ -276,6 +313,16 @@ void GameMgr::check_neighbors(Node* pn, std::vector<Node>& gray, std::vector<Nod
 
 }
 
+/**
+ * \brief an helper function to the check_neighbor function that checks the given node in row and col
+ * \param row the row of the checked node
+ * \param col the column of the checked node
+ * \param pn the current node
+ * \param gray the gray vector reference
+ * \param black the black vector reference
+ * \param pq the priority queue reference
+ * \param callers_team the team which invoked the a*
+ */
 void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Node>& gray, std::vector<Node>& black,
 	std::priority_queue <Node*, std::vector<Node*>, CompareNodes>& pq, Team* callers_team)
 {
@@ -313,39 +360,46 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 	}
 }
 
-///
-///adds a team to the teams vector
-///
+/**
+ * \brief adds a team to the teams vector
+ * \param team the team to add
+ */
 void GameMgr::add_team(Team* team)
 {
 	this->teams_.push_back(team);
 }
 
+/**
+ * \brief throw grenade action
+ * \param calling_player the player who throws the grenade
+ * \param target the target point of the grenade
+ * \return true if player threw a grenade and false otherwise
+ */
 bool GameMgr::throw_grenade(Player* calling_player, Point2D& target)
 {
-	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
 	double distance = calling_player_point.get_distance(target);
-	int start_i = target.get_row();
-	int start_j = target.get_col();
-
-	//int max_damage = targetPlayer->get_max_hp() / 5;
 
 	if (distance < calling_player->get_throw_dis_max() &&
 		distance > calling_player->get_throw_dis_min())
 	{
-		//grenades_.push_back(new Grenade(start_i, start_j, max_damage));
+		int start_i = target.get_row();
+		int start_j = target.get_col();
 		PlaySound(TEXT("Sounds/PinDrop.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		grenades_.push_back(new Grenade(start_i, start_j, calling_player->get_grenade_dmg(), DEFAULT_FUZE, calling_player->get_team()->get_color()));
 		return true;
 	}
-	else
-		return false;
+	return false;
 }
 
+/**
+ * \brief the shoot action
+ * \param calling_player the player who shoots
+ * \param target the target point of the bullet
+ * \return true if player shot was successful and false otherwise
+ */
 bool GameMgr::shoot(Player* calling_player, Point2D& target)
 {
-	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
 
 	int start_i = calling_player_point.get_row();
@@ -356,7 +410,6 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 
 	if (calling_player_point.get_distance(target) <= 1)
 	{
-		//bullets_.push_back(new Bullet(start_i , start_j, target, max_damage));
 		PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
 		bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 		return true;
@@ -366,15 +419,11 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	{
 		Room& targets_room = maze_.get_room_at(target);
 		Room& player_room = maze_.get_room_at(calling_player_point);
-		//bool isInPosition = calling_player->get_into_position();
 		if (player_room == targets_room)
 		{
-			//if (isInPosition == true)
-			//{
 			bullets_.push_back(new Bullet(start_i, start_j, target, calling_player->get_shooting_dmg()));
 			PlaySound(TEXT("Sounds/Shoot.wav"), NULL, SND_ASYNC | SND_FILENAME);
 			return true;
-			//}
 		}
 	}
 	catch (...) {}; //if we get to the catch it means one of the points was not in a room
@@ -385,12 +434,16 @@ bool GameMgr::shoot(Player* calling_player, Point2D& target)
 	return false;
 }
 
+/**
+ * \brief the stab action
+ * \param calling_player the player who stabs
+ * \param target the target point of the stab
+ * \return true if player stab was successful and false otherwise
+ */
 bool GameMgr::stab(Player* calling_player, Point2D& target)
 {
 	Player* targetPlayer = get_player_at_pos(target);
 	Point2D calling_player_point = calling_player->get_location()->get_point();
-
-	//int max_damage = targetPlayer->get_max_hp() / 2;
 
 	if (targetPlayer->get_hp() > 0 && calling_player_point.get_distance(target) <= calling_player->get_stab_dis())
 	{
@@ -402,13 +455,22 @@ bool GameMgr::stab(Player* calling_player, Point2D& target)
 	return false;
 }
 
+/**
+ * \brief make the player at the target get hit
+ * \param target the target point
+ * \param damage the damage inflected
+ */
 void GameMgr::hit_player(Point2D& target, const int damage)
 {
-	//Player* targetPlayer = get_player_at_pos(target);
-	//targetPlayer->get_hit(damage);
 	get_player_at_pos(target)->get_hit(damage);
 }
 
+/**
+ * \brief collect a pickup action
+ * \param calling_player the player who collects the pickup
+ * \param target the target point of the pickup
+ * \return true if pickup successful and false otherwise
+ */
 bool GameMgr::pickup(Player* calling_player, Point2D& target)
 {
 	Node* target_node = &maze_.get_at_pos(target.get_row(), target.get_col());
@@ -436,16 +498,19 @@ bool GameMgr::pickup(Player* calling_player, Point2D& target)
 		else
 			return false;
 	}
-	else if (target_value == PLAYER || target_value == SPACE)
+	if (target_value == PLAYER || target_value == SPACE)
 		return false;
 	else
 		throw("at GameMgr::pickup , the given target point is not a pickup object");
 }
 
+/**
+ * \brief generate the heat map for each team
+ */
 void GameMgr::generate_map()
 {
 	std::cout << "Generating heat maps:" << std::endl;
-	for (auto team : teams_)
+	for (auto* team : teams_)
 	{
 		std::cout << "Generating map for team " << team->get_team_name() << std::endl;
 		const int num_tries = 1500;
@@ -471,6 +536,10 @@ void GameMgr::generate_map()
 	}
 }
 
+/**
+ * \brief clears the heat map of all teams in a specific room
+ * \param room the room which we need to clear
+ */
 void GameMgr::clear_room_map(Room& room)
 {
 	for (auto i = room.get_left_top().get_row(); i < room.get_right_bottom().get_row(); i++)
@@ -480,22 +549,23 @@ void GameMgr::clear_room_map(Room& room)
 			for (auto team : teams_)
 			{
 				team->get_map()[i][j] = 0;
-				//map_[i][j] = 0;
 			}
 		}
 	}
 }
 
+/**
+ * \brief generate the heat map for that specific room
+ * \param room the room to generate heat map to
+ * \param my_team the team who issued the call
+ */
 void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 {
-	//const auto num_tries = room.get_height() * room.get_width();
 	const auto num_tries = 15;
 	auto other_team = my_team != teams_[0] ? teams_[0] : teams_[1];
-	//clear_room_map(room);
 
 	for (auto i = 0; i < num_tries; i++)
 	{
-		//const auto pt = room.get_random_point_in_room();
 		for (auto player : my_team->get_teammates())
 		{
 			if (player->is_in_room())
@@ -508,21 +578,23 @@ void GameMgr::generate_map_for_room(Room& room, Team* my_team)
 					pg->simulate_explosion(other_team->get_map(), maze_);
 					delete pg;
 				}
-
 			}
 		}
 	}
 }
 
+/**
+ * \brief finds a room that contains at least 1 player for each team
+ */
 void GameMgr::find_rooms_with_fight()
 {
 	vector<vector<int>*> team_rooms;
 	int i = 0;
 	while (!fighting_rooms_->empty()) { fighting_rooms_->pop_back(); }
-	for (auto team : teams_)
+	for (auto* team : teams_)
 	{
 		team_rooms.push_back(new vector<int>());
-		for (auto player : team->get_teammates())
+		for (auto* player : team->get_teammates())
 		{
 			if (player->get_hp() > 0 && player->is_in_room())
 			{
@@ -540,6 +612,9 @@ void GameMgr::find_rooms_with_fight()
 	delete team_rooms[1];
 }
 
+/**
+ * \brief validates if any team lost
+ */
 void GameMgr::check_if_teams_alive()
 {
 	for (auto game_team : teams_)
@@ -552,6 +627,9 @@ void GameMgr::check_if_teams_alive()
 	}
 }
 
+/**
+ * \brief explodes a grenade
+ */
 void GameMgr::explode_grenades()
 {
 	for (auto itr = grenades_.begin(); itr != grenades_.end(); ++itr)
@@ -580,6 +658,9 @@ void GameMgr::explode_grenades()
 	}
 }
 
+/**
+ * \brief shoots bullets
+ */
 void GameMgr::shoot_bullets()
 {
 	bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
@@ -601,6 +682,9 @@ void GameMgr::shoot_bullets()
 	}
 }
 
+/**
+ * \brief the turn main function.
+ */
 void GameMgr::play_one_turn()
 {
 	check_if_teams_alive();
@@ -615,18 +699,9 @@ void GameMgr::play_one_turn()
 				clear_room_map(maze_.get_room_at(fighting_room));
 				generate_map_for_room(maze_.get_room_at(fighting_room), teams_[0] != cur_team ? cur_team : teams_[1]);
 			}
-			//for (Player* cur_player : cur_team->get_teammates())
-			/*
-			vector<Player*> activePlayers;
-			for (Player* curPlayer : cur_team->get_teammates())
-				if (curPlayer->get_hp() > 0 == true)
-					activePlayers.push_back(curPlayer);
-				else
-					curPlayer->set_is_moving(false);
-			*/
 			int index;
-			#pragma omp parallel for private (index) schedule(dynamic,1)
-			for(index = 0; index < cur_team->get_teammates().size(); index++)
+#pragma omp parallel for private (index) schedule(dynamic,1)
+			for (index = 0; index < cur_team->get_teammates().size(); index++)
 			{
 				Player* cur_player = cur_team->get_teammates().at(index);
 				if (cur_player->get_hp() > 0)
@@ -649,7 +724,10 @@ void GameMgr::play_one_turn()
 	std::cout << " Turn " << ++turn_counter << " ended " << std::endl << std::endl;
 }
 
-
+/**
+ * \brief checks if game has ended
+ * \return true if game is over
+ */
 bool GameMgr::is_game_over() const
 {
 	if (is_game_over_ == true)
@@ -658,6 +736,9 @@ bool GameMgr::is_game_over() const
 	return this->is_game_over_;
 }
 
+/**
+ * \brief clears all memory allocations of team
+ */
 void GameMgr::delete_team_related_allocations()
 {
 	for (auto game_team : teams_)
@@ -666,22 +747,41 @@ void GameMgr::delete_team_related_allocations()
 	}
 }
 
+/**
+ * \brief clears all gameMgr related allocation
+ */
 void GameMgr::clear_all_resources()
 {
 	delete_team_related_allocations();
 	delete fighting_rooms_;
 }
 
+/**
+ * \brief get the safest point in the room
+ * \param room the room which is searched
+ * \param team the team which issued the search
+ * \return a point which represents the safest point in the room
+ */
 Point2D GameMgr::get_safest_point_in_room(Room& room, Team* team)
 {
 	return Utils::find_minimum_in_room(maze_, room, team);
 }
 
+/**
+ * \brief get the safest point in the maze
+ * \param team the team which issued the search
+ * \return a point which represents the safest point in the maze
+ */
 Point2D GameMgr::get_safest_point_in_maze(Team* team)
 {
 	return Utils::find_minimum_in_matrix(maze_, team);
 }
 
+/**
+ * \brief get a player at a specific location
+ * \param position the position that we search
+ * \return a player in that position
+ */
 Player* GameMgr::get_player_at_pos(Point2D& position)
 {
 	for (auto curTeam : teams_)
@@ -692,6 +792,11 @@ Player* GameMgr::get_player_at_pos(Point2D& position)
 	throw "at GameMgr::get_player_at_pos , the given position is not a player";
 }
 
+/**
+ * \brief get a pickup at a specific location
+ * \param position the position that we search
+ * \return a pickup in that position
+ */
 PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
 {
 	for (PickupObject& curPickup : pickup_objects_)
@@ -699,14 +804,4 @@ PickupObject* GameMgr::get_pickup_at_pos(Point2D& position)
 			return &curPickup;
 
 	throw "at GameMgr::get_pickup_at_pos , the given position is not a PickupObject";
-}
-
-Player& GameMgr::get_player_at_pos_ref(Point2D& position)
-{
-	for (auto curTeam : teams_)
-		for (Player* curPlayer : curTeam->get_teammates())
-			if (curPlayer->get_location()->get_point() == position)
-				return *curPlayer;
-
-	throw "at GameMgr::get_player_at_pos , the given position is not a player";
 }

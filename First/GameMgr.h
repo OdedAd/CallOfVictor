@@ -77,7 +77,6 @@ private:
 
 	bool is_game_over_;
 
-	Player& get_player_at_pos_ref(Point2D& position);
 	PickupObject* get_pickup_at_pos(Point2D& position);
 
 };
