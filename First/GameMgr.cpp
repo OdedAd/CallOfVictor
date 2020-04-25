@@ -341,10 +341,14 @@ void GameMgr::check_node(const int row, const int col, Node* pn, std::vector<Nod
 		//	cost = 0.1;
 		else if (cur_node_value == PLAYER)
 		{ // player
-			if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
-				cost = 5000;
-			else
-				cost = 5;
+			try
+			{
+				if (callers_team != nullptr && get_player_at_pos(pt)->get_team() == callers_team)
+					cost = 5000;
+				else
+					cost = 5;
+			}
+			catch (...){cost = 15;}
 		}
 
 		cost += callers_team->get_map()[row][col] * 10;
